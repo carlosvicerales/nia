@@ -1,6 +1,7 @@
 {
   "name": "nia",
   "version": "1.0.0",
+//codex/instalar-dependencia-openai-y-reescribir-función
   "description": "Asesora virtual que realiza diagnósticos inteligentes de narrativa comercial B2B.",
   "main": "index.js",
   "scripts": {
@@ -12,5 +13,8 @@
   "type": "commonjs",
   "dependencies": {
     "openai": "^4.0.0"
+  "scripts": {
+    "test": "echo \"No tests specified\" && exit 0"
+//main
   }
 }
