@@ -1,0 +1,16 @@
+{
+  "name": "nia",
+  "version": "1.0.0",
+  "description": "Asesora virtual que realiza diagnósticos inteligentes de narrativa comercial B2B.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "openai": "^4.0.0"
+  }
+}

@@ -1,4 +1,6 @@
-const https = require('https');
+const { OpenAI } = require('openai');
+
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
 exports.handler = async (event, context) => {
   // Solo permitir POST
@@ -56,53 +58,22 @@ Responde EXACTAMENTE en este formato JSON:
   "recomendacion": "Recomendación personalizada específica basada en las respuestas, dirigida a ${nombre}. Sé empática pero directa, sugiere mejoras concretas."
 }`;
 
-    // Llamada a OpenAI
-    const openaiData = JSON.stringify({
-      model: "gpt-4o-mini",
+    // Llamada a OpenAI con el SDK oficial
+    const completion = await openai.chat.completions.create({
+      model: 'gpt-4o-mini',
       messages: [
         {
-          role: "system",
-          content: "Eres NIA, experta en narrativa comercial. Responde siempre en formato JSON válido."
+          role: 'system',
+          content:
+            'Eres NIA, experta en narrativa comercial. Responde siempre en formato JSON válido.'
         },
-        {
-          role: "user", 
-          content: prompt
-        }
+        { role: 'user', content: prompt }
       ],
       max_tokens: 500,
       temperature: 0.7
     });
 
-    const options = {
-      hostname: 'api.openai.com',
-      port: 443,
-      path: '/v1/chat/completions',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Length': Buffer.byteLength(openaiData)
-      }
-    };
-
-    const response = await new Promise((resolve, reject) => {
-      const req = https.request(options, (res) => {
-        let data = '';
-        res.on('data', (chunk) => data += chunk);
-        res.on('end', () => resolve({ statusCode: res.statusCode, data }));
-      });
-      
-      req.on('error', reject);
-      req.write(openaiData);
-      req.end();
-    });
-
-    if (response.statusCode !== 200) {
-      throw new Error(`OpenAI API error: ${response.statusCode}`);
-    }
-
-    const openaiResponse = JSON.parse(response.data);
-    const content = openaiResponse.choices[0].message.content;
+    const content = completion.choices[0].message.content;
     
     // Intentar parsear la respuesta JSON
     let result;
