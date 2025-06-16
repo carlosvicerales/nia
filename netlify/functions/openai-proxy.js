@@ -23,6 +23,16 @@ exports.handler = async (event, context) => {
   }
 
   try {
+    // Verificar que la API key de OpenAI esté configurada
+    if (!process.env.OPENAI_API_KEY) {
+      console.error('OpenAI API key not configured');
+      return {
+        statusCode: 500,
+        headers,
+        body: JSON.stringify({ error: 'OpenAI API key not configured' })
+      };
+    }
+
     const { responses, nombre } = JSON.parse(event.body);
     
     // Construir el prompt para OpenAI
