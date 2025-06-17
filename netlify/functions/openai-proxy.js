@@ -4,6 +4,9 @@ exports.handler = async function (event) {
   try {
     const { responses, nombre } = JSON.parse(event.body);
 
+    console.log("🧠 Generando diagnóstico para:", nombre);
+    console.log("📥 Respuestas:", responses);
+
     const prompt = `
 Actúa como NIA, una asesora virtual experta en narrativa comercial para empresas B2B.
 
@@ -41,33 +44,48 @@ Devuelve solo este JSON:
       method: "POST",
       headers: {
         "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
+        "Content-Type": "application/json"
       },
       body: JSON.stringify({
         model: "gpt-4o",
         messages: [
-          { role: "system", content: "Eres una asesora virtual experta en narrativa comercial B2B, llamada NIA." },
-          { role: "user", content: prompt }
+          {
+            role: "system",
+            content: "Eres NIA, una asesora empática y experta en narrativa comercial B2B."
+          },
+          {
+            role: "user",
+            content: prompt
+          }
         ],
-        temperature: 0.7
-      }),
+        temperature: 0.7,
+        max_tokens: 500
+      })
     });
 
     const data = await response.json();
 
-    const aiMessage = data.choices[0].message.content;
+    if (!data.choices || !data.choices[0]) {
+      throw new Error("No se recibió una respuesta válida de OpenAI");
+    }
 
+    const aiMessage = data.choices[0].message.content;
     const parsed = JSON.parse(aiMessage);
+
+    console.log("✅ Diagnóstico generado:", parsed);
 
     return {
       statusCode: 200,
-      body: JSON.stringify(parsed),
+      body: JSON.stringify(parsed)
     };
   } catch (error) {
-    console.error("Error:", error);
+    console.error("❌ Error generando diagnóstico:", error.message);
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: "Hubo un error al generar el diagnóstico." }),
+      body: JSON.stringify({
+        error: "Hubo un error al generar el diagnóstico.",
+        details: error.message
+      })
     };
   }
 };
