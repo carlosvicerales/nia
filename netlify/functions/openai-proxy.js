@@ -1,122 +1,73 @@
-const { OpenAI } = require('openai');
+const fetch = require("node-fetch");
 
-const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
-
-exports.handler = async (event, context) => {
-  // Solo permitir POST
-  if (event.httpMethod !== 'POST') {
-    return {
-      statusCode: 405,
-      body: JSON.stringify({ error: 'Method not allowed' })
-    };
-  }
-
-  // CORS headers
-  const headers = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'Content-Type',
-    'Access-Control-Allow-Methods': 'POST, OPTIONS',
-    'Content-Type': 'application/json'
-  };
-
-  // Handle preflight
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers, body: '' };
-  }
-
+exports.handler = async function (event) {
   try {
-    // Verificar que la API key de OpenAI esté configurada
-    if (!process.env.OPENAI_API_KEY) {
-      console.error('OpenAI API key not configured');
-      return {
-        statusCode: 500,
-        headers,
-        body: JSON.stringify({ error: 'OpenAI API key not configured' })
-      };
-    }
-
     const { responses, nombre } = JSON.parse(event.body);
-    
-    // Construir el prompt para OpenAI
+
     const prompt = `
-Eres NIA, asesora virtual experta en narrativa comercial entrenada por Carlos Henríquez.
+Actúa como NIA, una asesora virtual experta en narrativa comercial para empresas B2B.
 
-Analiza estas respuestas de una empresa B2B:
+Analiza las siguientes respuestas de un cliente y califica las siguientes dimensiones del 1 al 5:
 
-1. Tipo de clientes: ${responses[0] || 'No especificado'}
-2. Problema que resuelve: ${responses[1] || 'No especificado'}
-3. Resultado/transformación: ${responses[2] || 'No especificado'}
-4. Diferenciación: ${responses[3] || 'No especificado'}
-5. Narrativa actual: ${responses[4] || 'No especificado'}
+1. Claridad
+2. Foco en el cliente
+3. Promesa de transformación
+4. Diferenciación
+5. Autoridad / prueba social
 
-Evalúa la narrativa (pregunta 5) en estas 5 dimensiones con puntaje 1-5:
+Además, entrega una recomendación personalizada para mejorar su narrativa comercial.
 
-1. **Claridad** - ¿Se entiende fácilmente lo que hacen y para quién?
-2. **Foco en cliente** - ¿Está centrada en el cliente, no solo en la empresa?
-3. **Transformación** - ¿Hay un cambio o resultado claro para el cliente?
-4. **Diferenciación** - ¿Muestra algo único frente a competidores?
-5. **Autoridad** - ¿Hay evidencia de experiencia o resultados?
+Nombre del cliente: ${nombre}
+Respuestas:
+1. Tipo de cliente: ${responses[0]}
+2. Problema que resuelve: ${responses[1]}
+3. Transformación lograda: ${responses[2]}
+4. Diferenciación: ${responses[3]}
+5. Narrativa actual: ${responses[4]}
 
-Responde EXACTAMENTE en este formato JSON:
+Devuelve solo este JSON:
+
 {
-  "claridad": 3,
-  "foco_cliente": 2,
-  "transformacion": 4,
-  "diferenciacion": 2,
-  "autoridad": 3,
-  "total": 14,
-  "recomendacion": "Recomendación personalizada específica basada en las respuestas, dirigida a ${nombre}. Sé empática pero directa, sugiere mejoras concretas."
-}`;
+  "claridad": (número del 1 al 5),
+  "foco_cliente": (número del 1 al 5),
+  "transformacion": (número del 1 al 5),
+  "diferenciacion": (número del 1 al 5),
+  "autoridad": (número del 1 al 5),
+  "recomendacion": "Texto de la recomendación personalizada"
+}
+`;
 
-    // Llamada a OpenAI con el SDK oficial
-    const completion = await openai.chat.completions.create({
-      model: 'gpt-4o',
-      messages: [
-        {
-          role: 'system',
-          content:
-            'Eres NIA, experta en narrativa comercial. Responde siempre en formato JSON válido.'
-        },
-        { role: 'user', content: prompt }
-      ],
-      max_tokens: 500,
-      temperature: 0.7
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${process.env.OPENAI_API_KEY}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o",
+        messages: [
+          { role: "system", content: "Eres una asesora virtual experta en narrativa comercial B2B, llamada NIA." },
+          { role: "user", content: prompt }
+        ],
+        temperature: 0.7
+      }),
     });
 
-    const content = completion.choices[0].message.content;
-    
-    // Intentar parsear la respuesta JSON
-    let result;
-    try {
-      result = JSON.parse(content);
-    } catch (e) {
-      // Si no es JSON válido, crear respuesta por defecto
-      result = {
-        claridad: 3,
-        foco_cliente: 3,
-        transformacion: 3,
-        diferenciacion: 3,
-        autoridad: 3,
-        total: 15,
-        recomendacion: `${nombre}, tu narrativa tiene elementos positivos pero puede fortalecerse. Te recomiendo ser más específico sobre los resultados que generas y cómo te diferencias en tu mercado.`
-      };
-    }
+    const data = await response.json();
+
+    const aiMessage = data.choices[0].message.content;
+
+    const parsed = JSON.parse(aiMessage);
 
     return {
       statusCode: 200,
-      headers,
-      body: JSON.stringify(result)
+      body: JSON.stringify(parsed),
     };
-
   } catch (error) {
-    console.error('Error:', error);
+    console.error("Error:", error);
     return {
       statusCode: 500,
-      headers,
-      body: JSON.stringify({ 
-        error: 'Internal server error',
-        message: error.message 
-      })
+      body: JSON.stringify({ error: "Hubo un error al generar el diagnóstico." }),
     };
   }
 };
