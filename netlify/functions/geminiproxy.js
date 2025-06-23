@@ -1,14 +1,28 @@
-//gemini no responde bien
 const fetch = require('node-fetch');
 
 exports.handler = async function (event) {
   try {
-    const { nombre, responses } = JSON.parse(event.body);
+    if (event.httpMethod !== 'POST') {
+      return {
+        statusCode: 405,
+        body: JSON.stringify({ error: 'Método no permitido' })
+      };
+    }
+
+    const body = JSON.parse(event.body || '{}');
+    const { nombre, responses } = body;
+
+    if (!nombre || !responses || responses.length < 5) {
+      return {
+        statusCode: 400,
+        body: JSON.stringify({ error: 'Faltan datos en el body. Se requieren nombre y 5 respuestas.' })
+      };
+    }
 
     const prompt = `
-Actúa como NIA, asesora virtual experta en narrativa comercial para empresas B2B.
+Actúa como NIA, una asesora virtual experta en narrativa comercial para empresas B2B.
 
-Analiza las respuestas siguientes de un cliente llamado ${nombre} y califica las siguientes dimensiones del 1 al 5:
+Analiza las siguientes respuestas de un cliente y califica las siguientes dimensiones del 1 al 5:
 
 1. Claridad
 2. Foco en el cliente
@@ -16,68 +30,69 @@ Analiza las respuestas siguientes de un cliente llamado ${nombre} y califica las
 4. Diferenciación
 5. Autoridad / prueba social
 
-Entregando también una recomendación personalizada.
+Además, entrega una recomendación personalizada para mejorar su narrativa comercial.
 
+Nombre del cliente: ${nombre}
 Respuestas:
-1. ${responses[0]}
-2. ${responses[1]}
-3. ${responses[2]}
-4. ${responses[3]}
-5. ${responses[4]}
+1. Tipo de cliente: ${responses[0]}
+2. Problema que resuelve: ${responses[1]}
+3. Transformación lograda: ${responses[2]}
+4. Diferenciación: ${responses[3]}
+5. Narrativa actual: ${responses[4]}
 
-Devuelve este JSON:
+Devuelve solo este JSON:
 
 {
-  "claridad": (número),
-  "foco_cliente": (número),
-  "transformacion": (número),
-  "diferenciacion": (número),
-  "autoridad": (número),
-  "recomendacion": "texto personalizado"
+  "claridad": (número del 1 al 5),
+  "foco_cliente": (número del 1 al 5),
+  "transformacion": (número del 1 al 5),
+  "diferenciacion": (número del 1 al 5),
+  "autoridad": (número del 1 al 5),
+  "recomendacion": "Texto de la recomendación personalizada"
 }
-`;
+    `.trim();
 
-    if (!process.env.GEMINI_API_KEY) {
-      return {
-        statusCode: 500,
-        body: JSON.stringify({ error: "Falta la API Key de Gemini" })
-      };
-    }
+    const apiKey = process.env.GEMINI_API_KEY;
 
-    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+    const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: {
+        'Content-Type': 'application/json'
+      },
       body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
+        contents: [
+          {
+            parts: [{ text: prompt }]
+          }
+        ]
       })
     });
 
-    const result = await geminiResponse.json();
+    const data = await geminiResponse.json();
 
-    const raw = result?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-    if (!raw) {
+    if (!data.candidates || !data.candidates[0].content.parts[0].text) {
       return {
         statusCode: 500,
-        body: JSON.stringify({ error: "Gemini no devolvió contenido útil", dump: result })
+        body: JSON.stringify({ mensaje: 'Error procesando la respuesta de Gemini', data })
       };
     }
+
+    const resultado = data.candidates[0].content.parts[0].text;
 
     return {
       statusCode: 200,
       body: JSON.stringify({
-        mensaje: "🧠 Gemini procesó el diagnóstico",
-        resultado: raw
+        mensaje: '✅ Respuesta válida recibida de Gemini',
+        resultado
       })
     };
-
   } catch (error) {
-    console.error("❌ Error en Gemini:", error);
+    console.error('Error en geminiproxy:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        mensaje: "Error generando diagnóstico con Gemini",
-        error: error.message
+        mensaje: 'Error generando diagnóstico con Gemini',
+        error: error.message || error.toString()
       })
     };
   }
