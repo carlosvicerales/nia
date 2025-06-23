@@ -581,7 +581,7 @@
             }
         }
 
-        // frontend: reemplazo de generateDiagnosis() para Gemini
+        // frontend: generateDiagnosis adaptado SOLO para Gemini (sin webhook)
         async function generateDiagnosis() {
           const firstName = document.getElementById('firstName').value.trim();
           const lastName = document.getElementById('lastName').value.trim();
@@ -625,6 +625,7 @@
             if (!data.resultado) throw new Error("No se recibió respuesta válida de Gemini");
         
             const parsed = JSON.parse(data.resultado);
+        
             displayResults({
               scores: {
                 claridad: parsed.claridad,
@@ -640,6 +641,7 @@
             alert('Hubo un error generando tu diagnóstico. Por favor, intenta nuevamente.');
           }
         }
+
 
 
         async function sendToWebhook() {
