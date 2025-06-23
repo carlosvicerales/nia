@@ -53,7 +53,7 @@ Devuelve este JSON:
 
     const result = await geminiResponse.json();
 
-    const raw = result.candidates?.[0]?.content?.parts?.[0]?.text;
+    const raw = result?.candidates?.[0]?.content?.parts?.[0]?.text;
 
     if (!raw) {
       return {
