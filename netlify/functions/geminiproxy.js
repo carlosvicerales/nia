@@ -61,7 +61,10 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
     
     // --- LA ÚNICA LÍNEA QUE CAMBIA ES ESTA ---
     // Se ha cambiado 'v1beta' por 'v1'
-    const geminiAPI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-pro:generateContent?key=${apiKey}`;
+// Para cambiar al modelo de máxima calidad, solo harías esto:
+
+// const geminiAPI_URL = `pro latest`;
+    const geminiAPI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`;
     
     const geminiResponse = await fetch(geminiAPI_URL, {
       method: 'POST',
