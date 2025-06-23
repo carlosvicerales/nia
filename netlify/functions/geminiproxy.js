@@ -67,15 +67,49 @@ Devuelve solo este JSON:
         ]
       })
     });
-
-    const data = await geminiResponse.json();
-
-    if (!data.candidates || !data.candidates[0].content.parts[0].text) {
+    // CÓDIGO MODIFICADO PARA DEPURAR
+    const responseStatus = geminiResponse.status;
+    const responseText = await geminiResponse.text(); // ¡Obtén la respuesta como TEXTO!
+    
+    // Registra en la consola de tu función lo que realmente llegó
+    console.log('Status de la respuesta de Gemini:', responseStatus);
+    console.log('Texto de la respuesta de Gemini:', responseText);
+    
+    if (!geminiResponse.ok) {
+      // Si la respuesta no fue exitosa (ej: 401, 403, 500)
       return {
-        statusCode: 500,
-        body: JSON.stringify({ mensaje: 'Error procesando la respuesta de Gemini', data })
+        statusCode: responseStatus,
+        body: JSON.stringify({ 
+          mensaje: 'Error en la llamada a la API de Gemini.',
+          respuesta_recibida: responseText
+        })
       };
     }
+    
+    let data;
+    try {
+      // Solo intenta convertir a JSON si la llamada fue exitosa
+      data = JSON.parse(responseText); 
+    } catch (parseError) {
+      return {
+        statusCode: 500,
+        body: JSON.stringify({ 
+          mensaje: 'La respuesta de Gemini no es un JSON válido.',
+          error_parseo: parseError.message,
+          respuesta_recibida: responseText
+        })
+      };
+    }
+
+// Ahora el resto de tu lógica puede continuar de forma segura
+    if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+      return {
+      statusCode: 500,
+      body: JSON.stringify({ mensaje: 'Error: La respuesta de Gemini no tiene la estructura esperada.', data })
+      };
+    }
+// ... resto del código ...
+    
 
     const resultado = data.candidates[0].content.parts[0].text;
 
