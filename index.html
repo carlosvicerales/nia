@@ -612,7 +612,7 @@
               ]
             };
         
-            const response = await fetch('/.netlify/functions/openai-proxy', {
+            const response = await fetch('/.netlify/functions/geminiproxy', {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json'
@@ -669,7 +669,7 @@
         async function generateAIDiagnosis() {
 
             try {
-                const response = await fetch('/.netlify/functions/openai-proxy', {
+                const response = await fetch('/.netlify/functions/geminiproxy', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
