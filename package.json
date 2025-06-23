@@ -1,17 +1,8 @@
 {
-  "name": "nia",
+  "name": "nia-diagnostic-tool",
   "version": "1.0.0",
-  "description": "Asesora virtual que realiza diagnósticos inteligentes de narrativa comercial B2B.",
-  "main": "index.js",
-  "type": "commonjs",
-  "scripts": {
-    "test": "echo \"No tests specified\" && exit 0"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "description": "Función para conectar con la API de Gemini.",
   "dependencies": {
-    "openai": "^4.0.0",
-    "node-fetch": "^2.6.11"
+    "node-fetch": "^2.6.7"
   }
 }
