@@ -510,229 +510,190 @@
     </div>
 
    <script>
-        // Configuration
-        const WEBHOOK_URL = 'https://hook.eu1.make.com/tu-webhook-real'; // Replace with your webhook URL
-        
-        let currentQuestionIndex = 1;
-        let answers = {};
-        let userData = {};
+    // Configuration
+    const WEBHOOK_URL = 'https://hook.eu1.make.com/tu-webhook-real'; // Replace with your webhook URL
+    
+    let currentQuestionIndex = 1;
+    let answers = {};
+    let userData = {};
 
-        function startDiagnosis() {
-            document.getElementById('introScreen').style.display = 'none';
-            document.getElementById('progressContainer').style.display = 'block';
-            document.getElementById('questionScreens').style.display = 'block';
-            updateProgress();
-        }
+    function startDiagnosis() {
+        document.getElementById('introScreen').style.display = 'none';
+        document.getElementById('progressContainer').style.display = 'block';
+        document.getElementById('questionScreens').style.display = 'block';
+        updateProgress();
+    }
 
-        function nextQuestion(questionNumber) {
-            // Save current answer
-            const currentAnswer = document.getElementById(`answer${currentQuestionIndex}`).value.trim();
-            if (!currentAnswer) {
-                showError('Por favor, responde la pregunta antes de continuar.');
-                return;
-            }
-            
-            answers[`question${currentQuestionIndex}`] = currentAnswer;
-            
-            // Hide current question
-            document.getElementById(`question${currentQuestionIndex}`).style.display = 'none';
-            
-            // Show next question
-            currentQuestionIndex = questionNumber;
-            document.getElementById(`question${questionNumber}`).style.display = 'block';
-            
-            updateProgress();
-        }
-
-        function showDataCollection() {
-            // Save last answer
-            const lastAnswer = document.getElementById('answer5').value.trim();
-            if (!lastAnswer) {
-                showError('Por favor, responde la pregunta antes de continuar.');
-                return;
-            }
-            
-            answers.question5 = lastAnswer;
-            
-            // Hide question screens
-            document.getElementById('questionScreens').style.display = 'none';
-            
-            // Show data collection
-            document.getElementById('dataScreen').style.display = 'block';
-            currentQuestionIndex = 6;
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const progress = (currentQuestionIndex / 6) * 100;
-            document.getElementById('progressBar').style.width = `${progress}%`;
-            document.getElementById('currentStep').textContent = currentQuestionIndex;
-            
-            // Update step indicators
-            for (let i = 1; i <= 6; i++) {
-                const step = document.getElementById(`step${i}`);
-                if (i < currentQuestionIndex) {
-                    step.className = 'step-indicator step-completed';
-                } else if (i === currentQuestionIndex) {
-                    step.className = 'step-indicator step-active';
-                } else {
-                    step.className = 'step-indicator step-inactive';
-                }
-            }
-        }
-        
-        // --- CÓDIGO CORREGIDO ---
-        async function generateDiagnosis() {
-          const firstName = document.getElementById('firstName').value.trim();
-          const lastName = document.getElementById('lastName').value.trim();
-          const email = document.getElementById('email').value.trim();
-          const whatsapp = document.getElementById('whatsapp').value.trim();
-        
-          if (!firstName || !lastName || !email || !whatsapp) {
-            alert('Por favor, completa todos los campos.');
+    function nextQuestion(questionNumber) {
+        const currentAnswer = document.getElementById(`answer${currentQuestionIndex}`).value.trim();
+        if (!currentAnswer) {
+            showError('Por favor, responde la pregunta antes de continuar.');
             return;
-          }
+        }
+        answers[`question${currentQuestionIndex}`] = currentAnswer;
+        document.getElementById(`question${currentQuestionIndex}`).style.display = 'none';
+        currentQuestionIndex = questionNumber;
+        document.getElementById(`question${questionNumber}`).style.display = 'block';
+        updateProgress();
+    }
+
+    function showDataCollection() {
+        const lastAnswer = document.getElementById('answer5').value.trim();
+        if (!lastAnswer) {
+            showError('Por favor, responde la pregunta antes de continuar.');
+            return;
+        }
+        answers.question5 = lastAnswer;
+        document.getElementById('questionScreens').style.display = 'none';
+        document.getElementById('dataScreen').style.display = 'block';
+        currentQuestionIndex = 6;
+        updateProgress();
+    }
+
+    function updateProgress() {
+        const progress = (currentQuestionIndex / 6) * 100;
+        document.getElementById('progressBar').style.width = `${progress}%`;
+        document.getElementById('currentStep').textContent = currentQuestionIndex;
+        for (let i = 1; i <= 6; i++) {
+            const step = document.getElementById(`step${i}`);
+            if (i < currentQuestionIndex) {
+                step.className = 'step-indicator step-completed';
+            } else if (i === currentQuestionIndex) {
+                step.className = 'step-indicator step-active';
+            } else {
+                step.className = 'step-indicator step-inactive';
+            }
+        }
+    }
+    
+    // --- CÓDIGO CORREGIDO Y MÁS ROBUSTO ---
+    async function generateDiagnosis() {
+      const firstName = document.getElementById('firstName').value.trim();
+      const lastName = document.getElementById('lastName').value.trim();
+      const email = document.getElementById('email').value.trim();
+      const whatsapp = document.getElementById('whatsapp').value.trim();
+    
+      if (!firstName || !lastName || !email || !whatsapp) {
+        alert('Por favor, completa todos los campos.');
+        return;
+      }
+    
+      userData = { firstName, lastName, email, whatsapp };
+    
+      document.getElementById('dataScreen').style.display = 'none';
+      document.getElementById('progressContainer').style.display = 'none';
+      document.getElementById('loadingScreen').style.display = 'block';
+    
+      try {
+        const payload = {
+          nombre: firstName,
+          responses: [
+            answers.question1, answers.question2, answers.question3,
+            answers.question4, answers.question5
+          ]
+        };
+    
+        const response = await fetch('/.netlify/functions/geminiproxy', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload)
+        });
+    
+        // MANEJO DE ERRORES MEJORADO
+        if (!response.ok) {
+            // Si la respuesta es un 404 u otro error HTTP
+            const errorText = await response.text(); // Leemos el error como texto
+            console.error('Respuesta de error del servidor:', errorText);
+            throw new Error(`Error del servidor (${response.status}). La función 'geminiproxy' no se encontró o falló. Revisa el log de despliegue en Netlify.`);
+        }
+    
+        const data = await response.json(); // Solo intentamos leer JSON si la respuesta fue OK
+    
+        if (!data.resultado) {
+            throw new Error("La función respondió, pero no devolvió una estructura de resultado válida.");
+        }
+    
+        const parsed = data.resultado;
+    
+        displayResults({
+          scores: {
+            claridad: parsed.claridad, foco_cliente: parsed.foco_cliente,
+            transformacion: parsed.transformacion, diferenciacion: parsed.diferenciacion,
+            autoridad: parsed.autoridad
+          },
+          personalizedRecommendation: parsed.recomendacion
+        });
         
-          userData = { firstName, lastName, email, whatsapp };
+        sendToWebhook();
+
+      } catch (error) {
+        console.error('Error generando diagnóstico:', error);
+        // Ahora el alert mostrará el mensaje de error preciso que generamos
+        alert(`Hubo un error generando tu diagnóstico:\n\n${error.message}`);
         
-          // mostrar pantalla de carga
-          document.getElementById('dataScreen').style.display = 'none';
-          document.getElementById('progressContainer').style.display = 'none';
-          document.getElementById('loadingScreen').style.display = 'block';
-        
-          try {
-            const payload = {
-              nombre: firstName,
-              responses: [
-                answers.question1,
-                answers.question2,
-                answers.question3,
-                answers.question4,
-                answers.question5
-              ]
-            };
-        
-            // CORRECCIÓN 1: Apuntar a 'geminiproxy'
-            const response = await fetch('/.netlify/functions/geminiproxy', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify(payload)
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('dataScreen').style.display = 'block';
+        document.getElementById('progressContainer').style.display = 'block';
+      }
+    }
+    // --- FIN CÓDIGO CORREGIDO ---
+
+    async function sendToWebhook() {
+        const WEBHOOK_URL_REAL = 'https://hook.eu1.make.com/tu-webhook-real'; 
+        if (WEBHOOK_URL_REAL === 'https://hook.eu1.make.com/tu-webhook-real') return;
+        const webhookData = { userData, answers, timestamp: new Date().toISOString() };
+        try {
+            await fetch(WEBHOOK_URL_REAL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(webhookData)
             });
-        
-            const data = await response.json();
-        
-            if (!response.ok) {
-                throw new Error(data.mensaje || 'Error en el servidor de diagnóstico.');
-            }
-
-            if (!data.resultado) throw new Error("No se recibió una estructura de resultado válida.");
-        
-            // CORRECCIÓN 2: No usar JSON.parse(), 'data.resultado' ya es un objeto
-            const parsed = data.resultado;
-        
-            displayResults({
-              scores: {
-                claridad: parsed.claridad,
-                foco_cliente: parsed.foco_cliente,
-                transformacion: parsed.transformacion,
-                diferenciacion: parsed.diferenciacion,
-                autoridad: parsed.autoridad
-              },
-              personalizedRecommendation: parsed.recomendacion
-            });
-            
-            // Opcional: Enviar datos al webhook después de un diagnóstico exitoso
-            sendToWebhook();
-
-          } catch (error) {
-            console.error('Error generando diagnóstico:', error);
-            alert(`Hubo un error generando tu diagnóstico: ${error.message}. Por favor, intenta nuevamente.`);
-            // Ocultar pantalla de carga y volver a la pantalla de datos en caso de error
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('dataScreen').style.display = 'block';
-            document.getElementById('progressContainer').style.display = 'block';
-          }
+        } catch (error) {
+            console.error('Webhook error:', error);
         }
-        // --- FIN CÓDIGO CORREGIDO ---
+    }
 
-
-        async function sendToWebhook() {
-            // Se eliminó la constante WEBHOOK_URL de la parte superior y se definió aquí
-            // para que no cause error si no se usa. Reemplaza con tu URL real.
-            const WEBHOOK_URL_REAL = 'https://hook.eu1.make.com/tu-webhook-real'; 
-            if (WEBHOOK_URL_REAL === 'https://hook.eu1.make.com/tu-webhook-real') return;
-            
-            const webhookData = {
-                userData,
-                answers,
-                timestamp: new Date().toISOString()
-            };
-            
-            try {
-                await fetch(WEBHOOK_URL_REAL, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify(webhookData)
-                });
-            } catch (error) {
-                console.error('Webhook error:', error);
-            }
+    function displayResults(diagnosis) {
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('resultsScreen').style.display = 'block';
+        document.getElementById('resultName').textContent = userData.firstName + ',';
+        document.getElementById('personalizedRecommendationTitle').textContent = `Recomendación Personalizada para ${userData.firstName}`;
+        const scores = diagnosis.scores;
+        const totalScore = Object.values(scores).reduce((sum, score) => sum + (Number(score) || 0), 0);
+        document.getElementById('totalScore').textContent = totalScore;
+        const dimensionsContainer = document.getElementById('dimensionsResults');
+        const dimensionNames = {
+            claridad: 'Claridad', foco_cliente: 'Foco en el cliente',
+            transformacion: 'Promesa de transformación', diferenciacion: 'Diferenciación',
+            autoridad: 'Autoridad/Prueba'
+        };
+        let dimensionsHTML = '';
+        for (const [key, score] of Object.entries(scores)) {
+            const width = (score / 5) * 100;
+            const displayName = dimensionNames[key] || key;
+            dimensionsHTML += `
+                <div class="flex items-center justify-between mb-2">
+                    <span class="text-gray-300">${displayName}</span>
+                    <span class="text-white font-bold">${score}/5</span>
+                </div>
+                <div class="dimension-bar mb-4">
+                    <div class="dimension-fill dimension-${score}" style="width: ${width}%"></div>
+                </div>
+            `;
         }
+        dimensionsContainer.innerHTML = dimensionsHTML;
+        document.getElementById('personalizedRecommendation').textContent = diagnosis.personalizedRecommendation;
+    }
 
-        function displayResults(diagnosis) {
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('resultsScreen').style.display = 'block';
-            
-            document.getElementById('resultName').textContent = userData.firstName + ',';
-            document.getElementById('personalizedRecommendationTitle').textContent = `Recomendación Personalizada para ${userData.firstName}`;
-            
-            const scores = diagnosis.scores;
-            const totalScore = Object.values(scores).reduce((sum, score) => sum + (Number(score) || 0), 0);
-            
-            document.getElementById('totalScore').textContent = totalScore;
-            
-            const dimensionsContainer = document.getElementById('dimensionsResults');
-            const dimensionNames = {
-                claridad: 'Claridad',
-                foco_cliente: 'Foco en el cliente',
-                transformacion: 'Promesa de transformación',
-                diferenciacion: 'Diferenciación',
-                autoridad: 'Autoridad/Prueba'
-            };
-            
-            let dimensionsHTML = '';
-            for (const [key, score] of Object.entries(scores)) {
-                const width = (score / 5) * 100;
-                // Usar 'foco_cliente' como clave para el nombre de la dimensión
-                const displayName = dimensionNames[key] || key;
-                dimensionsHTML += `
-                    <div class="flex items-center justify-between mb-2">
-                        <span class="text-gray-300">${displayName}</span>
-                        <span class="text-white font-bold">${score}/5</span>
-                    </div>
-                    <div class="dimension-bar mb-4">
-                        <div class="dimension-fill dimension-${score}" style="width: ${width}%"></div>
-                    </div>
-                `;
-            }
-            dimensionsContainer.innerHTML = dimensionsHTML;
-            
-            document.getElementById('personalizedRecommendation').textContent = diagnosis.personalizedRecommendation;
-        }
+    function showError(message) {
+        document.getElementById('errorModalMessage').textContent = message;
+        document.getElementById('errorModal').classList.remove('hidden');
+    }
 
-        function showError(message) {
-            document.getElementById('errorModalMessage').textContent = message;
-            document.getElementById('errorModal').classList.remove('hidden');
-        }
-
-        function closeErrorModal() {
-            document.getElementById('errorModal').classList.add('hidden');
-        }
-    </script>
+    function closeErrorModal() {
+        document.getElementById('errorModal').classList.add('hidden');
+    }
+</script>
 
             <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 hidden">
                 <div class="glass-effect p-6 rounded-2xl max-w-md text-center">
