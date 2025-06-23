@@ -1,3 +1,4 @@
+//gemini no responde bien
 const fetch = require('node-fetch');
 
 exports.handler = async function (event) {
