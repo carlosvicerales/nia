@@ -509,7 +509,7 @@
         </footer>
     </div>
 
-    <script>
+   <script>
         // Configuration
         const WEBHOOK_URL = 'https://hook.eu1.make.com/tu-webhook-real'; // Replace with your webhook URL
         
@@ -580,8 +580,8 @@
                 }
             }
         }
-
-        // frontend: generateDiagnosis adaptado SOLO para Gemini (sin webhook)
+        
+        // --- CÓDIGO CORREGIDO ---
         async function generateDiagnosis() {
           const firstName = document.getElementById('firstName').value.trim();
           const lastName = document.getElementById('lastName').value.trim();
@@ -612,6 +612,7 @@
               ]
             };
         
+            // CORRECCIÓN 1: Apuntar a 'geminiproxy'
             const response = await fetch('/.netlify/functions/geminiproxy', {
               method: 'POST',
               headers: {
@@ -622,30 +623,46 @@
         
             const data = await response.json();
         
-            if (!data.resultado) throw new Error("No se recibió respuesta válida de Gemini");
+            if (!response.ok) {
+                throw new Error(data.mensaje || 'Error en el servidor de diagnóstico.');
+            }
+
+            if (!data.resultado) throw new Error("No se recibió una estructura de resultado válida.");
         
-            const parsed = JSON.parse(data.resultado);
+            // CORRECCIÓN 2: No usar JSON.parse(), 'data.resultado' ya es un objeto
+            const parsed = data.resultado;
         
             displayResults({
               scores: {
                 claridad: parsed.claridad,
-                foco: parsed.foco_cliente,
+                foco_cliente: parsed.foco_cliente,
                 transformacion: parsed.transformacion,
                 diferenciacion: parsed.diferenciacion,
                 autoridad: parsed.autoridad
               },
               personalizedRecommendation: parsed.recomendacion
             });
+            
+            // Opcional: Enviar datos al webhook después de un diagnóstico exitoso
+            sendToWebhook();
+
           } catch (error) {
-            console.error('Error generando diagnóstico con Gemini:', error);
-            alert('Hubo un error generando tu diagnóstico. Por favor, intenta nuevamente.');
+            console.error('Error generando diagnóstico:', error);
+            alert(`Hubo un error generando tu diagnóstico: ${error.message}. Por favor, intenta nuevamente.`);
+            // Ocultar pantalla de carga y volver a la pantalla de datos en caso de error
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('dataScreen').style.display = 'block';
+            document.getElementById('progressContainer').style.display = 'block';
           }
         }
-
+        // --- FIN CÓDIGO CORREGIDO ---
 
 
         async function sendToWebhook() {
-            if (WEBHOOK_URL === 'TU_WEBHOOK_URL') return; // Skip if not configured
+            // Se eliminó la constante WEBHOOK_URL de la parte superior y se definió aquí
+            // para que no cause error si no se usa. Reemplaza con tu URL real.
+            const WEBHOOK_URL_REAL = 'https://hook.eu1.make.com/tu-webhook-real'; 
+            if (WEBHOOK_URL_REAL === 'https://hook.eu1.make.com/tu-webhook-real') return;
             
             const webhookData = {
                 userData,
@@ -654,7 +671,7 @@
             };
             
             try {
-                await fetch(WEBHOOK_URL, {
+                await fetch(WEBHOOK_URL_REAL, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -666,93 +683,22 @@
             }
         }
 
-        async function generateAIDiagnosis() {
-
-            try {
-                const response = await fetch('/.netlify/functions/geminiproxy', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        responses: [
-                            answers.question1,
-                            answers.question2,
-                            answers.question3,
-                            answers.question4,
-                            answers.question5
-                        ],
-                        nombre: userData.firstName
-                    })
-                });
-
-                const result = await response.json();
-
-                // Transform response to match expected format
-                return {
-                    scores: {
-                        claridad: result.claridad || 3,
-                        foco: result.foco_cliente || 3,
-                        transformacion: result.transformacion || 3,
-                        diferenciacion: result.diferenciacion || 3,
-                        autoridad: result.autoridad || 3
-                    },
-                    personalizedRecommendation: result.recomendacion || `${userData.firstName}, tu narrativa tiene elementos positivos pero puede fortalecerse. Te recomiendo ser más específico sobre los resultados que generas y cómo te diferencias en tu mercado.`
-                };
-                
-            } catch (error) {
-                console.error('OpenAI API error:', error);
-                return generateMockDiagnosis();
-            }
-        }
-
-        function generateMockDiagnosis() {
-            // Fallback diagnosis for demo purposes
-            return {
-                scores: {
-                    claridad: 3,
-                    foco: 4,
-                    transformacion: 2,
-                    diferenciacion: 3,
-                    autoridad: 2
-                },
-                personalizedRecommendation: `Veo que tienes claridad sobre tu mercado objetivo, pero tu narrativa actual podría ser más específica sobre los resultados que generas. Te recomiendo liderar con el impacto concreto que logras para tus clientes antes de explicar cómo lo haces. Esto conectará mejor con empresarios que buscan resultados claros y medibles.`
-            };
-        }
-
         function displayResults(diagnosis) {
             document.getElementById('loadingScreen').style.display = 'none';
             document.getElementById('resultsScreen').style.display = 'block';
             
-            // Set name
-            document.getElementById('resultName').textContent = userData.firstName;
+            document.getElementById('resultName').textContent = userData.firstName + ',';
             document.getElementById('personalizedRecommendationTitle').textContent = `Recomendación Personalizada para ${userData.firstName}`;
             
-            // Calculate total score
             const scores = diagnosis.scores;
-            const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
-            const percentage = Math.round((totalScore / 25) * 100);
+            const totalScore = Object.values(scores).reduce((sum, score) => sum + (Number(score) || 0), 0);
             
             document.getElementById('totalScore').textContent = totalScore;
-            document.getElementById('scorePercentage').textContent = percentage + '%';
             
-            // Set score circle color
-            //const scoreCircle = document.getElementById('scoreCircle');
-            //if (percentage >= 80) {
-            //    scoreCircle.className = 'score-circle score-excellent';
-            //} else if (percentage >= 60) {
-            //    scoreCircle.className = 'score-circle score-good';
-            //} else if (percentage >= 40) {
-            //    scoreCircle.className = 'score-circle score-average';
-            //} else {
-            //    scoreCircle.className = 'score-circle score-poor';
-            //}
-            
-            // Display dimensions
             const dimensionsContainer = document.getElementById('dimensionsResults');
             const dimensionNames = {
                 claridad: 'Claridad',
-                foco: 'Foco en el cliente',
+                foco_cliente: 'Foco en el cliente',
                 transformacion: 'Promesa de transformación',
                 diferenciacion: 'Diferenciación',
                 autoridad: 'Autoridad/Prueba'
@@ -761,9 +707,11 @@
             let dimensionsHTML = '';
             for (const [key, score] of Object.entries(scores)) {
                 const width = (score / 5) * 100;
+                // Usar 'foco_cliente' como clave para el nombre de la dimensión
+                const displayName = dimensionNames[key] || key;
                 dimensionsHTML += `
                     <div class="flex items-center justify-between mb-2">
-                        <span class="text-gray-300">${dimensionNames[key]}</span>
+                        <span class="text-gray-300">${displayName}</span>
                         <span class="text-white font-bold">${score}/5</span>
                     </div>
                     <div class="dimension-bar mb-4">
@@ -773,31 +721,8 @@
             }
             dimensionsContainer.innerHTML = dimensionsHTML;
             
-            // Set personalized recommendation
             document.getElementById('personalizedRecommendation').textContent = diagnosis.personalizedRecommendation;
         }
-
-        // Add smooth scrolling and animation effects
-        document.addEventListener('DOMContentLoaded', function() {
-            // Add fade-in animations to elements as they appear
-            const observerOptions = {
-                threshold: 0.1,
-                rootMargin: '0px 0px -50px 0px'
-            };
-            
-            const observer = new IntersectionObserver(function(entries) {
-                entries.forEach(entry => {
-                    if (entry.isIntersecting) {
-                        entry.target.classList.add('fade-in');
-                    }
-                });
-            }, observerOptions);
-            
-            // Observe all question screens
-            document.querySelectorAll('.question-screen').forEach(screen => {
-                observer.observe(screen);
-            });
-        });
 
         function showError(message) {
             document.getElementById('errorModalMessage').textContent = message;
@@ -807,8 +732,6 @@
         function closeErrorModal() {
             document.getElementById('errorModal').classList.add('hidden');
         }
-
-       
     </script>
 
             <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 hidden">
