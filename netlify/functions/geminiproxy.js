@@ -1,24 +1,29 @@
+// Ruta completa: /netlify/functions/geminiproxy.js
+
 const fetch = require('node-fetch');
 
 exports.handler = async function (event) {
-  try {
-    if (event.httpMethod !== 'POST') {
-      return {
-        statusCode: 405,
-        body: JSON.stringify({ error: 'Método no permitido' })
-      };
-    }
+  // 1. Validar que el método sea POST
+  if (event.httpMethod !== 'POST') {
+    return {
+      statusCode: 405, // Method Not Allowed
+      body: JSON.stringify({ error: 'Método no permitido. Solo se aceptan solicitudes POST.' })
+    };
+  }
 
+  try {
+    // 2. Procesar los datos de entrada
     const body = JSON.parse(event.body || '{}');
     const { nombre, responses } = body;
 
-    if (!nombre || !responses || responses.length < 5) {
+    if (!nombre || !responses || !Array.isArray(responses) || responses.length < 5) {
       return {
-        statusCode: 400,
-        body: JSON.stringify({ error: 'Faltan datos en el body. Se requieren nombre y 5 respuestas.' })
+        statusCode: 400, // Bad Request
+        body: JSON.stringify({ error: 'Faltan datos en el body. Se requieren "nombre" y un arreglo de 5 "responses".' })
       };
     }
 
+    // 3. Construir el prompt para la API de Gemini
     const prompt = `
 Actúa como NIA, una asesora virtual experta en narrativa comercial para empresas B2B.
 
@@ -40,7 +45,7 @@ Respuestas:
 4. Diferenciación: ${responses[3]}
 5. Narrativa actual: ${responses[4]}
 
-Devuelve solo este JSON:
+Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni después:
 
 {
   "claridad": (número del 1 al 5),
@@ -53,7 +58,11 @@ Devuelve solo este JSON:
     `.trim();
 
     const apiKey = process.env.GEMINI_API_KEY;
-
+    if (!apiKey) {
+        throw new Error("La variable de entorno GEMINI_API_KEY no está configurada en Netlify.");
+    }
+    
+    // 4. Llamar a la API de Gemini
     const geminiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
@@ -67,66 +76,58 @@ Devuelve solo este JSON:
         ]
       })
     });
-    // CÓDIGO MODIFICADO PARA DEPURAR
-    const responseStatus = geminiResponse.status;
-    const responseText = await geminiResponse.text(); // ¡Obtén la respuesta como TEXTO!
-    
-    // Registra en la consola de tu función lo que realmente llegó
-    console.log('Status de la respuesta de Gemini:', responseStatus);
-    console.log('Texto de la respuesta de Gemini:', responseText);
-    
+
     if (!geminiResponse.ok) {
-      // Si la respuesta no fue exitosa (ej: 401, 403, 500)
-      return {
-        statusCode: responseStatus,
-        body: JSON.stringify({ 
-          mensaje: 'Error en la llamada a la API de Gemini.',
-          respuesta_recibida: responseText
-        })
-      };
+        const errorText = await geminiResponse.text();
+        console.error('Respuesta de error de Gemini:', errorText);
+        return {
+            statusCode: geminiResponse.status,
+            body: JSON.stringify({ mensaje: 'Error en la llamada a la API de Gemini.', detalles: errorText })
+        };
     }
     
-    let data;
-    try {
-      // Solo intenta convertir a JSON si la llamada fue exitosa
-      data = JSON.parse(responseText); 
-    } catch (parseError) {
+    const data = await geminiResponse.json();
+
+    // 5. Extraer y limpiar la respuesta de Gemini
+    if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
+      console.error('Estructura inesperada en la respuesta de Gemini:', data);
       return {
         statusCode: 500,
-        body: JSON.stringify({ 
-          mensaje: 'La respuesta de Gemini no es un JSON válido.',
-          error_parseo: parseError.message,
-          respuesta_recibida: responseText
-        })
+        body: JSON.stringify({ mensaje: 'Error procesando la respuesta de Gemini: estructura inesperada.', data })
       };
     }
 
-// Ahora el resto de tu lógica puede continuar de forma segura
-    if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
-      return {
-      statusCode: 500,
-      body: JSON.stringify({ mensaje: 'Error: La respuesta de Gemini no tiene la estructura esperada.', data })
-      };
+    // A veces Gemini devuelve el JSON dentro de un bloque de código markdown (```json ... ```)
+    const rawResult = data.candidates[0].content.parts[0].text;
+    const cleanedResult = rawResult.replace(/```json/g, '').replace(/```/g, '').trim();
+
+    let resultadoJson;
+    try {
+        resultadoJson = JSON.parse(cleanedResult);
+    } catch(e) {
+        console.error("No se pudo parsear el JSON de la respuesta de Gemini. Respuesta cruda:", rawResult);
+        return {
+            statusCode: 500,
+            body: JSON.stringify({ mensaje: 'La respuesta de Gemini no era un JSON válido.', respuesta_recibida: rawResult })
+        };
     }
-// ... resto del código ...
-    
 
-    const resultado = data.candidates[0].content.parts[0].text;
-
+    // 6. Devolver la respuesta final
     return {
       statusCode: 200,
       body: JSON.stringify({
-        mensaje: '✅ Respuesta válida recibida de Gemini',
-        resultado
+        mensaje: '✅ Diagnóstico generado con éxito',
+        resultado: resultadoJson
       })
     };
+
   } catch (error) {
-    console.error('Error en geminiproxy:', error);
+    console.error('Error en el handler de la función:', error);
     return {
       statusCode: 500,
       body: JSON.stringify({
-        mensaje: 'Error generando diagnóstico con Gemini',
-        error: error.message || error.toString()
+        mensaje: 'Error crítico en la función serverless.',
+        error: error.message
       })
     };
   }
