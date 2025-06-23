@@ -581,57 +581,66 @@
             }
         }
 
+        // frontend: reemplazo de generateDiagnosis() para Gemini
         async function generateDiagnosis() {
-            // Validate form
-            const firstName = document.getElementById('firstName').value.trim();
-            const lastName = document.getElementById('lastName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const whatsapp = document.getElementById('whatsapp').value.trim();
-            
-            if (!firstName || !lastName || !email || !whatsapp) {
-                showError('Por favor, completa todos los campos.');
-                return;
-            }
-             // Validación 2: Email debe tener formato válido
-            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-            if (!emailRegex.test(email)) {
-                showError('Por favor, ingresa un correo electrónico válido.');
-                return;
-            }
-
-            // Validación 3: WhatsApp debe tener formato internacional
-            const whatsappRegex = /^\+\d{10,15}$/;
-            if (!whatsappRegex.test(whatsapp)) {
-                showError('Por favor, ingresa un número de WhatsApp válido en formato internacional (ej: +56912345678).');
-                return;
-            }
-
-            userData = { firstName, lastName, email, whatsapp };
-            
-            // Show loading screen
-            document.getElementById('dataScreen').style.display = 'none';
-            document.getElementById('progressContainer').style.display = 'none';
-            document.getElementById('loadingScreen').style.display = 'block';
-            
-            try {
-                // Send data to webhook
-                await sendToWebhook();
-                
-                // Generate diagnosis with AI
-                const diagnosis = await generateAIDiagnosis();
-                
-                // Show results
-                displayResults(diagnosis);
-                
-            } catch (error) {
-                console.error('Error generating diagnosis:', error);
-                showError('Hubo un error generando tu diagnóstico. Por favor, intenta nuevamente.');
-                
-                // Fallback to mock diagnosis
-                const mockDiagnosis = generateMockDiagnosis();
-                displayResults(mockDiagnosis);
-            }
+          const firstName = document.getElementById('firstName').value.trim();
+          const lastName = document.getElementById('lastName').value.trim();
+          const email = document.getElementById('email').value.trim();
+          const whatsapp = document.getElementById('whatsapp').value.trim();
+        
+          if (!firstName || !lastName || !email || !whatsapp) {
+            alert('Por favor, completa todos los campos.');
+            return;
+          }
+        
+          userData = { firstName, lastName, email, whatsapp };
+        
+          // mostrar pantalla de carga
+          document.getElementById('dataScreen').style.display = 'none';
+          document.getElementById('progressContainer').style.display = 'none';
+          document.getElementById('loadingScreen').style.display = 'block';
+        
+          try {
+            const payload = {
+              nombre: firstName,
+              responses: [
+                answers.question1,
+                answers.question2,
+                answers.question3,
+                answers.question4,
+                answers.question5
+              ]
+            };
+        
+            const response = await fetch('/.netlify/functions/openai-proxy', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(payload)
+            });
+        
+            const data = await response.json();
+        
+            if (!data.resultado) throw new Error("No se recibió respuesta válida de Gemini");
+        
+            const parsed = JSON.parse(data.resultado);
+            displayResults({
+              scores: {
+                claridad: parsed.claridad,
+                foco: parsed.foco_cliente,
+                transformacion: parsed.transformacion,
+                diferenciacion: parsed.diferenciacion,
+                autoridad: parsed.autoridad
+              },
+              personalizedRecommendation: parsed.recomendacion
+            });
+          } catch (error) {
+            console.error('Error generando diagnóstico con Gemini:', error);
+            alert('Hubo un error generando tu diagnóstico. Por favor, intenta nuevamente.');
+          }
         }
+
 
         async function sendToWebhook() {
             if (WEBHOOK_URL === 'TU_WEBHOOK_URL') return; // Skip if not configured
