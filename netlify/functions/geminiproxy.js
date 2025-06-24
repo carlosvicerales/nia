@@ -63,8 +63,8 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
     // Se ha cambiado 'v1beta' por 'v1'
 // Para cambiar al modelo de máxima calidad, solo harías esto:
 
-// const geminiAPI_URL = `pro latest`;
-    const geminiAPI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-pro-latest:generateContent?key=${apiKey}`;
+// Asegúrate de que la línea de la URL en geminiproxy.js sea esta:
+    const geminiAPI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
     
     const geminiResponse = await fetch(geminiAPI_URL, {
       method: 'POST',
