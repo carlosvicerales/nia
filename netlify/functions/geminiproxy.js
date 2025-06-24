@@ -53,7 +53,7 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
     const projectId = 'nia-asistente-de-narrativa'; // Reemplazar si creaste un proyecto nuevo
     
     // CORRECCIÓN 1: Usamos el nombre de modelo oficial y estable para garantizar el funcionamiento a largo plazo.
-    const modelId = 'gemini-2.0-flash-001';
+    const modelId = 'gemini-2.0-flash-lite-001';
     const location = 'us-central1';
     const vertexAPI_URL = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${modelId}:generateContent`;
 
