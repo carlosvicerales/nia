@@ -1,12 +1,34 @@
 // Ruta: /netlify/functions/geminiproxy.js
+const { GoogleAuth } = require('google-auth-library');
 
-const fetch = require('node-fetch');
+// --- Helper para obtener el token de autenticación ---
+async function getAuthToken() {
+  const credentialsBase64 = process.env.GOOGLE_CREDENTIALS_BASE64;
+  if (!credentialsBase64) {
+    throw new Error("La variable de entorno GOOGLE_CREDENTIALS_BASE64 no está configurada.");
+  }
+  
+  // Decodificar las credenciales de Base64 a JSON
+  const credentialsJson = Buffer.from(credentialsBase64, 'base64').toString('utf-8');
+  const credentials = JSON.parse(credentialsJson);
 
+  const auth = new GoogleAuth({
+    credentials,
+    scopes: 'https://www.googleapis.com/auth/cloud-platform',
+  });
+
+  const client = await auth.getClient();
+  const accessToken = await client.getAccessToken();
+  return accessToken.token;
+}
+
+
+// --- Handler principal de la función ---
 exports.handler = async function (event) {
   if (event.httpMethod !== 'POST') {
     return {
       statusCode: 405,
-      body: JSON.stringify({ error: 'Método no permitido. Solo se aceptan solicitudes POST.' })
+      body: JSON.stringify({ error: 'Método no permitido.' })
     };
   }
 
@@ -17,7 +39,7 @@ exports.handler = async function (event) {
     if (!nombre || !responses || !Array.isArray(responses) || responses.length < 5) {
       return {
         statusCode: 400,
-        body: JSON.stringify({ error: 'Faltan datos en el body. Se requieren "nombre" y un arreglo de 5 "responses".' })
+        body: JSON.stringify({ error: 'Faltan datos en el body.' })
       };
     }
 
@@ -45,58 +67,55 @@ Respuestas:
 Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni después:
 
 {
-  "claridad": (número del 1 al 5),
-  "foco_cliente": (número del 1 al 5),
-  "transformacion": (número del 1 al 5),
-  "diferenciacion": (número del 1 al 5),
-  "autoridad": (número del 1 al 5),
+  "claridad": 1,
+  "foco_cliente": 1,
+  "transformacion": 1,
+  "diferenciacion": 1,
+  "autoridad": 1,
   "recomendacion": "Texto de la recomendación personalizada"
 }
     `.trim();
 
-    const apiKey = process.env.GEMINI_API_KEY;
-    if (!apiKey) {
-        throw new Error("La variable de entorno GEMINI_API_KEY no está configurada en Netlify.");
-    }
-    
-    // --- LA ÚNICA LÍNEA QUE CAMBIA ES ESTA ---
-    // Se ha cambiado 'v1beta' por 'v1'
-// Para cambiar al modelo de máxima calidad, solo harías esto:
+    // Obtener el token de autenticación
+    const authToken = await getAuthToken();
 
-// Asegúrate de que la línea de la URL en geminiproxy.js sea esta:
-    const geminiAPI_URL = `https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash-latest:generateContent?key=${apiKey}`;
+    const projectId = 'nia-asistente-de-narrativa'; // Tu Project ID
+    const modelId = 'gemini-1.5-flash-001'; // Usamos un modelo específico de Vertex
+    const location = 'us-central1';
+
+    // URL del endpoint de Vertex AI
+    const vertexAPI_URL = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${modelId}:generateContent`;
+
+    // Usamos la librería 'node-fetch' que ya teníamos
+    const fetch = (await import('node-fetch')).default;
     
-    const geminiResponse = await fetch(geminiAPI_URL, {
+    const vertexResponse = await fetch(vertexAPI_URL, {
       method: 'POST',
       headers: {
+        'Authorization': `Bearer ${authToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        contents: [
-          {
-            parts: [{ text: prompt }]
-          }
-        ]
+        contents: [{ role: 'user', parts: [{ text: prompt }] }]
       })
     });
 
-    if (!geminiResponse.ok) {
-        const errorText = await geminiResponse.text();
-        console.error('Respuesta de error de Gemini:', errorText);
-        // Devolvemos el status code que nos dio Gemini para un mejor debug
-        return {
-            statusCode: geminiResponse.status,
-            body: JSON.stringify({ mensaje: 'Error en la llamada a la API de Gemini.', detalles: errorText })
-        };
+    if (!vertexResponse.ok) {
+      const errorText = await vertexResponse.text();
+      console.error('Respuesta de error de Vertex AI:', errorText);
+      return {
+        statusCode: vertexResponse.status,
+        body: JSON.stringify({ mensaje: 'Error en la llamada a la API de Vertex AI.', detalles: errorText })
+      };
     }
     
-    const data = await geminiResponse.json();
+    const data = await vertexResponse.json();
 
     if (!data.candidates || !data.candidates[0]?.content?.parts[0]?.text) {
-      console.error('Estructura inesperada en la respuesta de Gemini:', data);
+      console.error('Estructura inesperada en la respuesta de Vertex AI:', data);
       return {
         statusCode: 500,
-        body: JSON.stringify({ mensaje: 'Error procesando la respuesta de Gemini: estructura inesperada.', data })
+        body: JSON.stringify({ mensaje: 'Error procesando la respuesta de Vertex AI.', data })
       };
     }
 
@@ -107,10 +126,10 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
     try {
         resultadoJson = JSON.parse(cleanedResult);
     } catch(e) {
-        console.error("No se pudo parsear el JSON de la respuesta de Gemini. Respuesta cruda:", rawResult);
+        console.error("No se pudo parsear el JSON de la respuesta de Vertex AI:", rawResult);
         return {
             statusCode: 500,
-            body: JSON.stringify({ mensaje: 'La respuesta de Gemini no era un JSON válido.', respuesta_recibida: rawResult })
+            body: JSON.stringify({ mensaje: 'La respuesta de Vertex AI no era un JSON válido.', respuesta_recibida: rawResult })
         };
     }
 
@@ -128,7 +147,7 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
       statusCode: 500,
       body: JSON.stringify({
         mensaje: 'Error crítico en la función serverless.',
-        error: error.message
+        error: error.message || error.toString()
       })
     };
   }
