@@ -12,7 +12,7 @@ async function getAuthToken() {
 
   const auth = new GoogleAuth({
     credentials,
-    scopes: 'https://www.googleapis.com/auth/cloud-platform',
+    scopes: '[https://www.googleapis.com/auth/cloud-platform](https://www.googleapis.com/auth/cloud-platform)',
   });
 
   const client = await auth.getClient();
@@ -50,9 +50,10 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
     `.trim();
 
     const authToken = await getAuthToken();
-    const projectId = 'nia-asistente-de-narrativa';
-    // Puedes cambiar entre '-1.5-flash-001' o 'gemini-1.5-pro-latest' si ya tienes facturación activa
-    const modelId = 'gemini-2.0-flash-lite-001';
+    const projectId = 'nia-asistente-de-narrativa'; // Reemplazar si creaste un proyecto nuevo
+    
+    // CORRECCIÓN 1: Usamos el nombre de modelo oficial y estable para garantizar el funcionamiento a largo plazo.
+    const modelId = 'gemini-2.0-flash-001';
     const location = 'us-central1';
     const vertexAPI_URL = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${modelId}:generateContent`;
 
@@ -87,22 +88,23 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
 
     const rawResult = data.candidates[0].content.parts[0].text;
     
-    // --- LÓGICA DE LIMPIEZA MEJORADA ---
-    // Buscamos el primer '{' para asegurarnos de empezar a leer el JSON desde el punto correcto,
-    // ignorando cualquier texto o marcador que la IA haya puesto antes (como `json` o ```json).
+    // CORRECCIÓN 2: Lógica de limpieza a prueba de balas para solucionar el error 500.
+    // Extrae el contenido desde el primer '{' hasta el último '}'
     const jsonStartIndex = rawResult.indexOf('{');
-    if (jsonStartIndex === -1) {
+    const jsonEndIndex = rawResult.lastIndexOf('}');
+    
+    if (jsonStartIndex === -1 || jsonEndIndex === -1) {
         console.error("La respuesta de la IA no contenía un objeto JSON válido.", rawResult);
         return { statusCode: 500, body: JSON.stringify({ mensaje: 'La respuesta de la IA no contenía un objeto JSON.' }) };
     }
-    const cleanedResult = rawResult.substring(jsonStartIndex);
-    // --- FIN DE LA LÓGICA DE LIMPIEZA ---
+    // Extraemos la subcadena que contiene solo el JSON.
+    const cleanedResult = rawResult.substring(jsonStartIndex, jsonEndIndex + 1);
 
     let resultadoJson;
     try {
         resultadoJson = JSON.parse(cleanedResult);
     } catch(e) {
-        console.error("No se pudo parsear el JSON de la respuesta de Vertex AI, incluso después de limpiar:", cleanedResult);
+        console.error("No se pudo parsear el JSON, incluso después de limpiar:", cleanedResult);
         return {
             statusCode: 500,
             body: JSON.stringify({ mensaje: 'La respuesta de Vertex AI no era un JSON válido.', error: e.message, respuesta_recibida: cleanedResult })
