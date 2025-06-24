@@ -80,7 +80,7 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
     const authToken = await getAuthToken();
 
     const projectId = 'nia-asistente-de-narrativa'; // Tu Project ID
-    const modelId = 'gemini-1.5-flash-001'; // Usamos un modelo específico de Vertex
+    const modelId = 'gemini-2.0-flash-lite-001'; // Usamos un modelo específico de Vertex
     const location = 'us-central1';
 
     // URL del endpoint de Vertex AI
