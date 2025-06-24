@@ -51,8 +51,8 @@ Devuelve solo y únicamente el siguiente objeto JSON, sin nada más antes ni des
 
     const authToken = await getAuthToken();
     const projectId = 'nia-asistente-de-narrativa';
-    // Puedes cambiar entre 'gemini-1.5-flash-001' o 'gemini-1.5-pro-latest' si ya tienes facturación activa
-    const modelId = 'gemini-1.5-flash-001';
+    // Puedes cambiar entre '-1.5-flash-001' o 'gemini-1.5-pro-latest' si ya tienes facturación activa
+    const modelId = 'gemini-2.0-flash-lite-001';
     const location = 'us-central1';
     const vertexAPI_URL = `https://us-central1-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${modelId}:generateContent`;
 
