@@ -1,9 +1,0 @@
-{
-  "name": "nia-diagnostic-tool",
-  "version": "1.0.0",
-  "description": "Función para conectar con la API de Gemini.",
-  "dependencies": {
-    "node-fetch": "^2.6.7",
-    "google-auth-library": "^9.0.0"
-  }
-}
