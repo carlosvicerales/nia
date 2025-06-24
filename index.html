@@ -593,7 +593,8 @@
           ]
         };
     
-        const response = await fetch('/.netlify/functions/geminiproxy', {
+        const webhookURL = 'https://primary-production-a7160.up.railway.app/webhook/ea79e90a-0967-46b8-9681-166910e2e2e0';
+        const response = await fetch(webhookURL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
