@@ -617,6 +617,40 @@
     function closeErrorModal() {
         document.getElementById('errorModal').classList.add('hidden');
     }
+
+// Script para sanitizar respuestas antes de enviar a MAKE
+document.addEventListener('DOMContentLoaded', function () {
+    // Selecciona todos los formularios relevantes (ajusta el selector según tu estructura)
+    const forms = document.querySelectorAll('form');
+
+    forms.forEach(form => {
+        form.addEventListener('submit', function (event) {
+            // Busca todos los campos de texto y áreas de texto dentro del formulario
+            const inputs = form.querySelectorAll('input[type="text"], textarea');
+            
+            inputs.forEach(input => {
+                // Sanitiza el valor de cada campo
+                input.value = sanitizeText(input.value);
+            });
+            // El formulario sigue su curso normal después de la sanitización
+        });
+    });
+
+    // Función de sanitización: elimina comillas, saltos de línea, y caracteres no imprimibles
+    function sanitizeText(text) {
+        // Elimina comillas dobles y simples, saltos de línea, tabulaciones, y caracteres Unicode de control
+        let sanitized = text
+            .replace(/["']/g, '')           // Elimina comillas dobles y simples
+            .replace(/[\r\n]+/g, ' ')       // Reemplaza saltos de línea por espacio
+            .replace(/\t+/g, ' ')           // Reemplaza tabulaciones por espacio
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Elimina caracteres de control
+            .replace(/\s+/g, ' ')           // Reemplaza múltiples espacios por uno solo
+            .trim();                        // Elimina espacios al inicio y final
+        return sanitized;
+    }
+});
+
+    
 </script>
 
             <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 hidden">
@@ -630,6 +664,8 @@
                     </button>
                 </div>
             </div>
+
+        
 
 </body>
 </html>
