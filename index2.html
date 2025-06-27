@@ -617,6 +617,207 @@
     function closeErrorModal() {
         document.getElementById('errorModal').classList.add('hidden');
     }
+
+//Sanitizador:
+    // Función principal de sanitización - técnicamente robusta y probada
+    function sanitizeForJSON(inputString) {
+        if (typeof inputString !== 'string' || !inputString) {
+            return '';
+        }
+        
+        return inputString
+            // Paso 1: Escapar barras invertidas primero (orden crítico)
+            .replace(/\\/g, '\\\\')
+            // Paso 2: Escapar comillas dobles
+            .replace(/"/g, '\\"')
+            // Paso 3: Escapar comillas simples  
+            .replace(/'/g, "\\'")
+            // Paso 4: Manejar saltos de línea y caracteres especiales
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '\\r')
+            .replace(/\t/g, '\\t')
+            // Paso 5: Eliminar caracteres de control problemáticos
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+            // Paso 6: Limpiar espacios excesivos
+            .replace(/\s+/g, ' ')
+            .trim();
+    }
+    
+    // Función para validar que el JSON sea correcto
+    function validateJSONStructure(data) {
+        try {
+            JSON.stringify(data);
+            return true;
+        } catch (error) {
+            console.error('Error de validación JSON:', error);
+            return false;
+        }
+    }
+    
+    // Función para recopilar y sanitizar todos los datos del formulario
+    function collectSanitizedFormData() {
+        // Mapeo de todos los campos de tu formulario de diagnóstico
+        const formFields = {
+            tipoClientes: 'input[name*="cliente"], textarea[name*="cliente"], #clientes',
+            problemaPrincipal: 'input[name*="problema"], textarea[name*="problema"], #problema',
+            resultadoTransformacion: 'input[name*="resultado"], textarea[name*="resultado"], #resultado',
+            diferenciador: 'input[name*="diferencia"], textarea[name*="diferencia"], #diferenciador',
+            narrativaActual: 'input[name*="narrativa"], textarea[name*="narrativa"], #narrativa, textarea[name*="presentacion"]',
+            nombre: 'input[name*="nombre"], #nombre',
+            email: 'input[name*="email"], input[type="email"], #email',
+            telefono: 'input[name*="telefono"], input[name*="phone"], #telefono',
+            empresa: 'input[name*="empresa"], #empresa'
+        };
+        
+        const sanitizedData = {};
+        
+        // Procesar cada campo del formulario
+        Object.keys(formFields).forEach(fieldKey => {
+            const selectors = formFields[fieldKey].split(', ');
+            let fieldValue = '';
+            
+            // Buscar el campo usando múltiples selectores
+            for (const selector of selectors) {
+                const element = document.querySelector(selector);
+                if (element && element.value) {
+                    fieldValue = element.value;
+                    break;
+                }
+            }
+            
+            // Sanitizar el valor encontrado
+            sanitizedData[fieldKey] = sanitizeForJSON(fieldValue);
+        });
+        
+        // Validar la estructura final
+        if (!validateJSONStructure(sanitizedData)) {
+            throw new Error('Los datos sanitizados no generan un JSON válido');
+        }
+        
+        return sanitizedData;
+    }
+    
+    // Función para enviar datos a MAKE con manejo robusto de errores
+    async function sendToMAKE(sanitizedData) {
+        const MAKE_WEBHOOK_URL = 'TU_URL_DE_WEBHOOK_AQUI'; // Reemplaza con tu URL real
+        
+        try {
+            console.log('Enviando datos sanitizados:', sanitizedData);
+            
+            const response = await fetch(MAKE_WEBHOOK_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify(sanitizedData)
+            });
+            
+            if (!response.ok) {
+                throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+            }
+            
+            const result = await response.json();
+            console.log('✅ Datos enviados exitosamente a MAKE:', result);
+            return result;
+            
+        } catch (error) {
+            console.error('❌ Error al enviar a MAKE:', error);
+            throw error;
+        }
+    }
+    
+    // Función principal para manejar el envío del formulario
+    async function handleDiagnosticoSubmission(event) {
+        if (event) {
+            event.preventDefault();
+        }
+        
+        try {
+            // Mostrar indicador de carga
+            const loadingElement = document.querySelector('.loading, [class*="loading"]');
+            if (loadingElement) {
+                loadingElement.style.display = 'block';
+            }
+            
+            // Recopilar y sanitizar datos
+            const sanitizedData = collectSanitizedFormData();
+            
+            // Enviar a MAKE
+            const result = await sendToMAKE(sanitizedData);
+            
+            // Mostrar resultado exitoso
+            showDiagnosticoResult(result);
+            
+        } catch (error) {
+            console.error('Error en el proceso de diagnóstico:', error);
+            showErrorMessage('Hubo un problema al procesar tu diagnóstico. Por favor, intenta nuevamente.');
+        } finally {
+            // Ocultar indicador de carga
+            const loadingElement = document.querySelector('.loading, [class*="loading"]');
+            if (loadingElement) {
+                loadingElement.style.display = 'none';
+            }
+        }
+    }
+    
+    // Funciones auxiliares para la interfaz
+    function showDiagnosticoResult(data) {
+        // Mostrar la sección de resultados
+        const resultSection = document.querySelector('.diagnostico-resultado, [class*="resultado"]');
+        if (resultSection) {
+            resultSection.style.display = 'block';
+            resultSection.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
+    
+    function showErrorMessage(message) {
+        alert(message); // Puedes reemplazar esto con tu sistema de notificaciones
+    }
+    
+    // Inicialización cuando el DOM esté listo
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 Sistema de sanitización de NIA iniciado');
+        
+        // Buscar el formulario principal con múltiples selectores
+        const possibleSelectors = [
+            'form',
+            '[data-form="diagnostico"]',
+            '.diagnostico-form',
+            '#diagnosticoForm',
+            'form[action*="make"]'
+        ];
+        
+        let form = null;
+        for (const selector of possibleSelectors) {
+            form = document.querySelector(selector);
+            if (form) break;
+        }
+        
+        if (form) {
+            form.addEventListener('submit', handleDiagnosticoSubmission);
+            console.log('✅ Formulario encontrado y configurado');
+        }
+        
+        // También buscar botones de envío específicos
+        const submitButtons = document.querySelectorAll(
+            'button[type="submit"], .submit-btn, [data-submit], button[class*="enviar"]'
+        );
+        
+        submitButtons.forEach(button => {
+            button.addEventListener('click', function(e) {
+                if (!form) {
+                    e.preventDefault();
+                    handleDiagnosticoSubmission(e);
+                }
+            });
+        });
+        
+        if (submitButtons.length > 0) {
+            console.log(`✅ ${submitButtons.length} botón(es) de envío configurado(s)`);
+        }
+    });
+
 </script>
 
             <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 hidden">
