@@ -619,28 +619,40 @@
     }
     
 //sanitizador
-    document.addEventListener('DOMContentLoaded', function () {
-    const form = document.getElementById('diagnostico');
-    if (form) {
-        form.addEventListener('submit', function (event) {
-            // Sanitiza todos los campos de texto y textarea
-            const inputs = form.querySelectorAll('input[type="text"], textarea');
-            inputs.forEach(input => {
+// No afecta la lógica ni la estructura: solo limpia los textos peligrosos y pegados desde otras fuentes.
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Detecta todos los formularios del documento
+    document.querySelectorAll('form').forEach(function(form) {
+        form.addEventListener('submit', function(e) {
+            // Sanitiza inputs y textareas
+            form.querySelectorAll('input[type="text"], textarea').forEach(function(input) {
                 input.value = sanitizeText(input.value);
             });
-            // El formulario sigue su curso normal
+            // El flujo de envío continúa normal
         });
-    }
+    });
+
+    // Si usas botones fuera de formularios (flujos tipo wizard), sanitiza en cada siguiente
+    document.querySelectorAll('button, input[type="button"], input[type="submit"]').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+            // Busca campos dentro del mismo contenedor del botón
+            var parent = btn.closest('form, .step, .pregunta, .container, body');
+            if (!parent) return;
+            parent.querySelectorAll('input[type="text"], textarea').forEach(function(input) {
+                input.value = sanitizeText(input.value);
+            });
+        });
+    });
 
     function sanitizeText(text) {
-        let sanitized = text
-            .replace(/["']/g, '')           // Elimina comillas dobles y simples
-            .replace(/[\r\n]+/g, ' ')       // Reemplaza saltos de línea por espacio
-            .replace(/\t+/g, ' ')           // Reemplaza tabulaciones por espacio
-            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Elimina caracteres de control
-            .replace(/\s+/g, ' ')           // Reemplaza múltiples espacios por uno solo
-            .trim();
-        return sanitized;
+        return text
+            .replace(/["']/g, '') // Quita comillas dobles y simples
+            .replace(/[\r\n]+/g, ' ') // Quita saltos de línea
+            .replace(/\t+/g, ' ') // Quita tabs
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Quita caracteres de control
+            .replace(/\s+/g, ' ') // Espacios múltiples a uno solo
+            .trim(); // Quita espacios al inicio y final
     }
 });
 </script>
