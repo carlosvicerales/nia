@@ -678,18 +678,30 @@ document.addEventListener('DOMContentLoaded', function() {
     const loadingSection = document.getElementById('loadingSection') || document.querySelector('.loading-section');
     const resultSection = document.getElementById('resultSection') || document.querySelector('.result-section');
     
-    function mostrarSeccion(seccion) {
+      function mostrarSeccion(seccion) {
+        console.log('🔄 Cambiando sección...');
+        
+        // Buscar secciones por ID (preferido) o por contenido (fallback)
+        const formSection = document.getElementById('formSection') || 
+                           document.querySelector('*:contains("Hola, soy NIA")')?.closest('div');
+        const loadingSection = document.getElementById('loadingSection') || 
+                              document.querySelector('*:contains("Analizando tu narrativa")')?.closest('div');
+        const resultSection = document.getElementById('resultSection') || 
+                             document.querySelector('*:contains("diagnóstico está listo")')?.closest('div');
+        
         // Ocultar todas las secciones
         if (formSection) formSection.style.display = 'none';
         if (loadingSection) loadingSection.style.display = 'none';
         if (resultSection) resultSection.style.display = 'none';
         
         // Mostrar la sección solicitada
-        if (seccion) {
+        if (seccion && seccion.style) {
             seccion.style.display = 'block';
             seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            console.log('✅ Sección mostrada correctamente');
         }
     }
+
     
     // === FUNCIONES DE MODAL DE ERROR ===
     function mostrarErrorModal(mensaje) {
@@ -897,134 +909,105 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // === VALIDACIÓN COMPLETA CON BLOQUEO REAL ===
-    function validarFormularioCompleto() {
-        console.log('🔍 Validando formulario completo...');
-        
-        const campos = document.querySelectorAll('input, textarea');
-        let todoValido = true;
-        let primerCampoInvalido = null;
-        
-        campos.forEach(campo => {
-            if (campo.offsetParent !== null && !campo.readOnly && !campo.disabled) { 
-                const esValido = validarCampo(campo);
+            function validarFormularioCompleto() {
+                console.log('🔍 Validando formulario completo...');
                 
-                if (!esValido) {
-                    todoValido = false;
-                    if (!primerCampoInvalido) {
-                        primerCampoInvalido = campo;
+                const campos = document.querySelectorAll('input, textarea');
+                let todoValido = true;
+                let primerCampoInvalido = null;
+                
+                campos.forEach(campo => {
+                    if (campo.offsetParent !== null && !campo.readOnly && !campo.disabled) { 
+                        const esValido = validarCampo(campo);
+                        
+                        if (!esValido) {
+                            todoValido = false;
+                            if (!primerCampoInvalido) {
+                                primerCampoInvalido = campo;
+                            }
+                        }
                     }
+                });
+                
+                if (primerCampoInvalido) {
+                    primerCampoInvalido.scrollIntoView({ 
+                        behavior: 'smooth', 
+                        block: 'center' 
+                    });
+                    primerCampoInvalido.focus();
                 }
+                
+                console.log(`🎯 Validación: ${todoValido ? 'EXITOSA' : 'FALLIDA'}`);
+                return todoValido;
             }
-        });
-        
-        if (primerCampoInvalido) {
-            primerCampoInvalido.scrollIntoView({ 
-                behavior: 'smooth', 
-                block: 'center' 
-            });
-            primerCampoInvalido.focus();
-        }
-        
-        console.log(`🎯 Validación: ${todoValido ? 'EXITOSA' : 'FALLIDA'}`);
-        return todoValido;
-    }
     
-    // === ENVÍO DE DATOS CON MANEJO ROBUSTO ===
-    async function enviarDatos(evento) {
-        if (evento) {
-            evento.preventDefault();
-            evento.stopPropagation();
-        }
-        
-        console.log('🚀 Iniciando envío...');
-        
-        // VALIDACIÓN ESTRICTA - BLOQUEA SI HAY ERRORES
-        if (!validarFormularioCompleto()) {
-            console.log('🚫 Envío BLOQUEADO debido a errores de validación');
-            return false; // DETIENE COMPLETAMENTE LA FUNCIÓN
-        }
-        
-        // Mostrar pantalla de carga
-        mostrarSeccion(loadingSection);
-        
-        // Recopilar datos sanitizados
-        const datos = {};
-        const campos = document.querySelectorAll('input, textarea');
-        
-        campos.forEach((campo, index) => {
-            if (campo.offsetParent !== null && !campo.readOnly && !campo.disabled && campo.value) { 
-                const clave = campo.name || campo.id || `campo_${index}`;
-                datos[clave] = sanitizarTexto(campo.value);
+            // === ENVÍO DE DATOS CON MANEJO ROBUSTO ===
+           async function enviarDatos(evento) {
+            if (evento) {
+                evento.preventDefault();
+                evento.stopPropagation();
             }
-        });
-        
-        console.log('📤 Datos a enviar:', datos);
-        
-        // Validar que tenemos datos
-        if (Object.keys(datos).length === 0) {
-            console.log('⚠️ No hay datos para enviar');
-            mostrarSeccion(formSection);
-            return false;
-        }
-        
-        // Envío con manejo robusto de respuestas
-        try {
-            console.log('🌐 Enviando petición a MAKE...');
             
-            const response = await fetch('https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(datos)
+            console.log('🚀 Iniciando envío...');
+            
+            // VALIDACIÓN ESTRICTA - BLOQUEA SI HAY ERRORES
+            if (!validarFormularioCompleto()) {
+                console.log('🚫 Envío BLOQUEADO debido a errores de validación');
+                return false;
+            }
+            
+            // Mostrar pantalla de carga
+            const loadingSection = document.getElementById('loadingSection');
+            mostrarSeccion(loadingSection);
+            
+            // Recopilar datos sanitizados
+            const datos = {};
+            const campos = document.querySelectorAll('input, textarea');
+            
+            campos.forEach((campo, index) => {
+                if (campo.offsetParent !== null && !campo.readOnly && !campo.disabled && campo.value) { 
+                    const clave = campo.name || campo.id || `campo_${index}`;
+                    datos[clave] = sanitizarTexto(campo.value);
+                }
             });
             
-            console.log(`📡 Respuesta recibida - Status: ${response.status}`);
+            console.log('📤 Datos a enviar:', datos);
             
-            // MANEJO INTELIGENTE DE STATUS CODES
-            if (response.status >= 200 && response.status < 300) {
-                // Respuesta exitosa estándar
-                console.log('✅ Envío exitoso (status 2xx)');
+            // Validar que tenemos datos
+            if (Object.keys(datos).length === 0) {
+                console.log('⚠️ No hay datos para enviar');
+                const formSection = document.getElementById('formSection');
+                mostrarSeccion(formSection);
+                return false;
+            }
+            
+            // Envío con manejo inteligente de respuestas
+            try {
+                console.log('🌐 Enviando petición a MAKE...');
                 
-                try {
-                    const resultado = await response.json();
-                    console.log('📋 Respuesta JSON:', resultado);
-                } catch (jsonError) {
-                    console.log('📋 Respuesta sin JSON válido (pero envío exitoso)');
-                }
+                const response = await fetch('https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    body: JSON.stringify(datos)
+                });
                 
-                // Mostrar resultados - NO mostrar error
-                setTimeout(() => {
-                    mostrarSeccion(resultSection);
-                }, 1000);
+                console.log(`📡 Respuesta recibida - Status: ${response.status}`);
                 
-                return true;
-                
-            } else if (response.status === 500) {
-                // Error 500 puede ser falso positivo en webhooks
-                console.log('⚠️ Status 500 recibido - verificando contenido...');
-                
-                try {
-                    const contenido = await response.text();
-                    console.log('📄 Contenido de respuesta 500:', contenido);
+                // Con la configuración correcta en MAKE, siempre debería ser 200
+                if (response.status >= 200 && response.status < 300) {
+                    console.log('✅ Envío exitoso');
                     
-                    // Si contiene datos del diagnóstico, considerarlo exitoso
-                    if (contenido.includes('diagnóstico') || contenido.includes('puntos') || contenido.includes('evaluación') || contenido.includes('resultado')) {
-                        console.log('✅ Error 500 pero respuesta válida detectada - tratando como exitoso');
-                        
-                        setTimeout(() => {
-                            mostrarSeccion(resultSection);
-                        }, 1000);
-                        
-                        return true;
-                    }
-                } catch (e) {
-                    console.log('📄 No se pudo leer contenido de respuesta 500');
-                }
-                
-                throw new Error(`Error del servidor: ${response.status}`);
-            } else {
+                    // Mostrar resultados después de un breve delay
+                    setTimeout(() => {
+                        const resultSection = document.getElementById('resultSection');
+                        mostrarSeccion(resultSection);
+                    }, 1500);
+                    
+                    return true;
+                } else {
                     throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
                 }
                 
@@ -1032,14 +1015,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('❌ Error real en envío:', error);
                 
                 // Volver al formulario y mostrar error
+                const formSection = document.getElementById('formSection');
                 mostrarSeccion(formSection);
                 mostrarErrorModal('Hubo un problema al enviar tu información. Por favor, inténtalo de nuevo.');
                 
                 return false;
             }
         }
+
         
-        // === CONFIGURACIÓN DE EVENTOS ===
+    // === CONFIGURACIÓN DE EVENTOS ===
         
         // Validación en tiempo real
         document.addEventListener('blur', function(e) {
@@ -1065,7 +1050,36 @@ document.addEventListener('DOMContentLoaded', function() {
             '.btn-generar-final',
             'button[type="submit"]'
         ];
+
+            // === CONFIGURACIÓN ESPECÍFICA DEL BOTÓN FINAL ===
+        let botonConfigurado = false;
         
+        // Buscar específicamente el botón "Generar Mi Diagnóstico"
+        const botones = document.querySelectorAll('button.btn-primary.text-lg');
+        botones.forEach(boton => {
+            const texto = boton.textContent?.trim() || '';
+            const tieneOnclick = boton.onclick !== null;
+            
+            // Identificar el botón correcto: texto específico + sin onclick existente
+            if (texto.includes('Generar Mi Diagnóstico') && !tieneOnclick) {
+                console.log('🎯 Botón "Generar Mi Diagnóstico" encontrado y configurado');
+                
+                // Configurar nuestro evento
+                boton.addEventListener('click', enviarDatos);
+                botonConfigurado = true;
+                
+                return;
+            }
+        });
+        
+        if (botonConfigurado) {
+            console.log('✅ Botón final configurado correctamente');
+        } else {
+            console.log('⚠️ No se encontró el botón específico');
+        }
+
+
+/*        
         let botonConfigurado = false;
         selectoresBotonesFinal.forEach(selector => {
             const boton = document.querySelector(selector);
@@ -1093,7 +1107,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('✅ Sistema integral configurado completamente');
         });
-        
+  */
+      
         // === FUNCIONES DE UTILIDAD ===
         function mostrarBotones() {
             console.log('🔍 BOTONES DETECTADOS:');
