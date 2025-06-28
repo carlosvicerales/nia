@@ -666,283 +666,285 @@
     }
 
 //========= SANITIZADOR: ===============
-//=== Validador de campos y alertas ====
-
-    
-        // SISTEMA DE VALIDACIÓN INLINE Y CONTROL DE FLUJO NIA - VERSIÓN DEFINITIVA
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✨ Sistema de validación integral NIA activado');
-    
-    // === CONTROL DE SECCIONES DE UI ===
-    const formSection = document.getElementById('formSection') || document.querySelector('.form-section') || document.querySelector('form')?.closest('div');
-    const loadingSection = document.getElementById('loadingSection') || document.querySelector('.loading-section');
-    const resultSection = document.getElementById('resultSection') || document.querySelector('.result-section');
-    
-      function mostrarSeccion(seccion) {
-        console.log('🔄 Cambiando sección...');
+    // SISTEMA DE VALIDACIÓN Y CONTROL DE FLUJO NIA - VERSIÓN DEFINITIVA
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('✨ Sistema de validación integral NIA activado');
         
-        // Buscar secciones por ID (preferido) o por contenido (fallback)
-        const formSection = document.getElementById('formSection') || 
-                           document.querySelector('*:contains("Hola, soy NIA")')?.closest('div');
-        const loadingSection = document.getElementById('loadingSection') || 
-                              document.querySelector('*:contains("Analizando tu narrativa")')?.closest('div');
-        const resultSection = document.getElementById('resultSection') || 
-                             document.querySelector('*:contains("diagnóstico está listo")')?.closest('div');
-        
-        // Ocultar todas las secciones
-        if (formSection) formSection.style.display = 'none';
-        if (loadingSection) loadingSection.style.display = 'none';
-        if (resultSection) resultSection.style.display = 'none';
-        
-        // Mostrar la sección solicitada
-        if (seccion && seccion.style) {
-            seccion.style.display = 'block';
-            seccion.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            console.log('✅ Sección mostrada correctamente');
-        }
-    }
-
-    
-    // === FUNCIONES DE MODAL DE ERROR ===
-    function mostrarErrorModal(mensaje) {
-        const modal = document.getElementById('errorModal');
-        const mensajeElement = document.getElementById('errorModalMessage');
-        
-        if (modal && mensajeElement) {
-            mensajeElement.innerHTML = mensaje.replace(/\n/g, '<br>');
-            modal.classList.remove('hidden');
-            console.log('⚠️ Error mostrado en modal:', mensaje);
-        } else {
-            alert(mensaje);
-            console.log('⚠️ Error mostrado en alert (fallback):', mensaje);
-        }
-    }
-    
-    window.closeErrorModal = function() {
-        const modal = document.getElementById('errorModal');
-        if (modal) {
-            modal.classList.add('hidden');
-            console.log('✅ Modal de error cerrado');
-        }
-    }
-    
-    // === FUNCIONES DE SANITIZACIÓN ===
-    function sanitizarTexto(texto) {
-        if (typeof texto !== 'string' || !texto) {
-            return '';
-        }
-        
-        return texto
-            .replace(/"/g, '')              
-            .replace(/'/g, '')              
-            .replace(/`/g, '')              
-            .replace(/\r\n/g, ' ')          
-            .replace(/\n/g, ' ')            
-            .replace(/\r/g, ' ')            
-            .replace(/\t/g, ' ')            
-            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') 
-            .replace(/\s+/g, ' ')           
-            .trim();                        
-    }
-    
-    // === FUNCIONES DE VALIDACIÓN ===
-    function validarTextoLargo(texto) {
-        const textoLimpio = texto.trim();
-        
-        if (!textoLimpio) {
-            return { valido: false, mensaje: 'Este campo es obligatorio' };
-        }
-        
-        if (textoLimpio.length < 10) {
-            return { valido: false, mensaje: 'Necesitas escribir al menos 10 caracteres' };
-        }
-        
-        if (/<[^>]*>/g.test(texto)) {
-            return { valido: false, mensaje: 'No copies texto con HTML, escribe tu respuesta' };
-        }
-        
-        const saltosDeLinea = (texto.match(/\n/g) || []).length;
-        if (saltosDeLinea > 3) {
-            return { valido: false, mensaje: 'Evita copiar de web, escribe tu respuesta en texto plano' };
-        }
-        
-        return { valido: true, mensaje: 'Perfecto' };
-    }
-    
-    function validarEmail(email) {
-        const emailLimpio = email.trim();
-        if (!emailLimpio) {
-            return { valido: false, mensaje: 'El email es obligatorio' };
-        }
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(emailLimpio)) {
-            return { valido: false, mensaje: 'Ingresa un email válido (ej: carlos@empresa.com)' };
-        }
-        
-        return { valido: true, mensaje: 'Email válido' };
-    }
-    
-    function validarTelefono(telefono) {
-        const telefonoLimpio = telefono.trim();
-        if (!telefonoLimpio) {
-            return { valido: false, mensaje: 'El WhatsApp es obligatorio' };
-        }
-        
-        const telefonoSinFormato = telefonoLimpio.replace(/[\s\-\(\)]/g, '');
-        const telefonoRegex = /^[\+]?[\d]{8,15}$/;
-        
-        if (!telefonoRegex.test(telefonoSinFormato)) {
-            return { valido: false, mensaje: 'Formato: +56987654321 o 987654321' };
-        }
-        
-        return { valido: true, mensaje: 'WhatsApp válido' };
-    }
-    
-    function validarNombre(nombre) {
-        const nombreLimpio = nombre.trim();
-        if (!nombreLimpio) {
-            return { valido: false, mensaje: 'Este campo es obligatorio' };
-        }
-        
-        if (nombreLimpio.length < 2) {
-            return { valido: false, mensaje: 'Mínimo 2 caracteres' };
-        }
-        
-        return { valido: true, mensaje: 'Correcto' };
-    }
-    
-    // === FUNCIONES DE INTERFAZ ===
-    function mostrarError(campo, mensaje) {
-        limpiarValidacion(campo);
-        
-        campo.classList.add('campo-error');
-        
-        const mensajeError = document.createElement('div');
-        mensajeError.className = 'mensaje-error';
-        mensajeError.textContent = mensaje;
-        
-        campo.parentNode.insertBefore(mensajeError, campo.nextSibling);
-        console.log(`❌ Error: ${mensaje}`);
-    }
-    
-    function mostrarExito(campo, mensaje) {
-        limpiarValidacion(campo);
-        
-        campo.classList.add('campo-valido');
-        
-        const mensajeExito = document.createElement('div');
-        mensajeExito.className = 'mensaje-exito';
-        mensajeExito.textContent = mensaje;
-        
-        campo.parentNode.insertBefore(mensajeExito, campo.nextSibling);
-        console.log(`✅ Válido: ${mensaje}`);
-    }
-    
-    function limpiarValidacion(campo) {
-        campo.classList.remove('campo-error', 'campo-valido');
-        
-        const mensajesExistentes = campo.parentNode.querySelectorAll('.mensaje-error, .mensaje-exito');
-        mensajesExistentes.forEach(mensaje => mensaje.remove());
-    }
-    
-    // === VALIDACIÓN DE CAMPO INDIVIDUAL ===
-    function validarCampo(campo) {
-        campo.value = sanitizarTexto(campo.value || '');
-        
-        const valor = campo.value;
-        const tipoValidacion = determinarTipoValidacion(campo);
-        
-        let resultado;
-        switch (tipoValidacion) {
-            case 'texto':
-                resultado = validarTextoLargo(valor);
-                break;
-            case 'email':
-                resultado = validarEmail(valor);
-                break;
-            case 'telefono':
-                resultado = validarTelefono(valor);
-                break;
-            case 'nombre':
-                resultado = validarNombre(valor);
-                break;
-            default:
-                resultado = { valido: true, mensaje: 'Campo válido' };
-        }
-        
-        if (resultado.valido) {
-            if (valor.length > 0) {
-                mostrarExito(campo, resultado.mensaje);
-            } else {
-                limpiarValidacion(campo);
+        // === CONTROL DE SECCIONES DE UI ===
+        function mostrarSeccion(targetSection) {
+            console.log('🔄 Cambiando sección...');
+            
+            // Buscar secciones por ID
+            const formSection = document.getElementById('formSection');
+            const loadingSection = document.getElementById('loadingSection');
+            const resultSection = document.getElementById('resultSection');
+            
+            // Verificar que las secciones existen
+            if (!formSection || !loadingSection || !resultSection) {
+                console.error('❌ No se encontraron todas las secciones requeridas');
+                console.log('FormSection:', formSection);
+                console.log('LoadingSection:', loadingSection);
+                console.log('ResultSection:', resultSection);
+                return false;
             }
-        } else {
-            mostrarError(campo, resultado.mensaje);
+            
+            // Ocultar todas las secciones
+            formSection.style.display = 'none';
+            loadingSection.style.display = 'none';  
+            resultSection.style.display = 'none';
+            
+            // Mostrar la sección solicitada
+            if (targetSection && targetSection.style) {
+                targetSection.style.display = 'block';
+                targetSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                console.log(`✅ Sección mostrada: ${targetSection.id}`);
+                return true;
+            } else {
+                console.error('❌ Sección objetivo no válida');
+                return false;
+            }
         }
         
-        return resultado.valido;
-    }
-    
-    function determinarTipoValidacion(campo) {
-        const name = campo.name?.toLowerCase() || '';
-        const id = campo.id?.toLowerCase() || '';
-        const placeholder = campo.placeholder?.toLowerCase() || '';
-        
-        if (campo.type === 'email' || name.includes('email') || id.includes('email') || placeholder.includes('email')) {
-            return 'email';
+        // === FUNCIONES DE MODAL DE ERROR ===
+        function mostrarErrorModal(mensaje) {
+            const modal = document.getElementById('errorModal');
+            const mensajeElement = document.getElementById('errorModalMessage');
+            
+            if (modal && mensajeElement) {
+                mensajeElement.innerHTML = mensaje.replace(/\n/g, '<br>');
+                modal.classList.remove('hidden');
+                console.log('⚠️ Error mostrado en modal:', mensaje);
+            } else {
+                alert(mensaje);
+                console.log('⚠️ Error mostrado en alert (fallback):', mensaje);
+            }
         }
         
-        if (name.includes('whatsapp') || name.includes('telefono') || id.includes('whatsapp') || placeholder.includes('whatsapp')) {
-            return 'telefono';
+        window.closeErrorModal = function() {
+            const modal = document.getElementById('errorModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                console.log('✅ Modal de error cerrado');
+            }
         }
         
-        if (name.includes('nombre') || name.includes('apellido') || id.includes('nombre') || placeholder.includes('nombre')) {
+        // === FUNCIONES DE SANITIZACIÓN ===
+        function sanitizarTexto(texto) {
+            if (typeof texto !== 'string' || !texto) {
+                return '';
+            }
+            
+            return texto
+                .replace(/"/g, '')              
+                .replace(/'/g, '')              
+                .replace(/`/g, '')              
+                .replace(/\r\n/g, ' ')          
+                .replace(/\n/g, ' ')            
+                .replace(/\r/g, ' ')            
+                .replace(/\t/g, ' ')            
+                .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') 
+                .replace(/\s+/g, ' ')           
+                .trim();                        
+        }
+        
+        // === FUNCIONES DE VALIDACIÓN ===
+        function validarTextoLargo(texto) {
+            const textoLimpio = texto.trim();
+            
+            if (!textoLimpio) {
+                return { valido: false, mensaje: 'Este campo es obligatorio' };
+            }
+            
+            if (textoLimpio.length < 10) {
+                return { valido: false, mensaje: 'Necesitas escribir al menos 10 caracteres' };
+            }
+            
+            if (/<[^>]*>/g.test(texto)) {
+                return { valido: false, mensaje: 'No copies texto con HTML, escribe tu respuesta' };
+            }
+            
+            const saltosDeLinea = (texto.match(/\n/g) || []).length;
+            if (saltosDeLinea > 3) {
+                return { valido: false, mensaje: 'Evita copiar de web, escribe tu respuesta en texto plano' };
+            }
+            
+            return { valido: true, mensaje: 'Perfecto' };
+        }
+        
+        function validarEmail(email) {
+            const emailLimpio = email.trim();
+            if (!emailLimpio) {
+                return { valido: false, mensaje: 'El email es obligatorio' };
+            }
+            
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(emailLimpio)) {
+                return { valido: false, mensaje: 'Ingresa un email válido (ej: carlos@empresa.com)' };
+            }
+            
+            return { valido: true, mensaje: 'Email válido' };
+        }
+        
+        function validarTelefono(telefono) {
+            const telefonoLimpio = telefono.trim();
+            if (!telefonoLimpio) {
+                return { valido: false, mensaje: 'El WhatsApp es obligatorio' };
+            }
+            
+            const telefonoSinFormato = telefonoLimpio.replace(/[\s\-\(\)]/g, '');
+            const telefonoRegex = /^[\+]?[\d]{8,15}$/;
+            
+            if (!telefonoRegex.test(telefonoSinFormato)) {
+                return { valido: false, mensaje: 'Formato: +56987654321 o 987654321' };
+            }
+            
+            return { valido: true, mensaje: 'WhatsApp válido' };
+        }
+        
+        function validarNombre(nombre) {
+            const nombreLimpio = nombre.trim();
+            if (!nombreLimpio) {
+                return { valido: false, mensaje: 'Este campo es obligatorio' };
+            }
+            
+            if (nombreLimpio.length < 2) {
+                return { valido: false, mensaje: 'Mínimo 2 caracteres' };
+            }
+            
+            return { valido: true, mensaje: 'Correcto' };
+        }
+        
+        // === FUNCIONES DE INTERFAZ ===
+        function mostrarError(campo, mensaje) {
+            limpiarValidacion(campo);
+            
+            campo.classList.add('campo-error');
+            
+            const mensajeError = document.createElement('div');
+            mensajeError.className = 'mensaje-error';
+            mensajeError.textContent = mensaje;
+            
+            campo.parentNode.insertBefore(mensajeError, campo.nextSibling);
+            console.log(`❌ Error: ${mensaje}`);
+        }
+        
+        function mostrarExito(campo, mensaje) {
+            limpiarValidacion(campo);
+            
+            campo.classList.add('campo-valido');
+            
+            const mensajeExito = document.createElement('div');
+            mensajeExito.className = 'mensaje-exito';
+            mensajeExito.textContent = mensaje;
+            
+            campo.parentNode.insertBefore(mensajeExito, campo.nextSibling);
+            console.log(`✅ Válido: ${mensaje}`);
+        }
+        
+        function limpiarValidacion(campo) {
+            campo.classList.remove('campo-error', 'campo-valido');
+            
+            const mensajesExistentes = campo.parentNode.querySelectorAll('.mensaje-error, .mensaje-exito');
+            mensajesExistentes.forEach(mensaje => mensaje.remove());
+        }
+        
+        // === VALIDACIÓN DE CAMPO INDIVIDUAL ===
+        function validarCampo(campo) {
+            campo.value = sanitizarTexto(campo.value || '');
+            
+            const valor = campo.value;
+            const tipoValidacion = determinarTipoValidacion(campo);
+            
+            let resultado;
+            switch (tipoValidacion) {
+                case 'texto':
+                    resultado = validarTextoLargo(valor);
+                    break;
+                case 'email':
+                    resultado = validarEmail(valor);
+                    break;
+                case 'telefono':
+                    resultado = validarTelefono(valor);
+                    break;
+                case 'nombre':
+                    resultado = validarNombre(valor);
+                    break;
+                default:
+                    resultado = { valido: true, mensaje: 'Campo válido' };
+            }
+            
+            if (resultado.valido) {
+                if (valor.length > 0) {
+                    mostrarExito(campo, resultado.mensaje);
+                } else {
+                    limpiarValidacion(campo);
+                }
+            } else {
+                mostrarError(campo, resultado.mensaje);
+            }
+            
+            return resultado.valido;
+        }
+        
+        function determinarTipoValidacion(campo) {
+            const name = campo.name?.toLowerCase() || '';
+            const id = campo.id?.toLowerCase() || '';
+            const placeholder = campo.placeholder?.toLowerCase() || '';
+            
+            if (campo.type === 'email' || name.includes('email') || id.includes('email') || placeholder.includes('email')) {
+                return 'email';
+            }
+            
+            if (name.includes('whatsapp') || name.includes('telefono') || id.includes('whatsapp') || placeholder.includes('whatsapp')) {
+                return 'telefono';
+            }
+            
+            if (name.includes('nombre') || name.includes('apellido') || id.includes('nombre') || placeholder.includes('nombre')) {
+                return 'nombre';
+            }
+            
+            if (campo.tagName === 'TEXTAREA' || placeholder.length > 20) {
+                return 'texto';
+            }
+            
             return 'nombre';
         }
         
-        if (campo.tagName === 'TEXTAREA' || placeholder.length > 20) {
-            return 'texto';
-        }
-        
-        return 'nombre';
-    }
-    
-    // === VALIDACIÓN COMPLETA CON BLOQUEO REAL ===
-            function validarFormularioCompleto() {
-                console.log('🔍 Validando formulario completo...');
-                
-                const campos = document.querySelectorAll('input, textarea');
-                let todoValido = true;
-                let primerCampoInvalido = null;
-                
-                campos.forEach(campo => {
-                    if (campo.offsetParent !== null && !campo.readOnly && !campo.disabled) { 
-                        const esValido = validarCampo(campo);
-                        
-                        if (!esValido) {
-                            todoValido = false;
-                            if (!primerCampoInvalido) {
-                                primerCampoInvalido = campo;
-                            }
+        // === VALIDACIÓN COMPLETA CON BLOQUEO REAL ===
+        function validarFormularioCompleto() {
+            console.log('🔍 Validando formulario completo...');
+            
+            const campos = document.querySelectorAll('input, textarea');
+            let todoValido = true;
+            let primerCampoInvalido = null;
+            
+            campos.forEach(campo => {
+                if (campo.offsetParent !== null && !campo.readOnly && !campo.disabled) { 
+                    const esValido = validarCampo(campo);
+                    
+                    if (!esValido) {
+                        todoValido = false;
+                        if (!primerCampoInvalido) {
+                            primerCampoInvalido = campo;
                         }
                     }
-                });
-                
-                if (primerCampoInvalido) {
-                    primerCampoInvalido.scrollIntoView({ 
-                        behavior: 'smooth', 
-                        block: 'center' 
-                    });
-                    primerCampoInvalido.focus();
                 }
-                
-                console.log(`🎯 Validación: ${todoValido ? 'EXITOSA' : 'FALLIDA'}`);
-                return todoValido;
+            });
+            
+            if (primerCampoInvalido) {
+                primerCampoInvalido.scrollIntoView({ 
+                    behavior: 'smooth', 
+                    block: 'center' 
+                });
+                primerCampoInvalido.focus();
             }
-    
-            // === ENVÍO DE DATOS CON MANEJO ROBUSTO ===
-           async function enviarDatos(evento) {
+            
+            console.log(`🎯 Validación: ${todoValido ? 'EXITOSA' : 'FALLIDA'}`);
+            return todoValido;
+        }
+        
+        // === ENVÍO DE DATOS CON MANEJO ROBUSTO ===
+        async function enviarDatos(evento) {
             if (evento) {
                 evento.preventDefault();
                 evento.stopPropagation();
@@ -958,7 +960,10 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Mostrar pantalla de carga
             const loadingSection = document.getElementById('loadingSection');
-            mostrarSeccion(loadingSection);
+            if (!mostrarSeccion(loadingSection)) {
+                console.error('❌ No se pudo mostrar la pantalla de carga');
+                return false;
+            }
             
             // Recopilar datos sanitizados
             const datos = {};
@@ -996,17 +1001,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 console.log(`📡 Respuesta recibida - Status: ${response.status}`);
                 
-                // Con la configuración correcta en MAKE, siempre debería ser 200
+                // Con la configuración correcta en MAKE, debería ser 200
                 if (response.status >= 200 && response.status < 300) {
                     console.log('✅ Envío exitoso');
                     
-                    // Mostrar resultados después de un breve delay
+                    // Intentar leer respuesta JSON
+                    try {
+                        const resultado = await response.json();
+                        console.log('📋 Respuesta de MAKE:', resultado);
+                    } catch (jsonError) {
+                        console.log('📋 Respuesta sin JSON válido (pero envío exitoso)');
+                    }
+                    
+                    // Mostrar resultados después de delay
                     setTimeout(() => {
                         const resultSection = document.getElementById('resultSection');
                         mostrarSeccion(resultSection);
                     }, 1500);
                     
                     return true;
+                    
                 } else {
                     throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
                 }
@@ -1022,9 +1036,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 return false;
             }
         }
-
         
-    // === CONFIGURACIÓN DE EVENTOS ===
+        // === CONFIGURACIÓN DE EVENTOS ===
         
         // Validación en tiempo real
         document.addEventListener('blur', function(e) {
@@ -1043,108 +1056,87 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // INTERCEPTACIÓN DE BOTONES CON BLOQUEO REAL
-        const selectoresBotonesFinal = [
-            'button[onclick*="generateDiagnosis"]',
-            '#btnGenerarDiagnostico',
-            '.btn-generar-final',
-            'button[type="submit"]'
-        ];
-
-            // === CONFIGURACIÓN ESPECÍFICA DEL BOTÓN FINAL ===
+        // INTERCEPTACIÓN ESPECÍFICA DEL BOTÓN FINAL
         let botonConfigurado = false;
         
-        // Buscar específicamente el botón "Generar Mi Diagnóstico"
+        // Buscar el botón "Generar Mi Diagnóstico" específicamente
         const botones = document.querySelectorAll('button.btn-primary.text-lg');
         botones.forEach(boton => {
             const texto = boton.textContent?.trim() || '';
-            const tieneOnclick = boton.onclick !== null;
             
-            // Identificar el botón correcto: texto específico + sin onclick existente
-            if (texto.includes('Generar Mi Diagnóstico') && !tieneOnclick) {
-                console.log('🎯 Botón "Generar Mi Diagnóstico" encontrado y configurado');
-                
-                // Configurar nuestro evento
+            if (texto.includes('Generar Mi Diagnóstico') && !boton.onclick) {
                 boton.addEventListener('click', enviarDatos);
                 botonConfigurado = true;
-                
-                return;
+                console.log('✅ Botón "Generar Mi Diagnóstico" configurado correctamente');
             }
-        });
-        
-        if (botonConfigurado) {
-            console.log('✅ Botón final configurado correctamente');
-        } else {
-            console.log('⚠️ No se encontró el botón específico');
-        }
-
-
-/*        
-        let botonConfigurado = false;
-        selectoresBotonesFinal.forEach(selector => {
-            const boton = document.querySelector(selector);
-            if (boton) {
-                // Eliminar onclick existente para evitar conflictos
-                if (boton.onclick) {
-                    boton.onclick = null;
-                }
-                
-                boton.addEventListener('click', enviarDatos);
-                botonConfigurado = true;
-                console.log(`✅ Botón final configurado: ${selector}`);
-            }
-        });
-        
-        // Interceptar formularios también
-        document.querySelectorAll('form').forEach(form => {
-            form.addEventListener('submit', enviarDatos);
         });
         
         if (!botonConfigurado) {
-            console.log('⚠️ No se encontró botón final específico');
-            console.log('💡 Ejecuta mostrarBotones() para identificarlo');
+            console.log('⚠️ Botón específico no encontrado - usando detección alternativa');
+            
+            // Fallback: buscar por onclick existente
+            const botonesConOnclick = document.querySelectorAll('button[onclick*="generateDiagnosis"]');
+            if (botonesConOnclick.length > 0) {
+                botonesConOnclick[0].addEventListener('click', enviarDatos);
+                console.log('✅ Botón configurado via onclick fallback');
+            }
         }
         
         console.log('✅ Sistema integral configurado completamente');
-        });
-  */
-      
-        // === FUNCIONES DE UTILIDAD ===
-        function mostrarBotones() {
-            console.log('🔍 BOTONES DETECTADOS:');
-            const botones = document.querySelectorAll('button, input[type="submit"]');
-            
-            botones.forEach((boton, index) => {
-                const texto = boton.textContent?.trim() || boton.value?.trim() || '';
-                const id = boton.id || 'sin-id';
-                const clase = boton.className || 'sin-clase';
-                const onclick = boton.onclick ? 'tiene-onclick' : 'sin-onclick';
-                console.log(`${index + 1}. "${texto}" | ID: ${id} | Clase: ${clase} | ${onclick}`);
-            });
-        }
-        
-        function probarValidacion() {
-            console.log('🧪 Probando validación...');
-            const campos = document.querySelectorAll('input, textarea');
-            campos.forEach(campo => {
-                if (campo.offsetParent !== null) {
-                    validarCampo(campo);
-                }
-            });
-        }
-        
-        function limpiarTodo() {
-            console.log('🧹 Limpiando validaciones...');
-            document.querySelectorAll('.campo-error, .campo-valido').forEach(campo => {
-                campo.classList.remove('campo-error', 'campo-valido');
-            });
-            document.querySelectorAll('.mensaje-error, .mensaje-exito').forEach(mensaje => {
-                mensaje.remove();
-            });
-            console.log('✅ Limpieza completa');
-        }
-
+    });
     
+    // === FUNCIONES DE UTILIDAD ===
+    function verificarSecciones() {
+        console.log('🔍 VERIFICANDO SECCIONES:');
+        console.log('FormSection:', document.getElementById('formSection'));
+        console.log('LoadingSection:', document.getElementById('loadingSection'));
+        console.log('ResultSection:', document.getElementById('resultSection'));
+    }
+    
+    function probarFlujo() {
+        console.log('🧪 PROBANDO FLUJO DE SECCIONES:');
+        
+        const formSection = document.getElementById('formSection');
+        const loadingSection = document.getElementById('loadingSection');
+        const resultSection = document.getElementById('resultSection');
+        
+        if (formSection && loadingSection && resultSection) {
+            console.log('✅ Todas las secciones encontradas');
+            
+            // Simular flujo
+            console.log('📝 Mostrando formulario...');
+            formSection.style.display = 'block';
+            loadingSection.style.display = 'none';
+            resultSection.style.display = 'none';
+            
+            setTimeout(() => {
+                console.log('⏳ Mostrando carga...');
+                formSection.style.display = 'none';
+                loadingSection.style.display = 'block';
+                resultSection.style.display = 'none';
+            }, 2000);
+            
+            setTimeout(() => {
+                console.log('📊 Mostrando resultados...');
+                formSection.style.display = 'none';
+                loadingSection.style.display = 'none';
+                resultSection.style.display = 'block';
+            }, 4000);
+        } else {
+            console.log('❌ Faltan secciones - verifica los IDs');
+        }
+    }
+    
+    function limpiarTodo() {
+        console.log('🧹 Limpiando validaciones...');
+        document.querySelectorAll('.campo-error, .campo-valido').forEach(campo => {
+            campo.classList.remove('campo-error', 'campo-valido');
+        });
+        document.querySelectorAll('.mensaje-error, .mensaje-exito').forEach(mensaje => {
+            mensaje.remove();
+        });
+        console.log('✅ Limpieza completa');
+    }
 </script>
 
             <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 hidden">
