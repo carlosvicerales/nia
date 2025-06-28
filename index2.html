@@ -619,204 +619,141 @@
     }
 
 //Sanitizador:
-    // Función principal de sanitización - técnicamente robusta y probada
-    function sanitizeForJSON(inputString) {
-        if (typeof inputString !== 'string' || !inputString) {
-            return '';
-        }
-        
-        return inputString
-            // Paso 1: Escapar barras invertidas primero (orden crítico)
-            .replace(/\\/g, '\\\\')
-            // Paso 2: Escapar comillas dobles
-            .replace(/"/g, '\\"')
-            // Paso 3: Escapar comillas simples  
-            .replace(/'/g, "\\'")
-            // Paso 4: Manejar saltos de línea y caracteres especiales
-            .replace(/\n/g, '\\n')
-            .replace(/\r/g, '\\r')
-            .replace(/\t/g, '\\t')
-            // Paso 5: Eliminar caracteres de control problemáticos
-            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
-            // Paso 6: Limpiar espacios excesivos
-            .replace(/\s+/g, ' ')
-            .trim();
+    // Función de codificación Base64 robusta y segura
+function codificarBase64Seguro(texto) {
+    if (!texto || typeof texto !== 'string') {
+        return '';
     }
     
-    // Función para validar que el JSON sea correcto
-    function validateJSONStructure(data) {
-        try {
-            JSON.stringify(data);
-            return true;
-        } catch (error) {
-            console.error('Error de validación JSON:', error);
-            return false;
-        }
+    try {
+        // Codificación segura que maneja caracteres UTF-8
+        return btoa(unescape(encodeURIComponent(texto.trim())));
+    } catch (error) {
+        console.error('Error en codificación Base64:', error);
+        return btoa(texto.replace(/[^\x00-\x7F]/g, "")); // Fallback para caracteres problemáticos
     }
+}
+
+// Función para recopilar y codificar todos los campos del formulario
+function recopilarDatosCodificados() {
+    const datosCodificados = {};
     
-    // Función para recopilar y sanitizar todos los datos del formulario
-    function collectSanitizedFormData() {
-        // Mapeo de todos los campos de tu formulario de diagnóstico
-        const formFields = {
-            tipoClientes: 'input[name*="cliente"], textarea[name*="cliente"], #clientes',
-            problemaPrincipal: 'input[name*="problema"], textarea[name*="problema"], #problema',
-            resultadoTransformacion: 'input[name*="resultado"], textarea[name*="resultado"], #resultado',
-            diferenciador: 'input[name*="diferencia"], textarea[name*="diferencia"], #diferenciador',
-            narrativaActual: 'input[name*="narrativa"], textarea[name*="narrativa"], #narrativa, textarea[name*="presentacion"]',
-            nombre: 'input[name*="nombre"], #nombre',
-            email: 'input[name*="email"], input[type="email"], #email',
-            telefono: 'input[name*="telefono"], input[name*="phone"], #telefono',
-            empresa: 'input[name*="empresa"], #empresa'
-        };
-        
-        const sanitizedData = {};
-        
-        // Procesar cada campo del formulario
-        Object.keys(formFields).forEach(fieldKey => {
-            const selectors = formFields[fieldKey].split(', ');
-            let fieldValue = '';
-            
-            // Buscar el campo usando múltiples selectores
-            for (const selector of selectors) {
-                const element = document.querySelector(selector);
-                if (element && element.value) {
-                    fieldValue = element.value;
-                    break;
-                }
-            }
-            
-            // Sanitizar el valor encontrado
-            sanitizedData[fieldKey] = sanitizeForJSON(fieldValue);
-        });
-        
-        // Validar la estructura final
-        if (!validateJSONStructure(sanitizedData)) {
-            throw new Error('Los datos sanitizados no generan un JSON válido');
-        }
-        
-        return sanitizedData;
-    }
+    // Buscar todos los campos de entrada con múltiples estrategias
+    const campos = document.querySelectorAll('input, textarea, select');
     
-    // Función para enviar datos a MAKE con manejo robusto de errores
-    async function sendToMAKE(sanitizedData) {
-        const MAKE_WEBHOOK_URL = 'TU_URL_DE_WEBHOOK_AQUI'; // Reemplaza con tu URL real
-        
-        try {
-            console.log('Enviando datos sanitizados:', sanitizedData);
+    campos.forEach((campo, index) => {
+        if (campo.value && campo.value.trim()) {
+            // Generar nombre de campo inteligente
+            const nombreCampo = campo.name || 
+                               campo.id || 
+                               campo.getAttribute('data-field') ||
+                               campo.placeholder?.toLowerCase().replace(/[^a-z0-9]/g, '_') ||
+                               `campo_${index}`;
             
-            const response = await fetch(MAKE_WEBHOOK_URL, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(sanitizedData)
-            });
+            // Codificar el valor
+            datosCodificados[nombreCampo] = codificarBase64Seguro(campo.value);
             
-            if (!response.ok) {
-                throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
-            }
-            
-            const result = await response.json();
-            console.log('✅ Datos enviados exitosamente a MAKE:', result);
-            return result;
-            
-        } catch (error) {
-            console.error('❌ Error al enviar a MAKE:', error);
-            throw error;
-        }
-    }
-    
-    // Función principal para manejar el envío del formulario
-    async function handleDiagnosticoSubmission(event) {
-        if (event) {
-            event.preventDefault();
-        }
-        
-        try {
-            // Mostrar indicador de carga
-            const loadingElement = document.querySelector('.loading, [class*="loading"]');
-            if (loadingElement) {
-                loadingElement.style.display = 'block';
-            }
-            
-            // Recopilar y sanitizar datos
-            const sanitizedData = collectSanitizedFormData();
-            
-            // Enviar a MAKE
-            const result = await sendToMAKE(sanitizedData);
-            
-            // Mostrar resultado exitoso
-            showDiagnosticoResult(result);
-            
-        } catch (error) {
-            console.error('Error en el proceso de diagnóstico:', error);
-            showErrorMessage('Hubo un problema al procesar tu diagnóstico. Por favor, intenta nuevamente.');
-        } finally {
-            // Ocultar indicador de carga
-            const loadingElement = document.querySelector('.loading, [class*="loading"]');
-            if (loadingElement) {
-                loadingElement.style.display = 'none';
-            }
-        }
-    }
-    
-    // Funciones auxiliares para la interfaz
-    function showDiagnosticoResult(data) {
-        // Mostrar la sección de resultados
-        const resultSection = document.querySelector('.diagnostico-resultado, [class*="resultado"]');
-        if (resultSection) {
-            resultSection.style.display = 'block';
-            resultSection.scrollIntoView({ behavior: 'smooth' });
-        }
-    }
-    
-    function showErrorMessage(message) {
-        alert(message); // Puedes reemplazar esto con tu sistema de notificaciones
-    }
-    
-    // Inicialización cuando el DOM esté listo
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 Sistema de sanitización de NIA iniciado');
-        
-        // Buscar el formulario principal con múltiples selectores
-        const possibleSelectors = [
-            'form',
-            '[data-form="diagnostico"]',
-            '.diagnostico-form',
-            '#diagnosticoForm',
-            'form[action*="make"]'
-        ];
-        
-        let form = null;
-        for (const selector of possibleSelectors) {
-            form = document.querySelector(selector);
-            if (form) break;
-        }
-        
-        if (form) {
-            form.addEventListener('submit', handleDiagnosticoSubmission);
-            console.log('✅ Formulario encontrado y configurado');
-        }
-        
-        // También buscar botones de envío específicos
-        const submitButtons = document.querySelectorAll(
-            'button[type="submit"], .submit-btn, [data-submit], button[class*="enviar"]'
-        );
-        
-        submitButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                if (!form) {
-                    e.preventDefault();
-                    handleDiagnosticoSubmission(e);
-                }
-            });
-        });
-        
-        if (submitButtons.length > 0) {
-            console.log(`✅ ${submitButtons.length} botón(es) de envío configurado(s)`);
+            console.log(`✅ Campo codificado: ${nombreCampo} = ${campo.value.substring(0, 50)}...`);
         }
     });
+    
+    // Agregar metadatos útiles
+    datosCodificados.timestamp = new Date().toISOString();
+    datosCodificados.user_agent = codificarBase64Seguro(navigator.userAgent);
+    datosCodificados.url_origen = codificarBase64Seguro(window.location.href);
+    
+    return datosCodificados;
+}
+
+// Función de envío simplificada y robusta
+async function enviarDatosCodificados(webhookUrl) {
+    try {
+        console.log('🚀 Iniciando envío con Base64...');
+        
+        const datosCodificados = recopilarDatosCodificados();
+        
+        // Validar que tenemos datos
+        const camposConDatos = Object.keys(datosCodificados).filter(key => 
+            key !== 'timestamp' && key !== 'user_agent' && key !== 'url_origen'
+        );
+        
+        if (camposConDatos.length === 0) {
+            throw new Error('No se encontraron campos con datos para enviar');
+        }
+        
+        console.log(`📤 Enviando ${camposConDatos.length} campos codificados:`, camposConDatos);
+        
+        const respuesta = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(datosCodificados)
+        });
+        
+        if (!respuesta.ok) {
+            throw new Error(`Error HTTP ${respuesta.status}: ${respuesta.statusText}`);
+        }
+        
+        const resultado = await respuesta.json();
+        console.log('✅ ENVÍO EXITOSO - Datos Base64 procesados correctamente:', resultado);
+        
+        return resultado;
+        
+    } catch (error) {
+        console.error('❌ ERROR EN ENVÍO BASE64:', error);
+        throw error;
+    }
+}
+
+// Configuración automática del formulario
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🔧 Configurando sistema Base64 para NIA...');
+    
+    const WEBHOOK_URL = 'TU_URL_DE_WEBHOOK_MAKE_AQUI'; // Reemplaza con tu URL real
+    
+    // Buscar formulario principal
+    const formulario = document.querySelector('form') || document.body;
+    
+    // Buscar botones de envío
+    const botonesEnvio = document.querySelectorAll(`
+        button[type="submit"],
+        input[type="submit"], 
+        button[class*="submit"],
+        button[class*="enviar"],
+        [data-submit="true"]
+    `);
+    
+    // Configurar interceptación de envíos
+    if (formulario.tagName === 'FORM') {
+        formulario.addEventListener('submit', async function(evento) {
+            evento.preventDefault();
+            await enviarDatosCodificados(WEBHOOK_URL);
+        });
+    }
+    
+    // Configurar botones de envío
+    botonesEnvio.forEach(boton => {
+        boton.addEventListener('click', async function(evento) {
+            evento.preventDefault();
+            await enviarDatosCodificados(WEBHOOK_URL);
+        });
+    });
+    
+    console.log(`✅ Sistema Base64 configurado - ${botonesEnvio.length} botón(es) interceptado(s)`);
+});
+
+// Función de prueba para validar en consola
+function probarCodificacion() {
+    const textoPrueba = 'Texto con "comillas" y \n saltos de línea';
+    const codificado = codificarBase64Seguro(textoPrueba);
+    console.log('🧪 PRUEBA DE CODIFICACIÓN:');
+    console.log('Original:', textoPrueba);
+    console.log('Codificado:', codificado);
+    console.log('Decodificado:', decodeURIComponent(escape(atob(codificado))));
+}
+
 
 </script>
 
