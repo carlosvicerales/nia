@@ -898,83 +898,150 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // === ENVÍO DE DATOS ===
-    async function enviarDatos() {
-        console.log('🚀 Iniciando proceso de envío...');
-        
-        // VALIDACIÓN ESTRICTA - BLOQUEA SI HAY ERRORES
-        if (!validarFormularioCompleto()) {
-            console.log('🚫 Envío BLOQUEADO debido a errores de validación');
-            return false;
-        }
-        
-        // Mostrar pantalla de carga
-        mostrarPantalla('loadingScreen');
-        
-        // Recopilar datos sanitizados
-        const datos = {};
-        
-        // Recopilar respuestas de preguntas
-        for (let i = 1; i <= 5; i++) {
-            const campo = document.getElementById(`answer${i}`);
-            if (campo && campo.value) {
-                datos[`answer${i}`] = sanitizarTexto(campo.value);
-            }
-        }
-        
-        // Recopilar datos personales
-        const camposPersonales = ['firstName', 'lastName', 'email', 'whatsapp'];
-        camposPersonales.forEach(campoId => {
-            const campo = document.getElementById(campoId);
-            if (campo && campo.value) {
-                datos[campoId] = sanitizarTexto(campo.value);
-            }
-        });
-        
-        console.log('📤 Datos sanitizados para envío:', datos);
-        
-        if (Object.keys(datos).length === 0) {
-            console.log('⚠️ No hay datos para enviar');
-            mostrarPantalla('dataScreen');
-            alert('No se encontraron datos para procesar. Por favor, completa el formulario.');
-            return false;
-        }
-        
-        // Envío a MAKE
-        try {
-            console.log('🌐 Enviando petición a MAKE...');
-            
-            const response = await fetch('https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json'
-                },
-                body: JSON.stringify(datos)
-            });
-            
-            console.log(`📡 Respuesta recibida - Status: ${response.status}`);
-            
-            if (response.status >= 200 && response.status < 300) {
-                console.log('✅ Envío exitoso a MAKE');
-                
-                // Mostrar resultados después de delay
-                setTimeout(() => {
-                    mostrarPantalla('resultsScreen');
-                }, 1500);
-                
-                return true;
-                
+
+        async function enviarDatos() {
+    console.log('🚀 Iniciando proceso de envío corregido...');
+    
+    // VALIDACIÓN ESTRICTA
+    if (!validarFormularioCompleto()) {
+        console.log('🚫 Envío BLOQUEADO debido a errores de validación');
+        return false;
+    }
+    
+    // Mostrar pantalla de carga
+    mostrarPantalla('loadingScreen');
+    
+    // ESTRATEGIA DE RECOLECCIÓN ROBUSTA
+    console.log('📊 INICIANDO RECOLECCIÓN DE DATOS...');
+    const datos = {};
+    
+    // Estrategia 1: Recolección específica por IDs (principal)
+    console.log('🎯 Estrategia 1: Recolección por IDs específicos');
+    
+    // Recopilar respuestas de preguntas
+    for (let i = 1; i <= 5; i++) {
+        const campo = document.getElementById(`answer${i}`);
+        if (campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            if (valor) {
+                datos[`answer${i}`] = sanitizarTexto(valor);
+                console.log(`✅ answer${i} capturado: "${datos[`answer${i}`].substring(0, 30)}..."`);
             } else {
-                throw new Error(`Error HTTP ${response.status}: ${response.statusText}`);
+                console.log(`⚠️ answer${i} encontrado pero vacío`);
             }
-            
-        } catch (error) {
-            console.error('❌ Error en envío:', error);
-            mostrarPantalla('dataScreen');
-            alert('Hubo un problema al enviar tu información. Por favor, inténtalo de nuevo.');
-            return false;
+        } else {
+            console.log(`❌ answer${i} NO encontrado en DOM`);
         }
     }
+    
+    // Recopilar datos personales
+    const camposPersonales = ['firstName', 'lastName', 'email', 'whatsapp'];
+    camposPersonales.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            if (valor) {
+                datos[campoId] = sanitizarTexto(valor);
+                console.log(`✅ ${campoId} capturado: "${datos[campoId]}"`);
+            } else {
+                console.log(`⚠️ ${campoId} encontrado pero vacío`);
+            }
+        } else {
+            console.log(`❌ ${campoId} NO encontrado en DOM`);
+        }
+    });
+    
+    // Estrategia 2: Fallback - Buscar cualquier campo con datos
+    if (Object.keys(datos).length < 7) { // Esperamos al menos 5 respuestas + 2 datos personales mínimos
+        console.log('🔄 Estrategia 2: Fallback - buscando todos los campos con datos');
+        
+        const todosLosCampos = document.querySelectorAll('input, textarea');
+        todosLosCampos.forEach((campo, index) => {
+            const valor = campo.value ? campo.value.trim() : '';
+            if (valor) {
+                const clave = campo.id || campo.name || `campo_detectado_${index}`;
+                if (!datos[clave]) { // Solo agregar si no lo tenemos ya
+                    datos[clave] = sanitizarTexto(valor);
+                    console.log(`🔄 Fallback capturado - ${clave}: "${datos[clave].substring(0, 30)}..."`);
+                }
+            }
+        });
+    }
+    
+    // Estrategia 3: Verificación de datos críticos
+    console.log('🔍 VERIFICACIÓN FINAL DE DATOS:');
+    console.log('📤 Datos finales para envío:', datos);
+    console.log(`📊 Total de campos capturados: ${Object.keys(datos).length}`);
+    
+    // Validaciones de integridad
+    const respuestasCapturadas = Object.keys(datos).filter(key => key.startsWith('answer')).length;
+    const datosPersonalesCapturados = ['firstName', 'lastName', 'email', 'whatsapp'].filter(key => datos[key]).length;
+    
+    console.log(`📋 Respuestas capturadas: ${respuestasCapturadas}/5`);
+    console.log(`👤 Datos personales capturados: ${datosPersonalesCapturados}/4`);
+    
+    // Validar que tenemos datos suficientes
+    if (Object.keys(datos).length === 0) {
+        console.error('❌ NO SE CAPTURARON DATOS');
+        mostrarPantalla('dataScreen');
+        alert('No se pudieron capturar los datos del formulario. Por favor, recarga la página e inténtalo de nuevo.');
+        return false;
+    }
+    
+    if (respuestasCapturadas < 3) { // Al menos 3 respuestas para un diagnóstico mínimo
+        console.error(`❌ Datos insuficientes: solo ${respuestasCapturadas} respuestas capturadas`);
+        mostrarPantalla('dataScreen');
+        alert('Faltan respuestas por capturar. Por favor, asegúrate de completar todas las preguntas.');
+        return false;
+    }
+    
+    // Envío a MAKE con URL corregida
+    try {
+        console.log('🌐 Enviando petición a MAKE (webhook desarrollo - URL corregida)...');
+        
+        const response = await fetch('https://hook.us1.make.com/slwcooqhakkql48jwkdudbm3y67b5d33', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify(datos)
+        });
+        
+        console.log(`📡 Respuesta recibida - Status: ${response.status}`);
+        
+        if (response.status >= 200 && response.status < 300) {
+            console.log('✅ Envío exitoso a MAKE');
+            
+            // Intentar leer la respuesta
+            try {
+                const resultado = await response.json();
+                console.log('📋 Respuesta JSON de MAKE:', resultado);
+            } catch (jsonError) {
+                console.log('📋 Respuesta procesada correctamente (sin JSON válido)');
+            }
+            
+            // Mostrar resultados después de delay
+            setTimeout(() => {
+                mostrarPantalla('resultsScreen');
+            }, 1500);
+            
+            return true;
+            
+        } else {
+            const errorText = await response.text();
+            console.error(`❌ Error ${response.status}: ${errorText}`);
+            throw new Error(`Error HTTP ${response.status}: ${errorText}`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error en envío:', error);
+        mostrarPantalla('dataScreen');
+        alert('Hubo un problema al enviar tu información. Por favor, inténtalo de nuevo.');
+        return false;
+    }
+}
+
     
     // === INTERCEPTACIÓN DE TUS FUNCIONES EXISTENTES ===
     
@@ -1093,7 +1160,8 @@ function limpiarTodo() {
     console.log('✅ Limpieza completa');
 }
 
-  // Función de debugging específica para el problema de MAKE
+// ==== DEBBUG ====    
+// Función de debugging específica para el problema de MAKE
 async function debugearEnvioMAKE() {
     console.log('🔍 DEBUGGING ESPECÍFICO PARA MAKE');
     
@@ -1137,7 +1205,7 @@ async function debugearEnvioMAKE() {
     try {
         console.log('🚀 ENVIANDO A MAKE...');
         
-        const response = await fetch('https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc', {
+        const response = await fetch('https://hook.us1.make.com/slwcooqhakkql48jwkdudbm3y67b5d33', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -1168,7 +1236,56 @@ async function debugearEnvioMAKE() {
         
     } catch (error) {
         console.error('❌ ERROR DE RED:', error);
+        }
     }
+
+// ===NUEVO DEBUGGEAR
+    function diagnosticarCapturaDatos() {
+    console.log('🔍 DIAGNÓSTICO COMPLETO DE CAPTURA DE DATOS');
+    
+    // Verificar campos de preguntas
+    console.log('📋 CAMPOS DE PREGUNTAS:');
+    for (let i = 1; i <= 5; i++) {
+        const campo = document.getElementById(`answer${i}`);
+        console.log(`answer${i}:`, {
+            existe: !!campo,
+            valor: campo ? `"${campo.value.substring(0, 30)}..."` : 'N/A',
+            longitud: campo ? campo.value.length : 0,
+            visible: campo ? campo.offsetParent !== null : false,
+            enDOM: !!campo
+        });
+    }
+    
+    // Verificar campos personales
+    console.log('👤 CAMPOS PERSONALES:');
+    ['firstName', 'lastName', 'email', 'whatsapp'].forEach(id => {
+        const campo = document.getElementById(id);
+        console.log(`${id}:`, {
+            existe: !!campo,
+            valor: campo ? `"${campo.value}"` : 'N/A',
+            longitud: campo ? campo.value.length : 0,
+            visible: campo ? campo.offsetParent !== null : false
+        });
+    });
+    
+    // Buscar TODOS los campos con datos
+    console.log('🔍 TODOS LOS CAMPOS CON DATOS:');
+    const todosLosCampos = document.querySelectorAll('input, textarea');
+    let camposConDatos = 0;
+    todosLosCampos.forEach((campo, index) => {
+        if (campo.value && campo.value.trim()) {
+            camposConDatos++;
+            console.log(`Campo ${index}:`, {
+                id: campo.id || 'sin-id',
+                name: campo.name || 'sin-name',
+                valor: `"${campo.value.substring(0, 40)}..."`,
+                tipo: campo.tagName,
+                visible: campo.offsetParent !== null
+            });
+        }
+    });
+    
+    console.log(`📊 RESUMEN: ${camposConDatos} campos con datos encontrados`);
 }
 
     
