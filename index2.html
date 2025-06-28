@@ -619,87 +619,410 @@
     }
 
 //Sanitizador:
-// LIMPIADOR ULTRA-SIMPLE DE COMILLAS
+// SISTEMA DE VALIDACIÓN INTELIGENTE PARA NIA - VERSIÓN DEFINITIVA
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🧹 Limpiador de comillas NIA activado');
+    console.log('🛡️ Sistema de validación NIA activado');
     
-    // Función para eliminar comillas completamente
-    function eliminarComillas(texto) {
-        if (typeof texto !== 'string') return texto;
-        return texto
-            .replace(/"/g, '')    // Eliminar todas las comillas dobles
-            .replace(/'/g, '')    // Eliminar todas las comillas simples
-            .replace(/`/g, '')    // Eliminar comillas invertidas
-            .trim();              // Limpiar espacios extra
+    // === FUNCIONES DE MODAL DE ERROR ===
+    function mostrarError(mensaje) {
+        const modal = document.getElementById('errorModal');
+        const mensajeElement = document.getElementById('errorModalMessage');
+        
+        if (modal && mensajeElement) {
+            // Mostrar modal personalizado
+            mensajeElement.innerHTML = mensaje.replace(/\n/g, '<br>');
+            modal.classList.remove('hidden');
+            console.log('⚠️ Error mostrado en modal:', mensaje);
+        } else {
+            // Fallback si el modal no existe o tiene problemas
+            alert(mensaje);
+            console.log('⚠️ Error mostrado en alert (fallback):', mensaje);
+        }
     }
     
-    // Función para limpiar todos los campos antes del envío
-    function limpiarTodosLosCampos() {
-        console.log('🔍 Limpiando campos...');
+    // Función global para cerrar el modal
+    window.closeErrorModal = function() {
+        const modal = document.getElementById('errorModal');
+        if (modal) {
+            modal.classList.add('hidden');
+            console.log('✅ Modal de error cerrado');
+        }
+    }
+    
+    // === FUNCIONES DE VALIDACIÓN ===
+    
+    // Validar si el texto es apropiado para el diagnóstico
+    function esTextoValido(texto) {
+        if (!texto || typeof texto !== 'string') {
+            return { valido: false, razon: 'Texto vacío' };
+        }
         
-        let camposLimpiados = 0;
+        const textoLimpio = texto.trim();
         
-        // Buscar y limpiar TODOS los inputs y textareas
-        document.querySelectorAll('input, textarea').forEach(campo => {
-            if (campo.value && campo.value.includes('"') || campo.value.includes("'")) {
-                const valorOriginal = campo.value;
-                campo.value = eliminarComillas(valorOriginal);
-                console.log(`✅ Limpiado: "${valorOriginal}" → "${campo.value}"`);
-                camposLimpiados++;
+        // Verificar longitud mínima
+        if (textoLimpio.length < 10) {
+            return { valido: false, razon: 'Muy corto (mínimo 10 caracteres)' };
+        }
+        
+        // Verificar si contiene HTML
+        if (/<[^>]*>/g.test(texto)) {
+            return { valido: false, razon: 'Contiene código HTML' };
+        }
+        
+        // Verificar múltiples saltos de línea (indica texto copiado complejo)
+        const saltosDeLinea = (texto.match(/\n/g) || []).length;
+        if (saltosDeLinea > 4) {
+            return { valido: false, razon: 'Texto copiado de web (muchos saltos de línea)' };
+        }
+        
+        // Verificar caracteres de control problemáticos
+        if (/[\u0000-\u001F\u007F-\u009F]/g.test(texto)) {
+            return { valido: false, razon: 'Contiene caracteres de control problemáticos' };
+        }
+        
+        // Verificar que no sea solo espacios o caracteres especiales
+        if (!/[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9]/.test(textoLimpio)) {
+            return { valido: false, razon: 'No contiene texto válido' };
+        }
+        
+        return { valido: true, razon: 'Texto válido' };
+    }
+    
+    // Validar email
+    function validarEmail(email) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email.trim());
+    }
+    
+    // Validar teléfono/WhatsApp
+    function validarTelefono(telefono) {
+        // Limpiar el teléfono de espacios y caracteres especiales
+        const telefonoLimpio = telefono.replace(/[\s\-\(\)]/g, '');
+        // Debe tener entre 8 y 15 dígitos, puede empezar con +
+        const telefonoRegex = /^[\+]?[\d]{8,15}$/;
+        return telefonoRegex.test(telefonoLimpio);
+    }
+    
+    // === VALIDACIÓN PRINCIPAL DEL FORMULARIO ===
+    function validarFormularioCompleto() {
+        console.log('🔍 Iniciando validación completa del diagnóstico...');
+        
+        const errores = [];
+        
+        // PASO 1: Validar las 5 preguntas del diagnóstico
+        const preguntasDiagnostico = [
+            {
+                // Adaptado a tu HTML real - busca por múltiples selectores
+                selectores: [
+                    'textarea[name*="respuesta"]',
+                    'textarea[name*="pregunta"]', 
+                    'input[name*="respuesta"]',
+                    'textarea[placeholder*="clientes"]',
+                    'textarea[placeholder*="empresas"]'
+                ],
+                nombre: '¿Qué tipo de empresas o clientes atiendes?',
+                indice: 1
+            },
+            {
+                selectores: [
+                    'textarea[name*="problema"]',
+                    'input[name*="problema"]',
+                    'textarea[placeholder*="problema"]'
+                ],
+                nombre: '¿Qué problema principal resuelves?',
+                indice: 2
+            },
+            {
+                selectores: [
+                    'textarea[name*="resultado"]',
+                    'textarea[name*="transformacion"]',
+                    'input[name*="resultado"]',
+                    'textarea[placeholder*="resultado"]'
+                ],
+                nombre: '¿Qué resultado o transformación logran tus clientes?',
+                indice: 3
+            },
+            {
+                selectores: [
+                    'textarea[name*="diferencia"]',
+                    'textarea[name*="eligen"]',
+                    'input[name*="diferencia"]',
+                    'textarea[placeholder*="eligen"]'
+                ],
+                nombre: '¿Por qué tus clientes te eligen a ti?',
+                indice: 4
+            },
+            {
+                selectores: [
+                    'textarea[name*="narrativa"]',
+                    'textarea[name*="presentas"]',
+                    'textarea[name*="propuesta"]',
+                    'input[name*="narrativa"]',
+                    'textarea[placeholder*="presentas"]'
+                ],
+                nombre: 'Cómo sueles presentar tu negocio',
+                indice: 5
+            }
+        ];
+        
+        // Validar cada pregunta del diagnóstico
+        preguntasDiagnostico.forEach(pregunta => {
+            let campoEncontrado = null;
+            let valorCampo = '';
+            
+            // Buscar el campo usando múltiples selectores
+            for (const selector of pregunta.selectores) {
+                const campo = document.querySelector(selector);
+                if (campo && campo.value) {
+                    campoEncontrado = campo;
+                    valorCampo = campo.value.trim();
+                    break;
+                }
+            }
+            
+            // Si no encontramos el campo específico, buscar por índice en arrays
+            if (!campoEncontrado) {
+                const camposRespuesta = document.querySelectorAll('textarea, input[type="text"]');
+                if (camposRespuesta[pregunta.indice - 1]) {
+                    campoEncontrado = camposRespuesta[pregunta.indice - 1];
+                    valorCampo = campoEncontrado.value ? campoEncontrado.value.trim() : '';
+                }
+            }
+            
+            if (!campoEncontrado) {
+                console.log(`⚠️ No se encontró campo para: ${pregunta.nombre}`);
+                return;
+            }
+            
+            // Validar que no esté vacío
+            if (!valorCampo) {
+                errores.push(`Debes responder: "${pregunta.nombre}"`);
+                return;
+            }
+            
+            // Validar que el texto sea apropiado
+            const validacionTexto = esTextoValido(valorCampo);
+            if (!validacionTexto.valido) {
+                errores.push(`"${pregunta.nombre}": ${validacionTexto.razon}. Por favor, ingresa texto plano sin copiar de páginas web.`);
             }
         });
         
-        console.log(`🎯 Total de campos limpiados: ${camposLimpiados}`);
+        // PASO 2: Validar datos de contacto obligatorios
+        const datosContacto = [
+            {
+                selectores: ['input[name*="nombre"]', '#nombre', 'input[placeholder*="nombre"]'],
+                nombre: 'Nombre',
+                tipo: 'nombre'
+            },
+            {
+                selectores: ['input[name*="apellido"]', '#apellido', 'input[placeholder*="apellido"]'],
+                nombre: 'Apellido', 
+                tipo: 'nombre'
+            },
+            {
+                selectores: ['input[type="email"]', 'input[name*="email"]', '#email', 'input[placeholder*="email"]'],
+                nombre: 'Email',
+                tipo: 'email'
+            },
+            {
+                selectores: ['input[name*="whatsapp"]', 'input[name*="telefono"]', '#whatsapp', 'input[placeholder*="whatsapp"]'],
+                nombre: 'WhatsApp',
+                tipo: 'telefono'
+            }
+        ];
+        
+        datosContacto.forEach(contacto => {
+            let campoEncontrado = null;
+            let valorCampo = '';
+            
+            // Buscar el campo
+            for (const selector of contacto.selectores) {
+                const campo = document.querySelector(selector);
+                if (campo) {
+                    campoEncontrado = campo;
+                    valorCampo = campo.value ? campo.value.trim() : '';
+                    break;
+                }
+            }
+            
+            if (!campoEncontrado) {
+                console.log(`⚠️ No se encontró campo para: ${contacto.nombre}`);
+                return;
+            }
+            
+            // Validar que no esté vacío
+            if (!valorCampo) {
+                errores.push(`El campo "${contacto.nombre}" es obligatorio.`);
+                return;
+            }
+            
+            // Validaciones específicas por tipo
+            if (contacto.tipo === 'email') {
+                if (!validarEmail(valorCampo)) {
+                    errores.push(`Por favor, ingresa un email válido.`);
+                }
+            } else if (contacto.tipo === 'telefono') {
+                if (!validarTelefono(valorCampo)) {
+                    errores.push(`Por favor, ingresa un número de WhatsApp válido (ej: +56987654321).`);
+                }
+            } else if (contacto.tipo === 'nombre') {
+                if (valorCampo.length < 2) {
+                    errores.push(`El campo "${contacto.nombre}" debe tener al menos 2 caracteres.`);
+                }
+            }
+        });
+        
+        // Mostrar errores si los hay
+        if (errores.length > 0) {
+            const mensajeError = errores.join('\n\n');
+            mostrarError(mensajeError);
+            console.log('❌ Errores de validación:', errores);
+            return false;
+        }
+        
+        console.log('✅ Validación completa exitosa - todos los campos son válidos');
+        return true;
     }
     
-    // Interceptar TODOS los posibles envíos
-    // Opción 1: Formularios
+    // === INTERCEPTACIÓN DE ENVÍOS ===
+    
+    // Función para interceptar y validar antes del envío
+    function interceptarYValidar(evento) {
+        console.log('🚀 Interceptando envío para validación...');
+        
+        // Prevenir envío automático
+        if (evento) {
+            evento.preventDefault();
+            evento.stopPropagation();
+        }
+        
+        // Ejecutar validación
+        const esValido = validarFormularioCompleto();
+        
+        if (!esValido) {
+            console.log('❌ Validación fallida - envío cancelado');
+            return false;
+        }
+        
+        console.log('✅ Validación exitosa - permitiendo envío...');
+        
+        // Si llegamos aquí, la validación pasó
+        // Permitir que el envío original continúe
+        return true;
+    }
+    
+    // Configurar interceptación en múltiples puntos
+    
+    // 1. Interceptar envío de formularios
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function(e) {
-            console.log('📝 Interceptando envío de formulario');
-            limpiarTodosLosCampos();
-        });
-    });
-    
-    // Opción 2: Botones de envío
-    document.querySelectorAll('button, input[type="submit"]').forEach(boton => {
-        boton.addEventListener('click', function(e) {
-            // Verificar si es un botón de envío
-            if (this.type === 'submit' || 
-                this.textContent.toLowerCase().includes('enviar') ||
-                this.className.includes('submit') ||
-                this.className.includes('enviar')) {
-                
-                console.log('🔘 Interceptando click de botón de envío');
-                
-                // Limpiar después de un pequeño delay para capturar los datos
-                setTimeout(limpiarTodosLosCampos, 100);
+            if (!interceptarYValidar(e)) {
+                return false;
             }
+            // Si la validación pasa, permitir envío normal
         });
     });
     
-    // Opción 3: Interceptar cambios en campos (preventivo)
-    document.querySelectorAll('input, textarea').forEach(campo => {
-        campo.addEventListener('blur', function() {
-            if (this.value && (this.value.includes('"') || this.value.includes("'"))) {
-                const valorOriginal = this.value;
-                this.value = eliminarComillas(valorOriginal);
-                console.log(`🔄 Auto-limpiado: "${valorOriginal}" → "${this.value}"`);
+    // 2. Interceptar botones de envío y similares
+    document.addEventListener('click', function(e) {
+        const elemento = e.target;
+        
+        // Detectar si es un botón de envío o acción
+        const esBotonEnvio = (
+            elemento.type === 'submit' ||
+            elemento.textContent.toLowerCase().includes('enviar') ||
+            elemento.textContent.toLowerCase().includes('generar') ||
+            elemento.textContent.toLowerCase().includes('diagnóstico') ||
+            elemento.className.includes('submit') ||
+            elemento.className.includes('btn-primary') ||
+            elemento.onclick !== null
+        );
+        
+        if (esBotonEnvio) {
+            console.log('🔘 Botón de envío detectado:', elemento.textContent || elemento.className);
+            
+            if (!interceptarYValidar(e)) {
+                return false;
             }
-        });
+        }
     });
     
-    console.log('✅ Limpiador configurado - Múltiples puntos de interceptación activos');
+    // 3. Validación en tiempo real para retroalimentación inmediata
+    document.addEventListener('blur', function(e) {
+        if (e.target.tagName === 'TEXTAREA' || e.target.tagName === 'INPUT') {
+            const valor = e.target.value ? e.target.value.trim() : '';
+            
+            if (valor && e.target.tagName === 'TEXTAREA') {
+                const validacion = esTextoValido(valor);
+                if (!validacion.valido) {
+                    console.log(`⚠️ Texto problemático detectado: ${validacion.razon}`);
+                    // No mostrar error inmediatamente para no ser intrusivo
+                    // El error se mostrará al intentar enviar
+                }
+            }
+        }
+    }, true);
+    
+    console.log('✅ Sistema de validación configurado completamente');
 });
 
-// Función de prueba manual
-function probarLimpieza() {
-    console.log('🧪 PRUEBA DE LIMPIEZA:');
-    const pruebas = ['""ssdf"', 'aads"', 'texto con "comillas"'];
-    pruebas.forEach(texto => {
-        const limpio = texto.replace(/"/g, '').replace(/'/g, '');
-        console.log(`"${texto}" → "${limpio}"`);
+// === FUNCIONES DE PRUEBA Y DEBUG ===
+function probarValidaciones() {
+    console.log('🧪 PROBANDO SISTEMA DE VALIDACIÓN:');
+    
+    // Probar validación de texto
+    const textosProblematicos = [
+        'Texto normal y válido para el diagnóstico comercial',
+        'Texto con <div>HTML</div> problemático',
+        'Texto\ncon\nmuchos\nsaltos\nde\nlinea\nproblematicos\nque\nindican\ncopia\nde\nweb',
+        'Corto',
+        '   Solo espacios   ',
+        'Elige el diseño perfecto\nCrea un blog atractivo...' // Tu caso específico
+    ];
+    
+    textosProblematicos.forEach(texto => {
+        // Usar la misma función del script principal
+        const resultado = {
+            valido: texto.trim().length >= 10 && 
+                   !/<[^>]*>/g.test(texto) && 
+                   (texto.match(/\n/g) || []).length <= 4 &&
+                   !/[\u0000-\u001F\u007F-\u009F]/g.test(texto) &&
+                   /[a-zA-ZáéíóúñÁÉÍÓÚÑ0-9]/.test(texto.trim())
+        };
+        console.log(`"${texto.substring(0, 40)}..." → ${resultado.valido ? '✅ Válido' : '❌ Inválido'}`);
     });
+    
+    // Probar validación de email
+    const emails = ['carlos@vicerales.com', 'invalid-email', 'user@domain.co'];
+    emails.forEach(email => {
+        const esValido = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+        console.log(`Email "${email}" → ${esValido ? '✅ Válido' : '❌ Inválido'}`);
+    });
+    
+    // Probar validación de teléfono
+    const telefonos = ['+56987654321', '987654321', '123', '+1-555-123-4567'];
+    telefonos.forEach(tel => {
+        const telLimpio = tel.replace(/[\s\-\(\)]/g, '');
+        const esValido = /^[\+]?[\d]{8,15}$/.test(telLimpio);
+        console.log(`Teléfono "${tel}" → ${esValido ? '✅ Válido' : '❌ Inválido'}`);
+    });
+}
+
+// Función para probar el modal manualmente
+function probarModal() {
+    console.log('🧪 Probando modal de error...');
+    
+    const modal = document.getElementById('errorModal');
+    const mensaje = document.getElementById('errorModalMessage');
+    
+    if (modal && mensaje) {
+        mensaje.textContent = 'Esta es una prueba del modal de error de NIA.';
+        modal.classList.remove('hidden');
+        console.log('✅ Modal mostrado correctamente');
+    } else {
+        console.log('❌ Modal no encontrado - usando fallback');
+        alert('Esta es una prueba del modal de error de NIA (fallback).');
+    }
 }
 
 
