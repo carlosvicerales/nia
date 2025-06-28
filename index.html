@@ -619,41 +619,62 @@
     }
     
 //sanitizador
-// LIMPIADOR ULTRA-SIMPLE DE COMILLAS
+    // SANITIZADOR COMPLETO PARA TEXTO COPIADO - VERSIÓN DEFINITIVA
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🧹 Limpiador de comillas NIA activado');
+    console.log('🧹 Sanitizador completo NIA activado');
     
-    // Función para eliminar comillas completamente
-    function eliminarComillas(texto) {
+    // Función para sanitizar texto manteniendo legibilidad en español
+    function sanitizarTextoCompleto(texto) {
         if (typeof texto !== 'string') return texto;
+        
         return texto
-            .replace(/"/g, '')    // Eliminar todas las comillas dobles
-            .replace(/'/g, '')    // Eliminar todas las comillas simples
-            .replace(/`/g, '')    // Eliminar comillas invertidas
-            .trim();              // Limpiar espacios extra
+            // Paso 1: Eliminar comillas (ya funcionaba perfecto)
+            .replace(/"/g, '')              // Comillas dobles
+            .replace(/'/g, '')              // Comillas simples  
+            .replace(/`/g, '')              // Comillas invertidas
+            
+            // Paso 2: Convertir saltos de línea en espacios (CLAVE para tu error)
+            .replace(/\r\n/g, ' ')          // Windows (CRLF)
+            .replace(/\n/g, ' ')            // Unix/Linux (LF) 
+            .replace(/\r/g, ' ')            // Mac clásico (CR)
+            
+            // Paso 3: Convertir otros caracteres de control en espacios
+            .replace(/\t/g, ' ')            // Tabulaciones
+            .replace(/\f/g, ' ')            // Form feeds
+            .replace(/\v/g, ' ')            // Tabs verticales
+            
+            // Paso 4: Eliminar caracteres de control invisibles (preservando acentos)
+            .replace(/[\u0000-\u001F\u007F]/g, '')  // Solo caracteres de control básicos
+            
+            // Paso 5: Normalizar espacios múltiples
+            .replace(/\s+/g, ' ')           // Múltiples espacios → un espacio
+            .trim();                        // Eliminar espacios al inicio/final
     }
     
-    // Función para limpiar todos los campos antes del envío
+    // Función para limpiar todos los campos
     function limpiarTodosLosCampos() {
         console.log('🔍 Limpiando campos...');
         
         let camposLimpiados = 0;
         
-        // Buscar y limpiar TODOS los inputs y textareas
         document.querySelectorAll('input, textarea').forEach(campo => {
-            if (campo.value && campo.value.includes('"') || campo.value.includes("'")) {
+            if (campo.value) {
                 const valorOriginal = campo.value;
-                campo.value = eliminarComillas(valorOriginal);
-                console.log(`✅ Limpiado: "${valorOriginal}" → "${campo.value}"`);
-                camposLimpiados++;
+                const valorLimpio = sanitizarTextoCompleto(valorOriginal);
+                
+                // Solo actualizar si hay cambios
+                if (valorOriginal !== valorLimpio) {
+                    campo.value = valorLimpio;
+                    console.log(`✅ Sanitizado: "${valorOriginal.substring(0, 40)}..." → "${valorLimpio.substring(0, 40)}..."`);
+                    camposLimpiados++;
+                }
             }
         });
         
-        console.log(`🎯 Total de campos limpiados: ${camposLimpiados}`);
+        console.log(`🎯 Total de campos sanitizados: ${camposLimpiados}`);
     }
     
-    // Interceptar TODOS los posibles envíos
-    // Opción 1: Formularios
+    // Interceptar envíos de formulario
     document.querySelectorAll('form').forEach(form => {
         form.addEventListener('submit', function(e) {
             console.log('📝 Interceptando envío de formulario');
@@ -661,45 +682,75 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Opción 2: Botones de envío
+    // Interceptar botones de envío
     document.querySelectorAll('button, input[type="submit"]').forEach(boton => {
         boton.addEventListener('click', function(e) {
-            // Verificar si es un botón de envío
             if (this.type === 'submit' || 
                 this.textContent.toLowerCase().includes('enviar') ||
                 this.className.includes('submit') ||
-                this.className.includes('enviar')) {
+                this.className.includes('enviar') ||
+                this.id.includes('submit')) {
                 
                 console.log('🔘 Interceptando click de botón de envío');
-                
-                // Limpiar después de un pequeño delay para capturar los datos
                 setTimeout(limpiarTodosLosCampos, 100);
             }
         });
     });
     
-    // Opción 3: Interceptar cambios en campos (preventivo)
+    // Interceptar cambios en campos (limpieza automática)
     document.querySelectorAll('input, textarea').forEach(campo => {
         campo.addEventListener('blur', function() {
-            if (this.value && (this.value.includes('"') || this.value.includes("'"))) {
+            if (this.value) {
                 const valorOriginal = this.value;
-                this.value = eliminarComillas(valorOriginal);
-                console.log(`🔄 Auto-limpiado: "${valorOriginal}" → "${this.value}"`);
+                const valorLimpio = sanitizarTextoCompleto(valorOriginal);
+                
+                if (valorOriginal !== valorLimpio) {
+                    this.value = valorLimpio;
+                    console.log(`🔄 Auto-limpiado: "${valorOriginal.substring(0, 30)}..." → "${valorLimpio.substring(0, 30)}..."`);
+                }
             }
         });
     });
     
-    console.log('✅ Limpiador configurado - Múltiples puntos de interceptación activos');
+    // NUEVO: Interceptar pegado de texto (limpieza inmediata)
+    document.querySelectorAll('input, textarea').forEach(campo => {
+        campo.addEventListener('paste', function(e) {
+            console.log('📋 Texto pegado detectado');
+            
+            // Pequeño delay para que el texto se pegue primero
+            setTimeout(() => {
+                const valorOriginal = this.value;
+                const valorLimpio = sanitizarTextoCompleto(valorOriginal);
+                
+                if (valorOriginal !== valorLimpio) {
+                    this.value = valorLimpio;
+                    console.log(`📋 Texto pegado sanitizado: "${valorOriginal.substring(0, 30)}..." → "${valorLimpio.substring(0, 30)}..."`);
+                }
+            }, 10);
+        });
+    });
+    
+    console.log('✅ Sanitizador completo configurado - Múltiples interceptaciones activas');
 });
 
-// Función de prueba manual
-function probarLimpieza() {
-    console.log('🧪 PRUEBA DE LIMPIEZA:');
-    const pruebas = ['""ssdf"', 'aads"', 'texto con "comillas"'];
-    pruebas.forEach(texto => {
-        const limpio = texto.replace(/"/g, '').replace(/'/g, '');
-        console.log(`"${texto}" → "${limpio}"`);
-    });
+// Función de prueba específica para tu caso
+function probarSanitizacionCompleta() {
+    console.log('🧪 PRUEBA ESPECÍFICA PARA TU CASO:');
+    
+    const textoProblematico = `Elige el diseño perfecto
+Crea un blog atractivo y adaptado a tu estilo. Puedes elegir entre una selección de plantillas fáciles de usar, con diseños flexibles y montones de imágenes de fondo, o bien diseñar un blog totalmente nuevo.`;
+    
+    const textoLimpio = textoProblematico
+        .replace(/"/g, '').replace(/'/g, '').replace(/`/g, '')
+        .replace(/\r\n/g, ' ').replace(/\n/g, ' ').replace(/\r/g, ' ')
+        .replace(/\t/g, ' ').replace(/\f/g, ' ').replace(/\v/g, ' ')
+        .replace(/[\u0000-\u001F\u007F]/g, '')
+        .replace(/\s+/g, ' ').trim();
+    
+    console.log('📝 TEXTO ORIGINAL:', textoProblematico);
+    console.log('✅ TEXTO SANITIZADO:', textoLimpio);
+    console.log('🔍 LONGITUD ORIGINAL:', textoProblematico.length);
+    console.log('🔍 LONGITUD SANITIZADA:', textoLimpio.length);
 }
 
 </script>
