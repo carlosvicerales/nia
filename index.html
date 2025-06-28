@@ -619,42 +619,89 @@
     }
     
 //sanitizador
-// No afecta la lógica ni la estructura: solo limpia los textos peligrosos y pegados desde otras fuentes.
-
-document.addEventListener('DOMContentLoaded', function () {
-    // Detecta todos los formularios del documento
-    document.querySelectorAll('form').forEach(function(form) {
-        form.addEventListener('submit', function(e) {
-            // Sanitiza inputs y textareas
-            form.querySelectorAll('input[type="text"], textarea').forEach(function(input) {
-                input.value = sanitizeText(input.value);
-            });
-            // El flujo de envío continúa normal
-        });
-    });
-
-    // Si usas botones fuera de formularios (flujos tipo wizard), sanitiza en cada siguiente
-    document.querySelectorAll('button, input[type="button"], input[type="submit"]').forEach(function(btn) {
-        btn.addEventListener('click', function() {
-            // Busca campos dentro del mismo contenedor del botón
-            var parent = btn.closest('form, .step, .pregunta, .container, body');
-            if (!parent) return;
-            parent.querySelectorAll('input[type="text"], textarea').forEach(function(input) {
-                input.value = sanitizeText(input.value);
-            });
-        });
-    });
-
-    function sanitizeText(text) {
-        return text
-            .replace(/["']/g, '') // Quita comillas dobles y simples
-            .replace(/[\r\n]+/g, ' ') // Quita saltos de línea
-            .replace(/\t+/g, ' ') // Quita tabs
-            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Quita caracteres de control
-            .replace(/\s+/g, ' ') // Espacios múltiples a uno solo
-            .trim(); // Quita espacios al inicio y final
+// LIMPIADOR ULTRA-SIMPLE DE COMILLAS
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('🧹 Limpiador de comillas NIA activado');
+    
+    // Función para eliminar comillas completamente
+    function eliminarComillas(texto) {
+        if (typeof texto !== 'string') return texto;
+        return texto
+            .replace(/"/g, '')    // Eliminar todas las comillas dobles
+            .replace(/'/g, '')    // Eliminar todas las comillas simples
+            .replace(/`/g, '')    // Eliminar comillas invertidas
+            .trim();              // Limpiar espacios extra
     }
+    
+    // Función para limpiar todos los campos antes del envío
+    function limpiarTodosLosCampos() {
+        console.log('🔍 Limpiando campos...');
+        
+        let camposLimpiados = 0;
+        
+        // Buscar y limpiar TODOS los inputs y textareas
+        document.querySelectorAll('input, textarea').forEach(campo => {
+            if (campo.value && campo.value.includes('"') || campo.value.includes("'")) {
+                const valorOriginal = campo.value;
+                campo.value = eliminarComillas(valorOriginal);
+                console.log(`✅ Limpiado: "${valorOriginal}" → "${campo.value}"`);
+                camposLimpiados++;
+            }
+        });
+        
+        console.log(`🎯 Total de campos limpiados: ${camposLimpiados}`);
+    }
+    
+    // Interceptar TODOS los posibles envíos
+    // Opción 1: Formularios
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            console.log('📝 Interceptando envío de formulario');
+            limpiarTodosLosCampos();
+        });
+    });
+    
+    // Opción 2: Botones de envío
+    document.querySelectorAll('button, input[type="submit"]').forEach(boton => {
+        boton.addEventListener('click', function(e) {
+            // Verificar si es un botón de envío
+            if (this.type === 'submit' || 
+                this.textContent.toLowerCase().includes('enviar') ||
+                this.className.includes('submit') ||
+                this.className.includes('enviar')) {
+                
+                console.log('🔘 Interceptando click de botón de envío');
+                
+                // Limpiar después de un pequeño delay para capturar los datos
+                setTimeout(limpiarTodosLosCampos, 100);
+            }
+        });
+    });
+    
+    // Opción 3: Interceptar cambios en campos (preventivo)
+    document.querySelectorAll('input, textarea').forEach(campo => {
+        campo.addEventListener('blur', function() {
+            if (this.value && (this.value.includes('"') || this.value.includes("'"))) {
+                const valorOriginal = this.value;
+                this.value = eliminarComillas(valorOriginal);
+                console.log(`🔄 Auto-limpiado: "${valorOriginal}" → "${this.value}"`);
+            }
+        });
+    });
+    
+    console.log('✅ Limpiador configurado - Múltiples puntos de interceptación activos');
 });
+
+// Función de prueba manual
+function probarLimpieza() {
+    console.log('🧪 PRUEBA DE LIMPIEZA:');
+    const pruebas = ['""ssdf"', 'aads"', 'texto con "comillas"'];
+    pruebas.forEach(texto => {
+        const limpio = texto.replace(/"/g, '').replace(/'/g, '');
+        console.log(`"${texto}" → "${limpio}"`);
+    });
+}
+
 </script>
 
             <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 hidden">
