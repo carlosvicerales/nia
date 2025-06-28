@@ -619,139 +619,87 @@
     }
 
 //Sanitizador:
-    // Función de codificación Base64 robusta y segura
-function codificarBase64Seguro(texto) {
-    if (!texto || typeof texto !== 'string') {
-        return '';
-    }
-    
-    try {
-        // Codificación segura que maneja caracteres UTF-8
-        return btoa(unescape(encodeURIComponent(texto.trim())));
-    } catch (error) {
-        console.error('Error en codificación Base64:', error);
-        return btoa(texto.replace(/[^\x00-\x7F]/g, "")); // Fallback para caracteres problemáticos
-    }
-}
-
-// Función para recopilar y codificar todos los campos del formulario
-function recopilarDatosCodificados() {
-    const datosCodificados = {};
-    
-    // Buscar todos los campos de entrada con múltiples estrategias
-    const campos = document.querySelectorAll('input, textarea, select');
-    
-    campos.forEach((campo, index) => {
-        if (campo.value && campo.value.trim()) {
-            // Generar nombre de campo inteligente
-            const nombreCampo = campo.name || 
-                               campo.id || 
-                               campo.getAttribute('data-field') ||
-                               campo.placeholder?.toLowerCase().replace(/[^a-z0-9]/g, '_') ||
-                               `campo_${index}`;
-            
-            // Codificar el valor
-            datosCodificados[nombreCampo] = codificarBase64Seguro(campo.value);
-            
-            console.log(`✅ Campo codificado: ${nombreCampo} = ${campo.value.substring(0, 50)}...`);
-        }
-    });
-    
-    // Agregar metadatos útiles
-    datosCodificados.timestamp = new Date().toISOString();
-    datosCodificados.user_agent = codificarBase64Seguro(navigator.userAgent);
-    datosCodificados.url_origen = codificarBase64Seguro(window.location.href);
-    
-    return datosCodificados;
-}
-
-// Función de envío simplificada y robusta
-async function enviarDatosCodificados(webhookUrl) {
-    try {
-        console.log('🚀 Iniciando envío con Base64...');
-        
-        const datosCodificados = recopilarDatosCodificados();
-        
-        // Validar que tenemos datos
-        const camposConDatos = Object.keys(datosCodificados).filter(key => 
-            key !== 'timestamp' && key !== 'user_agent' && key !== 'url_origen'
-        );
-        
-        if (camposConDatos.length === 0) {
-            throw new Error('No se encontraron campos con datos para enviar');
-        }
-        
-        console.log(`📤 Enviando ${camposConDatos.length} campos codificados:`, camposConDatos);
-        
-        const respuesta = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify(datosCodificados)
-        });
-        
-        if (!respuesta.ok) {
-            throw new Error(`Error HTTP ${respuesta.status}: ${respuesta.statusText}`);
-        }
-        
-        const resultado = await respuesta.json();
-        console.log('✅ ENVÍO EXITOSO - Datos Base64 procesados correctamente:', resultado);
-        
-        return resultado;
-        
-    } catch (error) {
-        console.error('❌ ERROR EN ENVÍO BASE64:', error);
-        throw error;
-    }
-}
-
-// Configuración automática del formulario
+// LIMPIADOR ULTRA-SIMPLE DE COMILLAS
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('🔧 Configurando sistema Base64 para NIA...');
+    console.log('🧹 Limpiador de comillas NIA activado');
     
-    const WEBHOOK_URL = 'TU_URL_DE_WEBHOOK_MAKE_AQUI'; // Reemplaza con tu URL real
-    
-    // Buscar formulario principal
-    const formulario = document.querySelector('form') || document.body;
-    
-    // Buscar botones de envío
-    const botonesEnvio = document.querySelectorAll(`
-        button[type="submit"],
-        input[type="submit"], 
-        button[class*="submit"],
-        button[class*="enviar"],
-        [data-submit="true"]
-    `);
-    
-    // Configurar interceptación de envíos
-    if (formulario.tagName === 'FORM') {
-        formulario.addEventListener('submit', async function(evento) {
-            evento.preventDefault();
-            await enviarDatosCodificados(WEBHOOK_URL);
-        });
+    // Función para eliminar comillas completamente
+    function eliminarComillas(texto) {
+        if (typeof texto !== 'string') return texto;
+        return texto
+            .replace(/"/g, '')    // Eliminar todas las comillas dobles
+            .replace(/'/g, '')    // Eliminar todas las comillas simples
+            .replace(/`/g, '')    // Eliminar comillas invertidas
+            .trim();              // Limpiar espacios extra
     }
     
-    // Configurar botones de envío
-    botonesEnvio.forEach(boton => {
-        boton.addEventListener('click', async function(evento) {
-            evento.preventDefault();
-            await enviarDatosCodificados(WEBHOOK_URL);
+    // Función para limpiar todos los campos antes del envío
+    function limpiarTodosLosCampos() {
+        console.log('🔍 Limpiando campos...');
+        
+        let camposLimpiados = 0;
+        
+        // Buscar y limpiar TODOS los inputs y textareas
+        document.querySelectorAll('input, textarea').forEach(campo => {
+            if (campo.value && campo.value.includes('"') || campo.value.includes("'")) {
+                const valorOriginal = campo.value;
+                campo.value = eliminarComillas(valorOriginal);
+                console.log(`✅ Limpiado: "${valorOriginal}" → "${campo.value}"`);
+                camposLimpiados++;
+            }
+        });
+        
+        console.log(`🎯 Total de campos limpiados: ${camposLimpiados}`);
+    }
+    
+    // Interceptar TODOS los posibles envíos
+    // Opción 1: Formularios
+    document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', function(e) {
+            console.log('📝 Interceptando envío de formulario');
+            limpiarTodosLosCampos();
         });
     });
     
-    console.log(`✅ Sistema Base64 configurado - ${botonesEnvio.length} botón(es) interceptado(s)`);
+    // Opción 2: Botones de envío
+    document.querySelectorAll('button, input[type="submit"]').forEach(boton => {
+        boton.addEventListener('click', function(e) {
+            // Verificar si es un botón de envío
+            if (this.type === 'submit' || 
+                this.textContent.toLowerCase().includes('enviar') ||
+                this.className.includes('submit') ||
+                this.className.includes('enviar')) {
+                
+                console.log('🔘 Interceptando click de botón de envío');
+                
+                // Limpiar después de un pequeño delay para capturar los datos
+                setTimeout(limpiarTodosLosCampos, 100);
+            }
+        });
+    });
+    
+    // Opción 3: Interceptar cambios en campos (preventivo)
+    document.querySelectorAll('input, textarea').forEach(campo => {
+        campo.addEventListener('blur', function() {
+            if (this.value && (this.value.includes('"') || this.value.includes("'"))) {
+                const valorOriginal = this.value;
+                this.value = eliminarComillas(valorOriginal);
+                console.log(`🔄 Auto-limpiado: "${valorOriginal}" → "${this.value}"`);
+            }
+        });
+    });
+    
+    console.log('✅ Limpiador configurado - Múltiples puntos de interceptación activos');
 });
 
-// Función de prueba para validar en consola
-function probarCodificacion() {
-    const textoPrueba = 'Texto con "comillas" y \n saltos de línea';
-    const codificado = codificarBase64Seguro(textoPrueba);
-    console.log('🧪 PRUEBA DE CODIFICACIÓN:');
-    console.log('Original:', textoPrueba);
-    console.log('Codificado:', codificado);
-    console.log('Decodificado:', decodeURIComponent(escape(atob(codificado))));
+// Función de prueba manual
+function probarLimpieza() {
+    console.log('🧪 PRUEBA DE LIMPIEZA:');
+    const pruebas = ['""ssdf"', 'aads"', 'texto con "comillas"'];
+    pruebas.forEach(texto => {
+        const limpio = texto.replace(/"/g, '').replace(/'/g, '');
+        console.log(`"${texto}" → "${limpio}"`);
+    });
 }
 
 
