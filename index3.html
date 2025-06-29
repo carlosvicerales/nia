@@ -573,88 +573,134 @@
 
     // --- LÓGICA PRINCIPAL ---
     async function generateDiagnosis() {
-        const firstName = document.getElementById('firstName').value.trim();
-        const lastName = document.getElementById('lastName').value.trim();
-        const email = document.getElementById('email').value.trim();
-        const whatsapp = document.getElementById('whatsapp').value.trim();
-        if (!firstName || !lastName || !email) { alert('Por favor, completa tu nombre, apellido y email.'); return; }
-        userData = { firstName, lastName, email, whatsapp };
-        document.getElementById('dataScreen').style.display = 'none';
-        document.getElementById('progressContainer').style.display = 'none';
-        document.getElementById('loadingScreen').style.display = 'block';
-        try {
-            const payload = {
-                nombre: firstName,
-                apellido: lastName,
-                email: email,
-                whatsapp: whatsapp,
-                responses: [ answers.question1, answers.question2, answers.question3, answers.question4, answers.question5 ]
-            };
-            const response = await fetch(MAKE_WEBHOOK_URL, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
-            });
-            if (!response.ok) { throw new Error('Error de comunicación con el servidor.'); }
-            const dataRespuesta = await response.json();
-            if (!dataRespuesta || !dataRespuesta.resultado) { throw new Error('La respuesta recibida no tiene el formato esperado.'); }
-            displayResults(dataRespuesta.resultado);
-        } catch (error) {
-            console.error('Error final capturado:', error);
-            showCustomError("Lo sentimos, ha ocurrido un error al generar tu diagnóstico. Por favor, intenta de nuevo en unos minutos o contacta a soporte si el problema persiste.");
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('dataScreen').style.display = 'block';
-            document.getElementById('progressContainer').style.display = 'block';
-        }
+    const firstName = document.getElementById('firstName').value.trim();
+    const lastName = document.getElementById('lastName').value.trim();
+    const email = document.getElementById('email').value.trim();
+    const whatsapp = document.getElementById('whatsapp').value.trim();
+    
+    if (!firstName || !lastName || !email) { 
+        alert('Por favor, completa tu nombre, apellido y email.'); 
+        return; 
     }
+    
+    userData = { firstName, lastName, email, whatsapp };
+    document.getElementById('dataScreen').style.display = 'none';
+    document.getElementById('progressContainer').style.display = 'none';
+    document.getElementById('loadingScreen').style.display = 'block';
+    
+    try {
+        // NUEVO: Estructura de datos que MAKE espera
+        const payload = {
+            answer1: answers.question1 || '',
+            answer2: answers.question2 || '',
+            answer3: answers.question3 || '',
+            answer4: answers.question4 || '',
+            answer5: answers.question5 || '',
+            firstName: firstName,
+            lastName: lastName,
+            email: email,
+            whatsapp: whatsapp
+        };
+        
+        console.log('📤 Enviando datos con estructura correcta:', payload);
+        
+        const response = await fetch(MAKE_WEBHOOK_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload)
+        });
+        
+        if (!response.ok) { 
+            throw new Error('Error de comunicación con el servidor.'); 
+        }
+        
+        const dataRespuesta = await response.json();
+        console.log('📋 Respuesta completa de MAKE:', dataRespuesta);
+        
+        if (!dataRespuesta || !dataRespuesta.resultado) { 
+            throw new Error('La respuesta recibida no tiene el formato esperado.'); 
+        }
+        
+        // Llamar a la función de display mejorada
+        displayResults(dataRespuesta.resultado);
+        
+    } catch (error) {
+        console.error('Error final capturado:', error);
+        showCustomError("Lo sentimos, ha ocurrido un error al generar tu diagnóstico. Por favor, intenta de nuevo en unos minutos o contacta a soporte si el problema persiste.");
+        document.getElementById('loadingScreen').style.display = 'none';
+        document.getElementById('dataScreen').style.display = 'block';
+        document.getElementById('progressContainer').style.display = 'block';
+    }
+}
+
 
     // --- FUNCIÓN DE VISUALIZACIÓN (ACTUALIZADA) ---
     function displayResults(resultado) {
-        document.getElementById('loadingScreen').style.display = 'none';
-        document.getElementById('resultsScreen').style.display = 'block';
-        
+    console.log('🎨 Mostrando resultados en pantalla:', resultado);
+    
+    document.getElementById('loadingScreen').style.display = 'none';
+    document.getElementById('resultsScreen').style.display = 'block';
+    
+    // Mostrar nombre del usuario
+    if (userData.firstName) {
         document.getElementById('resultName').textContent = userData.firstName + ',';
         document.getElementById('personalizedRecommendationTitle').textContent = `Recomendación personalizada para ${userData.firstName}`;
-        
-        // Objeto de puntajes AHORA USA LAS NUEVAS CLAVES
-        const scores = {
-            foco_cliente: resultado.foco_cliente || 0,
-            promesa_transformacion: resultado.promesa_transformacion || 0,
-            autoridad_confianza: resultado.autoridad_confianza || 0,
-            diferenciacion: resultado.diferenciacion || 0,
-            oferta_valor: resultado.oferta_valor || 0,
-        };
-        
-        const totalScore = Object.values(scores).reduce((sum, score) => sum + (Number(score) || 0), 0);
-        document.getElementById('totalScore').textContent = totalScore;
-        
-        const dimensionsContainer = document.getElementById('dimensionsResults');
-        // Diccionario de etiquetas AHORA USA LAS NUEVAS CLAVES Y TEXTOS
-        const dimensionNames = {
-            foco_cliente: 'Foco en el Cliente',
-            promesa_transformacion: 'Promesa de Transformación',
-            autoridad_confianza: 'Autoridad y Confianza',
-            diferenciacion: 'Diferenciación',
-            oferta_valor: 'Oferta de Valor'
-        };
-        
-        let dimensionsHTML = '';
-        for (const [key, score] of Object.entries(scores)) {
-            const width = (score / 5) * 100;
-            const displayName = dimensionNames[key] || key; // Usa la nueva etiqueta
-            dimensionsHTML += `
-                <div class="flex items-center justify-between mb-2">
-                    <span class="text-gray-300">${displayName}</span>
-                    <span class="text-white font-bold">${score}/5</span>
-                </div>
-                <div class="dimension-bar mb-4">
-                    <div class="dimension-fill dimension-${score}" style="width: ${width}%"></div>
-                </div>
-            `;
-        }
-        dimensionsContainer.innerHTML = dimensionsHTML;
-        document.getElementById('personalizedRecommendation').textContent = resultado.recomendacion || "No se pudo generar una recomendación en este momento.";
     }
+    
+    // Calcular puntajes con validación
+    const scores = {
+        foco_cliente: Number(resultado.foco_cliente) || 0,
+        promesa_transformacion: Number(resultado.promesa_transformacion) || 0,
+        autoridad_confianza: Number(resultado.autoridad_confianza) || 0,
+        diferenciacion: Number(resultado.diferenciacion) || 0,
+        oferta_valor: Number(resultado.oferta_valor) || 0
+    };
+    
+    const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
+    document.getElementById('totalScore').textContent = totalScore;
+    
+    // Calcular y mostrar porcentaje si el elemento existe
+    const porcentaje = Math.round((totalScore / 25) * 100);
+    const elementoPorcentaje = document.getElementById('scorePercentage');
+    if (elementoPorcentaje) {
+        elementoPorcentaje.textContent = `${porcentaje}%`;
+    }
+    
+    // Generar barras de dimensiones
+    const dimensionsContainer = document.getElementById('dimensionsResults');
+    const dimensionNames = {
+        foco_cliente: 'Foco en el Cliente',
+        promesa_transformacion: 'Promesa de Transformación',
+        autoridad_confianza: 'Autoridad y Confianza',
+        diferenciacion: 'Diferenciación',
+        oferta_valor: 'Oferta de Valor'
+    };
+    
+    let dimensionsHTML = '';
+    for (const [key, score] of Object.entries(scores)) {
+        const width = (score / 5) * 100;
+        const displayName = dimensionNames[key] || key;
+        dimensionsHTML += `
+            <div class="flex items-center justify-between mb-2">
+                <span class="text-gray-300">${displayName}</span>
+                <span class="text-white font-bold">${score}/5</span>
+            </div>
+            <div class="dimension-bar mb-4">
+                <div class="dimension-fill dimension-${score}" style="width: ${width}%"></div>
+            </div>
+        `;
+    }
+    dimensionsContainer.innerHTML = dimensionsHTML;
+    
+    // Mostrar recomendación
+    const recomendacionElement = document.getElementById('personalizedRecommendation');
+    if (recomendacionElement) {
+        recomendacionElement.innerHTML = resultado.recomendacion || "No se pudo generar una recomendación en este momento.";
+    }
+    
+    console.log('✅ Resultados mostrados correctamente en pantalla');
+}
+
 
     function showCustomError(message) {
         document.getElementById('errorModalMessage').textContent = message;
@@ -1086,15 +1132,15 @@ document.addEventListener('DOMContentLoaded', function() {
         mostrarPantalla('dataScreen');
     };
     
-    // Interceptar generateDiagnosis
-    window.generateDiagnosis = async function(event) {
-        if (event) {
-            event.preventDefault();
-            event.stopPropagation();
-        }
-        
-        await enviarDatos();
-    };
+// Interceptar generateDiagnosis - DESACTIVADO para usar función original optimizada
+// window.generateDiagnosis = async function(event) {
+//     if (event) {
+//         event.preventDefault();
+//         event.stopPropagation();
+//     }
+//     
+//     await enviarDatos();
+// };
     
     // === CONFIGURACIÓN DE EVENTOS ===
     
@@ -1286,7 +1332,29 @@ async function debugearEnvioMAKE() {
     });
     
     console.log(`📊 RESUMEN: ${camposConDatos} campos con datos encontrados`);
-}
+    }
+    
+    //PROBARDOR
+    function probarDisplayResultados() {
+    // Simular datos de MAKE
+    const resultadoSimulado = {
+        foco_cliente: 3,
+        promesa_transformacion: 2,
+        autoridad_confianza: 4,
+        diferenciacion: 1,
+        oferta_valor: 5,
+        recomendacion: "¡Excelente! Tu mayor oportunidad está en la diferenciación. Te recomiendo definir claramente qué te hace único en el mercado y comunicarlo con fuerza. 🚀"
+    };
+    
+    // Simular userData
+    userData = { firstName: 'Carlos' };
+    
+    // Mostrar resultados
+    document.getElementById('loadingScreen').style.display = 'none';
+    displayResults(resultadoSimulado);
+    
+    console.log('✅ Prueba de display completada');
+    }
 
     
 </script>
