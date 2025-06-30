@@ -282,90 +282,108 @@
         .mensaje-exito::before {
             content: "✅";
         }
-        /* Estilos para las dimensiones con comentarios */
+        
+/* Estilos para las dimensiones con comentarios */
+        .evaluation-details {
+            margin: 30px 0;
+        }
+        
         .dimension-item {
             margin-bottom: 25px;
-            padding: 15px;
-            border-radius: 8px;
-            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #f8f4ff 0%, #e8d5ff 100%);
             border-left: 4px solid #9333ea;
+            transition: transform 0.2s ease;
+        }
+        
+        .dimension-item:hover {
+            transform: translateY(-2px);
         }
         
         .dimension-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
         
         .dimension-header h3 {
             margin: 0;
-            color: #333;
+            color: #4a5568;
             font-size: 1.1em;
+            font-weight: 600;
         }
         
         .dimension-score {
             font-weight: bold;
             color: #9333ea;
-            font-size: 1.2em;
+            font-size: 1.3em;
+            background: white;
+            padding: 5px 12px;
+            border-radius: 20px;
+            box-shadow: 0 2px 8px rgba(147, 51, 234, 0.2);
         }
         
         .dimension-comment {
-            font-size: 0.9em;
-            color: #666;
+            font-size: 0.95em;
+            color: #6b7280;
             font-style: italic;
-            line-height: 1.4;
-            padding-left: 10px;
-            border-left: 2px solid #e0e0e0;
+            line-height: 1.5;
+            padding: 10px 15px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 8px;
+            border-left: 3px solid #d1d5db;
         }
         
-        /* Centrado para Principales Brechas */
+        /* Centrado para contenido */
         .centered-content {
             text-align: center;
-            margin: 30px 0;
+            margin: 35px 0;
         }
         
         .centered-content h2 {
-            text-align: center;
-            margin-bottom: 20px;
             color: #9333ea;
+            margin-bottom: 20px;
+            font-size: 1.5em;
         }
         
+        /* Principales Brechas */
         .personalized-recommendation {
-            padding: 25px;
+            padding: 30px;
             background: linear-gradient(135deg, #f8f4ff 0%, #e8d5ff 100%);
-            border-radius: 12px;
-            margin: 30px 0;
+            border-radius: 15px;
+            margin: 35px 0;
+            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.15);
         }
         
         .recommendation-content p {
-            text-align: center;
-            font-size: 1.05em;
-            line-height: 1.6;
+            font-size: 1.1em;
+            line-height: 1.7;
             color: #4a5568;
+            font-weight: 500;
         }
         
-        /* Estilos destacados para Próximo Paso */
+        /* Próximo Paso destacado */
         .next-step-block {
             background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
-            border: 2px solid #f97316;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 25px 0;
-            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.15);
-            position: relative;
+            border: 3px solid #f97316;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2);
         }
         
         .next-step-header {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 12px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
         .next-step-icon {
-            font-size: 1.8em;
+            font-size: 2em;
             animation: pulse 2s infinite;
         }
         
@@ -384,11 +402,10 @@
         
         .next-step-content p {
             color: #4a5568;
-            font-size: 1.05em;
-            line-height: 1.6;
+            font-size: 1.1em;
+            line-height: 1.7;
             margin: 0;
-            font-weight: 500;
-            text-align: center;
+            font-weight: 600;
         }
         
         /* Responsividad */
@@ -404,6 +421,7 @@
                 gap: 8px;
             }
         }
+
 
 
     </style>
@@ -636,80 +654,91 @@
 
                         <div class="mb-8">
                             <h3 class="text-xl font-bold mb-3">Acá el detalle de tu evaluación</h3>
-                            <!-- Estructura para cada dimensión -->
+
+                            
+                          <!--Acá el detalle de tu evaluación -->
+
+                        <div class="evaluation-details">
+                            <!-- Foco en el Cliente y su Dolor -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
                                     <h3>Foco en el Cliente y su Dolor</h3>
                                     <span class="dimension-score" id="focoClienteScore">--/5</span>
                                 </div>
                                 <div class="dimension-comment" id="focoClienteComment">
-                                    <!-- Comentario de IA aparecerá aquí -->
+                                    Analizando tu enfoque en el cliente...
                                 </div>
                             </div>
-                            
+                        
+                            <!-- Promesa de Transformación -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
                                     <h3>Promesa de Transformación</h3>
                                     <span class="dimension-score" id="promesaTransformacionScore">--/5</span>
                                 </div>
                                 <div class="dimension-comment" id="promesaTransformacionComment">
-                                    <!-- Comentario de IA aparecerá aquí -->
+                                    Evaluando tu promesa de valor...
                                 </div>
                             </div>
-                            
+                        
+                            <!-- Autoridad y Confianza -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
                                     <h3>Autoridad y Confianza</h3>
                                     <span class="dimension-score" id="autoridadConfianzaScore">--/5</span>
                                 </div>
                                 <div class="dimension-comment" id="autoridadConfianzaComment">
-                                    <!-- Comentario de IA aparecerá aquí -->
+                                    Midiendo tu credibilidad...
                                 </div>
                             </div>
-                            
+                        
+                            <!-- Diferenciación -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
                                     <h3>Diferenciación</h3>
                                     <span class="dimension-score" id="diferenciacionScore">--/5</span>
                                 </div>
                                 <div class="dimension-comment" id="diferenciacionComment">
-                                    <!-- Comentario de IA aparecerá aquí -->
+                                    Analizando tu diferenciación...
                                 </div>
                             </div>
-                            
+                        
+                            <!-- Oferta de Valor -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
                                     <h3>Oferta de Valor</h3>
                                     <span class="dimension-score" id="ofertaValorScore">--/5</span>
                                 </div>
                                 <div class="dimension-comment" id="ofertaValorComment">
-                                    <!-- Comentario de IA aparecerá aquí -->
+                                    Evaluando tu propuesta de valor...
                                 </div>
                             </div>
-                            Antiguio div
+                        </div>
+
                             <!--div id="dimensionsResults" class="space-y-4">
                             
                             <!-- Dimensions will be populated by JavaScript -->
                             </div>
                         </div>
 
-                        <div class="mb-8 p-6 glass-effect rounded-xl">
-                            <h3 class="text-xl font-bold mb-4 text-purple-400"><span id="personalizedRecommendationTitle">Recomendación personalizada</span></h3>
-                            <div id="personalizedRecommendation" class="personalized-recommendation centered-content">
-                                <h2>Principales Brechas</h2>
-                                <div class="recommendation-content">
-                                    <p id="principalesBrechasText"></p>
-                                </div>
+                        <!-- Principales Brechas -->
+                        <div id="personalizedRecommendation" class="personalized-recommendation centered-content">
+                            <h2>Principales Brechas</h2>
+                            <div class="recommendation-content">
+                                <p id="principalesBrechasText">Analizando tus principales oportunidades de mejora...</p>
                             </div>
-                            <div id="nextStepBlock" class="next-step-block centered-content">
-                                <div class="next-step-header">
-                                    <span class="next-step-icon">🚀</span>
-                                    <h2>Tu Siguiente Paso Estratégico</h2>
-                                </div>
-                                <div class="next-step-content">
-                                    <p id="proximopasoText"></p>
-                                </div>
+                        </div>
+                        
+                        <!-- Tu Siguiente Paso Estratégico -->
+                        <div id="nextStepBlock" class="next-step-block centered-content">
+                            <div class="next-step-header">
+                                <span class="next-step-icon">🚀</span>
+                                <h2>Tu Siguiente Paso Estratégico</h2>
                             </div>
+                            <div class="next-step-content">
+                                <p id="proximopasoText">Preparando tu recomendación personalizada...</p>
+                            </div>
+                        </div>
 
                         
                                 <!-- Personalized recommendation will be populated by AI -->
@@ -890,7 +919,7 @@
     }
     
     console.log('✅ Resultados mostrados correctamente en pantalla');
-}
+    }
 
 
     function showCustomError(message) {
@@ -902,6 +931,63 @@
         document.getElementById('errorModal').classList.add('hidden');
     }
 
+
+    // Función principal para procesar la respuesta de NIA
+    function procesarResultadosDiagnostico(data) {
+    // Calcular puntaje total y porcentaje
+    const totalScore = data.foco_cliente + data.promesa_transformacion + 
+                      data.autoridad_confianza + data.diferenciacion + data.oferta_valor;
+    const percentage = Math.round((totalScore / 25) * 100);
+    
+    // Actualizar puntaje total (asumiendo que tienes estos elementos)
+    const totalScoreElement = document.getElementById('totalScore');
+    const scorePercentElement = document.getElementById('scorePercent');
+    
+    if (totalScoreElement) {
+        totalScoreElement.textContent = `${totalScore}/25 puntos`;
+    }
+    if (scorePercentElement) {
+        scorePercentElement.textContent = `${percentage}%`;
+    }
+    
+    // Actualizar cada dimensión
+    actualizarDimension('focoCliente', data.foco_cliente, data.comentario_foco_cliente);
+    actualizarDimension('promesaTransformacion', data.promesa_transformacion, data.comentario_promesa_transformacion);
+    actualizarDimension('autoridadConfianza', data.autoridad_confianza, data.comentario_autoridad_confianza);
+    actualizarDimension('diferenciacion', data.diferenciacion, data.comentario_diferenciacion);
+    actualizarDimension('ofertaValor', data.oferta_valor, data.comentario_oferta_valor);
+    
+    // Actualizar Principales Brechas
+    const principalesBrechasElement = document.getElementById('principalesBrechasText');
+    if (principalesBrechasElement) {
+        principalesBrechasElement.textContent = data.principales_brechas;
+    }
+    
+    // Actualizar Próximo Paso
+    const proximoPasoElement = document.getElementById('proximopasoText');
+    if (proximoPasoElement) {
+        proximoPasoElement.textContent = data.proximo_paso;
+    }
+}
+
+    // Función auxiliar para actualizar cada dimensión
+    function actualizarDimension(dimension, puntaje, comentario) {
+        const scoreElement = document.getElementById(`${dimension}Score`);
+        const commentElement = document.getElementById(`${dimension}Comment`);
+        
+        if (scoreElement) {
+            scoreElement.textContent = `${puntaje}/5`;
+        }
+        
+        if (commentElement) {
+            commentElement.textContent = `Análisis: ${comentario}`;
+        }
+    }
+
+
+
+
+    
 //========= SANITIZADOR: ===============
     // SISTEMA DE VALIDACIÓN INTEGRAL NIA - VERSIÓN DEFINITIVA CORREGIDA
 document.addEventListener('DOMContentLoaded', function() {
@@ -1240,9 +1326,20 @@ document.addEventListener('DOMContentLoaded', function() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Accept': 'application/json'
             },
-            body: JSON.stringify(datos)
+            body: JSON.stringify(datosFormulario)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Llamar a la nueva función
+            procesarResultadosDiagnostico(data.resultado);
+            
+            // Mostrar pantalla de resultados (si tienes esta lógica)
+            // mostrarPantalla('results');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Manejar error
         });
         
         console.log(`📡 Respuesta recibida - Status: ${response.status}`);
