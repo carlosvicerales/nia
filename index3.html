@@ -841,265 +841,296 @@ input {
     </div>
 
 <script>
-    // --- CONFIGURACIÓN ---
-    const MAKE_WEBHOOK_URL = 'https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc'; // Asegúrate que esta sea tu URL final
-
-    // --- VARIABLES GLOBALES ---
-    let currentQuestionIndex = 1;
-    let answers = {};
-    let userData = {};
-
-    // --- FUNCIONES DE NAVEGACIÓN ---
-    function startDiagnosis() { document.getElementById('introScreen').style.display = 'none'; document.getElementById('progressContainer').style.display = 'block'; document.getElementById('questionScreens').style.display = 'block'; updateProgress(); }
-    function nextQuestion(questionNumber) { const currentAnswer = document.getElementById(`answer${currentQuestionIndex}`).value.trim(); if (!currentAnswer) { showError('Por favor, responde la pregunta antes de continuar.'); return; } answers[`question${currentQuestionIndex}`] = currentAnswer; document.getElementById(`question${currentQuestionIndex}`).style.display = 'none'; currentQuestionIndex = questionNumber; document.getElementById(`question${questionNumber}`).style.display = 'block'; updateProgress(); }
-    function showDataCollection() { const lastAnswer = document.getElementById('answer5').value.trim(); if (!lastAnswer) { showError('Por favor, responde la pregunta antes de continuar.'); return; } answers.question5 = lastAnswer; document.getElementById('questionScreens').style.display = 'none'; document.getElementById('dataScreen').style.display = 'block'; currentQuestionIndex = 6; updateProgress(); }
-    function updateProgress() { const progress = (currentQuestionIndex / 6) * 100; document.getElementById('progressBar').style.width = `${progress}%`; document.getElementById('currentStep').textContent = currentQuestionIndex; for (let i = 1; i <= 6; i++) { const step = document.getElementById(`step${i}`); if (i < currentQuestionIndex) { step.className = 'step-indicator step-completed'; } else if (i === currentQuestionIndex) { step.className = 'step-indicator step-active'; } else { step.className = 'step-indicator step-inactive'; } } }
-
-    // --- LÓGICA PRINCIPAL ---
-    async function generateDiagnosis() {
-    const firstName = document.getElementById('firstName').value.trim();
-    const lastName = document.getElementById('lastName').value.trim();
-    const email = document.getElementById('email').value.trim();
-    const whatsapp = document.getElementById('whatsapp').value.trim();
+    // --- CONFIGURACIÓN PREGUNTAS + RESULTADO ----
+    // URL de tu webhook - REEMPLAZA con tu URL real
+    const webhookUrl = 'https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc'; // Tu webhook actual
     
-    if (!firstName || !lastName || !email) { 
-        alert('Por favor, completa tu nombre, apellido y email.'); 
-        return; 
-    }
-    
-    userData = { firstName, lastName, email, whatsapp };
-    document.getElementById('dataScreen').style.display = 'none';
-    document.getElementById('progressContainer').style.display = 'none';
-    document.getElementById('loadingScreen').style.display = 'block';
-    
-    try {
-        // NUEVO: Estructura de datos que MAKE espera
-        const payload = {
-            answer1: answers.question1 || '',
-            answer2: answers.question2 || '',
-            answer3: answers.question3 || '',
-            answer4: answers.question4 || '',
-            answer5: answers.question5 || '',
-            firstName: firstName,
-            lastName: lastName,
-            email: email,
-            whatsapp: whatsapp
-        };
+    // Función robusta para mostrar una pantalla y ocultar todas las demás
+    function mostrarPantalla(screenId) {
+        console.log(`🔄 Cambiando a pantalla: ${screenId}`);
         
-        console.log('📤 Enviando datos con estructura correcta:', payload);
+        // Lista de todas las posibles pantallas
+        const possibleScreens = [
+            'introScreen', 'questionScreens', 'question1', 'question2', 'question3', 
+            'question4', 'question5', 'dataScreen', 'loadingScreen', 'resultsScreen', 
+            'errorScreen'
+        ];
         
-        const response = await fetch(MAKE_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+        // Ocultar todas las pantallas posibles
+        possibleScreens.forEach(screenName => {
+            const screen = document.getElementById(screenName);
+            if (screen) {
+                screen.style.display = 'none';
+            }
         });
         
-        if (!response.ok) { 
-            throw new Error('Error de comunicación con el servidor.'); 
+        // Mostrar la pantalla solicitada
+        const targetScreen = document.getElementById(screenId);
+        if (targetScreen) {
+            targetScreen.style.display = 'block';
+            console.log(`✅ Pantalla ${screenId} mostrada`);
+        } else {
+            console.error(`❌ Pantalla ${screenId} no encontrada`);
+        }
+    }
+    
+    // Función para iniciar diagnóstico (adaptada a tu estructura actual)
+    function startDiagnosis() {
+        // Intentar diferentes formas de iniciar según tu estructura
+        if (document.getElementById('questionScreens')) {
+            document.getElementById('questionScreens').style.display = 'block';
+            mostrarPantalla('question1');
+        } else {
+            mostrarPantalla('question1');
+        }
+    }
+    
+    // Función para navegar entre preguntas (compatible con tu estructura)
+    function nextQuestion(currentQuestionNumber) {
+        const currentAnswerId = `answer${currentQuestionNumber}`;
+        const currentAnswer = document.getElementById(currentAnswerId);
+        
+        if (!currentAnswer || !currentAnswer.value.trim()) {
+            alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
+            return;
         }
         
-        const dataRespuesta = await response.json();
-        console.log('📋 Respuesta completa de MAKE:', dataRespuesta);
-        
-        if (!dataRespuesta || !dataRespuesta.resultado) { 
-            throw new Error('La respuesta recibida no tiene el formato esperado.'); 
+        const nextQuestionNumber = currentQuestionNumber + 1;
+        if (nextQuestionNumber <= 5) {
+            mostrarPantalla(`question${nextQuestionNumber}`);
+        } else {
+            mostrarPantalla('dataScreen');
         }
-        
-        // Llamar a la función de display mejorada
-        displayResults(dataRespuesta.resultado);
-        
-    } catch (error) {
-        console.error('Error final capturado:', error);
-        showCustomError("Lo sentimos, ha ocurrido un error al generar tu diagnóstico. Por favor, intenta de nuevo en unos minutos o contacta a soporte si el problema persiste.");
-        document.getElementById('loadingScreen').style.display = 'none';
-        document.getElementById('dataScreen').style.display = 'block';
-        document.getElementById('progressContainer').style.display = 'block';
-    }
-}
-
-
-    // --- FUNCIÓN DE VISUALIZACIÓN (ACTUALIZADA) ---
-    function displayResults(resultado) {
-    console.log('🎨 Mostrando resultados en pantalla:', resultado);
-    
-    document.getElementById('loadingScreen').style.display = 'none';
-    document.getElementById('resultsScreen').style.display = 'block';
-    
-    // Mostrar nombre del usuario
-    if (userData.firstName) {
-        document.getElementById('resultName').textContent = userData.firstName + ',';
-        document.getElementById('personalizedRecommendationTitle').textContent = `Recomendación personalizada para ${userData.firstName}`;
     }
     
-    // Calcular puntajes con validación
-    const scores = {
-        foco_cliente: Number(resultado.foco_cliente) || 0,
-        promesa_transformacion: Number(resultado.promesa_transformacion) || 0,
-        autoridad_confianza: Number(resultado.autoridad_confianza) || 0,
-        diferenciacion: Number(resultado.diferenciacion) || 0,
-        oferta_valor: Number(resultado.oferta_valor) || 0
-    };
-    
-    const totalScore = Object.values(scores).reduce((sum, score) => sum + score, 0);
-    document.getElementById('totalScore').textContent = totalScore;
-    
-    // Calcular y mostrar porcentaje si el elemento existe
-    const porcentaje = Math.round((totalScore / 25) * 100);
-    const elementoPorcentaje = document.getElementById('scorePercentage');
-    if (elementoPorcentaje) {
-        elementoPorcentaje.textContent = `${porcentaje}%`;
-    }
-    
-    // Generar barras de dimensiones
-    const dimensionsContainer = document.getElementById('dimensionsResults');
-    const dimensionNames = {
-        foco_cliente: 'Foco en el Cliente',
-        promesa_transformacion: 'Promesa de Transformación',
-        autoridad_confianza: 'Autoridad y Confianza',
-        diferenciacion: 'Diferenciación',
-        oferta_valor: 'Oferta de Valor'
-    };
-    
-    let dimensionsHTML = '';
-    for (const [key, score] of Object.entries(scores)) {
-        const width = (score / 5) * 100;
-        const displayName = dimensionNames[key] || key;
-        dimensionsHTML += `
-            <div class="flex items-center justify-between mb-2">
-                <span class="text-gray-300">${displayName}</span>
-                <span class="text-white font-bold">${score}/5</span>
-            </div>
-            <div class="dimension-bar mb-4">
-                <div class="dimension-fill dimension-${score}" style="width: ${width}%"></div>
-            </div>
-        `;
-    }
-    dimensionsContainer.innerHTML = dimensionsHTML;
-    
-    // Mostrar recomendación
-    const recomendacionElement = document.getElementById('personalizedRecommendation');
-    if (recomendacionElement) {
-        recomendacionElement.innerHTML = resultado.recomendacion || "No se pudo generar una recomendación en este momento.";
-    }
-    
-    console.log('✅ Resultados mostrados correctamente en pantalla');
-    }
-
-
-    function showCustomError(message) {
-        document.getElementById('errorModalMessage').textContent = message;
-        document.getElementById('errorModal').classList.remove('hidden');
-    }
-
-    function closeErrorModal() {
-        document.getElementById('errorModal').classList.add('hidden');
-    }
-
-
-//----Función principal para procesar la respuesta de NIA
-        function procesarResultadosDiagnostico(data) {
-            console.log('Datos recibidos:', data);
-    
-            try {
-                
-        // Calcular puntaje total y porcentaje
-        const totalScore = data.foco_cliente + data.promesa_transformacion + 
-                          data.autoridad_confianza + data.diferenciacion + data.oferta_valor;
-        const percentage = Math.round((totalScore / 25) * 100);
-        
-        // Actualizar puntaje total
-        const totalScoreElement = document.getElementById('totalScore');
-        const scorePercentElement = document.getElementById('scorePercent');
-        
-        if (totalScoreElement) {
-            totalScoreElement.textContent = `${totalScore}/25 puntos`;
+    // Función para mostrar recolección de datos
+    function showDataCollection() {
+        const answer5 = document.getElementById('answer5');
+        if (!answer5 || !answer5.value.trim()) {
+            alert('Por favor, completa tu narrativa comercial actual.');
+            return;
         }
-        if (scorePercentElement) {
-            scorePercentElement.textContent = `${percentage}%`;
-        }
+        mostrarPantalla('dataScreen');
+    }
+    
+    // Función principal mejorada para generar diagnóstico
+    async function generateDiagnosis() {
+        console.log('🚀 Iniciando generación de diagnóstico...');
         
-        // Actualizar cada dimensión
-        actualizarDimension('focoCliente', data.foco_cliente, data.comentario_foco_cliente);
-        actualizarDimension('promesaTransformacion', data.promesa_transformacion, data.comentario_promesa_transformacion);
-        actualizarDimension('autoridadConfianza', data.autoridad_confianza, data.comentario_autoridad_confianza);
-        actualizarDimension('diferenciacion', data.diferenciacion, data.comentario_diferenciacion);
-        actualizarDimension('ofertaValor', data.oferta_valor, data.comentario_oferta_valor);
+        // Recolectar respuestas de forma robusta
+        const answers = {};
+        let allAnswersComplete = true;
         
-        // Actualizar Principales Brechas
-        const principalesBrechasElement = document.getElementById('principalesBrechasText');
-        if (principalesBrechasElement && data.principales_brechas) {
-            principalesBrechasElement.textContent = data.principales_brechas;
-        }
-        
-        // Actualizar Próximo Paso
-        const proximoPasoElement = document.getElementById('proximopasoText');
-        if (proximoPasoElement && data.proximo_paso) {
-            proximoPasoElement.textContent = data.proximo_paso;
-        }
-        
-        // Mostrar pantalla de resultados
-        const resultsScreen = document.getElementById('resultsScreen');
-        if (resultsScreen) {
-            resultsScreen.style.display = 'block';
-        }
-        
-        console.log('Resultados actualizados correctamente');
-        
-            } catch (error) {
-                console.error('Error procesando resultados:', error);
-                alert('Hubo un problema mostrando los resultados. Por favor intenta nuevamente.');
+        for (let i = 1; i <= 5; i++) {
+            const answer = document.getElementById(`answer${i}`);
+            if (!answer || !answer.value.trim()) {
+                alert(`Por favor, completa la pregunta ${i}.`);
+                allAnswersComplete = false;
+                break;
             }
-        }
-
-        // Función auxiliar para actualizar cada dimensión
-        function actualizarDimension(dimension, puntaje, comentario) {
-            const scoreElement = document.getElementById(`${dimension}Score`);
-            const commentElement = document.getElementById(`${dimension}Comment`);
-            
-            if (scoreElement) {
-                scoreElement.textContent = `${puntaje}/5`;
-            }
-            
-            if (commentElement && comentario) {
-                commentElement.textContent = `Análisis: ${comentario}`;
-            }
+            answers[`answer${i}`] = answer.value.trim();
         }
         
-        // Modifica tu función de envío existente
-        function enviarDiagnostico() {
-            // Tu código existente de recolección de datos...
+        if (!allAnswersComplete) return;
+        
+        // Recolectar datos personales
+        const personalData = {};
+        const requiredFields = ['firstName', 'lastName', 'email'];
+        const optionalFields = ['whatsapp'];
+        
+        for (const field of requiredFields) {
+            const element = document.getElementById(field);
+            if (!element || !element.value.trim()) {
+                alert(`Por favor, completa el campo: ${field}`);
+                return;
+            }
+            personalData[field] = element.value.trim();
+        }
+        
+        for (const field of optionalFields) {
+            const element = document.getElementById(field);
+            personalData[field] = element ? element.value.trim() : '';
+        }
+        
+        // Mostrar pantalla de carga
+        mostrarPantalla('loadingScreen');
+        
+        try {
+            console.log('📡 Enviando datos a MAKE...');
             
-            fetch(webhookUrl, {
+            const response = await fetch(webhookUrl, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify({
-                    nombre: nombre,
-                    apellido: apellido,
-                    email: email,
-                    whatsapp: whatsapp,
-                    responses: responses
+                    ...answers,
+                    ...personalData
                 })
-            })
-            .then(response => {
-                console.log('Response status:', response.status);
-                return response.json(); // Ahora debería funcionar sin errores
-            })
-            .then(data => {
-                console.log('Data received:', data);
-                
-                if (data && data.resultado) {
-                    procesarResultadosDiagnostico(data.resultado);
-                } else {
-                    throw new Error('Estructura de datos incorrecta');
-                }
-            })
-            .catch(error => {
-                console.error('Error final capturado:', error);
-                alert('Hubo un problema procesando tu diagnóstico. Por favor intenta nuevamente.');
             });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Datos recibidos de MAKE:', data);
+            
+            if (data && data.resultado) {
+                displayResults(data.resultado);
+                mostrarPantalla('resultsScreen');
+            } else {
+                throw new Error('Estructura de datos incorrecta');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error en generateDiagnosis:', error);
+            mostrarPantalla('errorScreen');
         }
+    }
+    
+    // Función inteligente y adaptativa para mostrar resultados
+    function displayResults(data) {
+        console.log('🎨 Procesando resultados:', data);
+        
+        try {
+            // Calcular puntaje total de forma segura
+            const scores = [
+                data.foco_cliente || 0,
+                data.promesa_transformacion || 0,
+                data.autoridad_confianza || 0,
+                data.diferenciacion || 0,
+                data.oferta_valor || 0
+            ];
+            
+            const totalScore = scores.reduce((sum, score) => sum + score, 0);
+            const percentage = Math.round((totalScore / 25) * 100);
+            
+            console.log(`📊 Puntaje calculado: ${totalScore}/25 (${percentage}%)`);
+            
+            // Actualizar puntajes principales con múltiples intentos
+            updateElementSafely(['totalScore', 'total-score'], `${totalScore}/25 puntos`);
+            updateElementSafely(['scorePercent', 'score-percent', 'percentage'], `${percentage}%`);
+            
+            // Actualizar cada dimensión con función inteligente
+            updateDimensionSafely('foco', 'focoCliente', data.foco_cliente, data.comentario_foco_cliente);
+            updateDimensionSafely('promesa', 'promesaTransformacion', data.promesa_transformacion, data.comentario_promesa_transformacion);
+            updateDimensionSafely('autoridad', 'autoridadConfianza', data.autoridad_confianza, data.comentario_autoridad_confianza);
+            updateDimensionSafely('diferenciacion', 'diferenciacion', data.diferenciacion, data.comentario_diferenciacion);
+            updateDimensionSafely('oferta', 'ofertaValor', data.oferta_valor, data.comentario_oferta_valor);
+            
+            // Actualizar textos principales con múltiples variaciones de ID
+            updateElementSafely([
+                'principalesBrechasText', 'principales-brechas-text', 'brechas-text'
+            ], data.principales_brechas || 'Análisis no disponible');
+            
+            updateElementSafely([
+                'proximopasoText', 'proximoPasoText', 'proximo-paso-text', 'next-step-text'
+            ], data.proximo_paso || 'Recomendación no disponible');
+            
+            console.log('✅ Todos los resultados procesados correctamente');
+            
+        } catch (error) {
+            console.error('❌ Error en displayResults:', error);
+            alert('Error al mostrar resultados. Revisa la consola para detalles.');
+        }
+    }
+    
+    // Función auxiliar inteligente que prueba múltiples IDs
+    function updateElementSafely(possibleIds, content) {
+        for (const id of possibleIds) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = content;
+                console.log(`✅ Actualizado elemento: ${id} = "${content}"`);
+                return true;
+            }
+        }
+        console.warn(`⚠️ No se encontró ningún elemento con IDs: ${possibleIds.join(', ')}`);
+        return false;
+    }
+    
+    // Función auxiliar para actualizar dimensiones con múltiples variaciones
+    function updateDimensionSafely(shortName, fullName, score, comment) {
+        // Generar múltiples posibles IDs para el puntaje
+        const scoreIds = [
+            `${fullName}Score`, `${shortName}Score`, `${fullName}-score`, 
+            `${shortName}-score`, `score-${shortName}`, `score-${fullName}`
+        ];
+        
+        // Generar múltiples posibles IDs para el comentario
+        const commentIds = [
+            `${fullName}Comment`, `${shortName}Comment`, `${fullName}-comment`,
+            `${shortName}-comment`, `comment-${shortName}`, `comment-${fullName}`
+        ];
+        
+        updateElementSafely(scoreIds, `${score || 0}/5`);
+        updateElementSafely(commentIds, comment ? `Análisis: ${comment}` : 'Análisis no disponible');
+    }
+    
+    // Funciones de debugging y testing
+    function testResults() {
+        console.log('🧪 Ejecutando prueba de resultados...');
+        
+        const testData = {
+            foco_cliente: 3,
+            comentario_foco_cliente: "Tu mensaje identifica el segmento, pero puede profundizar más en el dolor específico.",
+            promesa_transformacion: 4,
+            comentario_promesa_transformacion: "La promesa es clara, pero considera ser más específica en resultados medibles.",
+            autoridad_confianza: 2,
+            comentario_autoridad_confianza: "Necesitas más evidencia social y casos de éxito que refuercen tu credibilidad.",
+            diferenciacion: 3,
+            comentario_diferenciacion: "Tu diferenciación es buena, pero puede ser más única y memorable.",
+            oferta_valor: 4,
+            comentario_oferta_valor: "La propuesta de valor es fuerte, pero optimízala para el ROI percibido.",
+            principales_brechas: "Tu narrativa tiene bases sólidas, pero la autoridad y diferenciación son tus mayores GAPs. Sin ellas, pierdes clientes cada día.",
+            proximo_paso: "Crea 3 micro-historias de éxito. Para un plan a medida, agenda tu sesión 1:1 con Carlos"
+        };
+        
+        displayResults(testData);
+        mostrarPantalla('resultsScreen');
+    }
+    
+    function listAllIds() {
+        const allElements = document.querySelectorAll('[id]');
+        const ids = Array.from(allElements).map(el => el.id).sort();
+        console.log('🔍 Todos los IDs disponibles en el DOM:', ids);
+        return ids;
+    }
+    
+    function debugElement(elementId) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            console.log(`✅ Elemento encontrado: ${elementId}`, element);
+            console.log(`   - tagName: ${element.tagName}`);
+            console.log(`   - className: ${element.className}`);
+            console.log(`   - textContent: "${element.textContent}"`);
+        } else {
+            console.log(`❌ Elemento NO encontrado: ${elementId}`);
+        }
+    }
+    
+    // Inicialización cuando se carga la página
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 NIA JavaScript cargado correctamente');
+        
+        // Mostrar pantalla inicial si existe
+        const introScreen = document.getElementById('introScreen');
+        if (introScreen) {
+            mostrarPantalla('introScreen');
+        }
+        
+        // Debug: Listar IDs después de 1 segundo (para asegurar que todo esté cargado)
+        setTimeout(() => {
+            console.log('🔍 Ejecutando análisis de IDs disponibles...');
+            listAllIds();
+        }, 1000);
+    });
+    
+    // Función de compatibilidad para tu estructura actual
+    if (typeof mostrarPantalla === 'undefined') {
+        window.mostrarPantalla = mostrarPantalla;
+    }
 
 
 //========= SANITIZADOR: ===============
