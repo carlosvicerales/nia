@@ -845,14 +845,85 @@ input {
     // URL de tu webhook - REEMPLAZA con tu URL real
     const webhookUrl = 'https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc'; // Tu webhook actual
     
-   // === FUNCIONES CORREGIDAS ===
-
-    // 1. Función de mostrar pantalla con barra de progreso
-   // Función adaptada a tu estructura HTML específica
+    // --- FUNCIONES AUXILIARES (DEFINIDAS PRIMERO) ---
+    
+    // Función para actualizar la barra de progreso visual
+    function updateProgressBar(screenId) {
+        const progressSteps = {
+            'question1': { step: 1, progress: 16 },
+            'question2': { step: 2, progress: 32 },
+            'question3': { step: 3, progress: 48 },
+            'question4': { step: 4, progress: 64 },
+            'question5': { step: 5, progress: 80 },
+            'dataScreen': { step: 6, progress: 100 }
+        };
+        
+        const currentStepInfo = progressSteps[screenId];
+        if (!currentStepInfo) {
+            console.log(`⚠️ No hay información de progreso para: ${screenId}`);
+            return;
+        }
+        
+        console.log(`📊 Actualizando progreso: Paso ${currentStepInfo.step} (${currentStepInfo.progress}%)`);
+        
+        // Actualizar barra de progreso
+        const progressBar = document.getElementById('progressBar');
+        if (progressBar) {
+            progressBar.style.width = `${currentStepInfo.progress}%`;
+            console.log(`✅ Barra actualizada: ${currentStepInfo.progress}%`);
+        }
+        
+        // Actualizar indicador de paso actual
+        const currentStepElement = document.getElementById('currentStep');
+        if (currentStepElement) {
+            currentStepElement.textContent = currentStepInfo.step;
+        }
+        
+        // Actualizar indicadores visuales de pasos
+        for (let i = 1; i <= 6; i++) {
+            const stepElement = document.getElementById(`step${i}`);
+            if (stepElement) {
+                if (i <= currentStepInfo.step) {
+                    stepElement.classList.remove('step-inactive');
+                    stepElement.classList.add('step-active');
+                } else {
+                    stepElement.classList.remove('step-active');
+                    stepElement.classList.add('step-inactive');
+                }
+            }
+        }
+    }
+    
+    // Función auxiliar inteligente que prueba múltiples IDs
+    function updateElementSafely(possibleIds, content) {
+        for (const id of possibleIds) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = content;
+                console.log(`✅ Actualizado elemento: ${id} = "${content}"`);
+                return true;
+            }
+        }
+        console.warn(`⚠️ No se encontró ningún elemento con IDs: ${possibleIds.join(', ')}`);
+        return false;
+    }
+    
+    // Función auxiliar para actualizar dimensiones
+    function updateDimensionSafely(shortName, fullName, score, comment) {
+        const scoreIds = [`${fullName}Score`, `${shortName}Score`];
+        const commentIds = [`${fullName}Comment`, `${shortName}Comment`];
+        
+        updateElementSafely(scoreIds, `${score || 0}/5`);
+        updateElementSafely(commentIds, comment ? `Análisis: ${comment}` : 'Análisis no disponible');
+    }
+    
+    // --- FUNCIONES PRINCIPALES ---
+    
+    // Función adaptada a tu estructura HTML específica
     function mostrarPantalla(screenId) {
         console.log(`🔄 Cambiando a pantalla: ${screenId}`);
         
-        // Pantallas principales (nivel superior)
+        // Pantallas principales de nivel superior
         const mainScreens = ['introScreen', 'questionScreens', 'dataScreen', 'loadingScreen', 'resultsScreen', 'errorScreen'];
         
         // Si es una pregunta específica (question1, question2, etc.)
@@ -899,77 +970,43 @@ input {
         }
         
         // Manejar barra de progreso
-            const progressContainer = document.getElementById('progressContainer');
-            if (progressContainer) {
-                if (['question1', 'question2', 'question3', 'question4', 'question5', 'dataScreen'].includes(screenId)) {
-                    progressContainer.style.display = 'block';
-                    updateProgressBar(screenId);
-                } else {
-                    progressContainer.style.display = 'none';
-                }
-            }
-        }
-
-        // Función corregida para navegar entre preguntas
-        function nextQuestion(currentQuestionNumber) {
-            const currentAnswerId = `answer${currentQuestionNumber}`;
-            const currentAnswer = document.getElementById(currentAnswerId);
-            
-            console.log(`🔄 Navegando de pregunta ${currentQuestionNumber} a ${currentQuestionNumber + 1}`);
-            
-            if (!currentAnswer || !currentAnswer.value.trim()) {
-                alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
-                return;
-            }
-            
-            const nextQuestionNumber = currentQuestionNumber + 1;
-            
-            if (nextQuestionNumber <= 5) {
-                mostrarPantalla(`question${nextQuestionNumber}`);
+        const progressContainer = document.getElementById('progressContainer');
+        if (progressContainer) {
+            if (['question1', 'question2', 'question3', 'question4', 'question5', 'dataScreen'].includes(screenId)) {
+                progressContainer.style.display = 'block';
+                updateProgressBar(screenId);
             } else {
-                mostrarPantalla('dataScreen');
+                progressContainer.style.display = 'none';
             }
         }
-
+    }
     
-       // Función corregida para navegar entre preguntas
-        function nextQuestion(currentQuestionNumber) {
-            const currentAnswerId = `answer${currentQuestionNumber}`;
-            const currentAnswer = document.getElementById(currentAnswerId);
-            
-            console.log(`🔄 Navegando de pregunta ${currentQuestionNumber} a ${currentQuestionNumber + 1}`);
-            
-            if (!currentAnswer || !currentAnswer.value.trim()) {
-                alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
-                return;
-            }
-            
-            const nextQuestionNumber = currentQuestionNumber + 1;
-            
-            if (nextQuestionNumber <= 5) {
-                mostrarPantalla(`question${nextQuestionNumber}`);
-            } else {
-                mostrarPantalla('dataScreen');
-            }
-        }
-
-       // Función para iniciar diagnóstico respetando tu estructura
-        function startDiagnosis() {
-            console.log('🚀 Iniciando diagnóstico...');
-            mostrarPantalla('question1'); // Esto manejará questionScreens automáticamente
+    // Función para iniciar diagnóstico
+    function startDiagnosis() {
+        console.log('🚀 Iniciando diagnóstico...');
+        mostrarPantalla('question1');
+    }
+    
+    // Función corregida para navegar entre preguntas
+    function nextQuestion(currentQuestionNumber) {
+        const currentAnswerId = `answer${currentQuestionNumber}`;
+        const currentAnswer = document.getElementById(currentAnswerId);
+        
+        console.log(`🔄 Navegando de pregunta ${currentQuestionNumber} a ${currentQuestionNumber + 1}`);
+        
+        if (!currentAnswer || !currentAnswer.value.trim()) {
+            alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
+            return;
         }
         
-        // Función para mostrar recolección de datos
-        function showDataCollection() {
-            const answer5 = document.getElementById('answer5');
-            if (!answer5 || !answer5.value.trim()) {
-                alert('Por favor, completa tu narrativa comercial actual.');
-                return;
-            }
+        const nextQuestionNumber = currentQuestionNumber + 1;
+        
+        if (nextQuestionNumber <= 5) {
+            mostrarPantalla(`question${nextQuestionNumber}`);
+        } else {
             mostrarPantalla('dataScreen');
         }
-
-
+    }
     
     // Función para mostrar recolección de datos
     function showDataCollection() {
@@ -981,11 +1018,11 @@ input {
         mostrarPantalla('dataScreen');
     }
     
-    // Función principal mejorada para generar diagnóstico
+    // Función principal para generar diagnóstico
     async function generateDiagnosis() {
         console.log('🚀 Iniciando generación de diagnóstico...');
         
-        // Recolectar respuestas de forma robusta
+        // Recolectar respuestas
         const answers = {};
         let allAnswersComplete = true;
         
@@ -1057,12 +1094,12 @@ input {
         }
     }
     
-    // Función inteligente y adaptativa para mostrar resultados
+    // Función inteligente para mostrar resultados
     function displayResults(data) {
         console.log('🎨 Procesando resultados:', data);
         
         try {
-            // Calcular puntaje total de forma segura
+            // Calcular puntaje total
             const scores = [
                 data.foco_cliente || 0,
                 data.promesa_transformacion || 0,
@@ -1076,25 +1113,20 @@ input {
             
             console.log(`📊 Puntaje calculado: ${totalScore}/25 (${percentage}%)`);
             
-            // Actualizar puntajes principales con múltiples intentos
-            updateElementSafely(['totalScore', 'total-score'], `${totalScore}/25 puntos`);
-            updateElementSafely(['scorePercent', 'score-percent', 'percentage'], `${percentage}%`);
+            // Actualizar elementos principales
+            updateElementSafely(['totalScore'], `${totalScore}/25 puntos`);
+            updateElementSafely(['scorePercent'], `${percentage}%`);
             
-            // Actualizar cada dimensión con función inteligente
+            // Actualizar dimensiones
             updateDimensionSafely('foco', 'focoCliente', data.foco_cliente, data.comentario_foco_cliente);
             updateDimensionSafely('promesa', 'promesaTransformacion', data.promesa_transformacion, data.comentario_promesa_transformacion);
             updateDimensionSafely('autoridad', 'autoridadConfianza', data.autoridad_confianza, data.comentario_autoridad_confianza);
             updateDimensionSafely('diferenciacion', 'diferenciacion', data.diferenciacion, data.comentario_diferenciacion);
             updateDimensionSafely('oferta', 'ofertaValor', data.oferta_valor, data.comentario_oferta_valor);
             
-            // Actualizar textos principales con múltiples variaciones de ID
-            updateElementSafely([
-                'principalesBrechasText', 'principales-brechas-text', 'brechas-text'
-            ], data.principales_brechas || 'Análisis no disponible');
-            
-            updateElementSafely([
-                'proximopasoText', 'proximoPasoText', 'proximo-paso-text', 'next-step-text'
-            ], data.proximo_paso || 'Recomendación no disponible');
+            // Actualizar textos principales
+            updateElementSafely(['principalesBrechasText'], data.principales_brechas || 'Análisis no disponible');
+            updateElementSafely(['proximopasoText'], data.proximo_paso || 'Recomendación no disponible');
             
             console.log('✅ Todos los resultados procesados correctamente');
             
@@ -1104,39 +1136,53 @@ input {
         }
     }
     
-    // Función auxiliar inteligente que prueba múltiples IDs
-    function updateElementSafely(possibleIds, content) {
-        for (const id of possibleIds) {
-            const element = document.getElementById(id);
-            if (element) {
-                element.textContent = content;
-                console.log(`✅ Actualizado elemento: ${id} = "${content}"`);
-                return true;
+    // --- FUNCIONES DE TESTING ---
+    
+    // Función para probar navegación completa
+    function testNavigation() {
+        console.log('🧪 Probando navegación paso a paso...');
+        
+        // Llenar respuestas de prueba
+        for (let i = 1; i <= 5; i++) {
+            const answer = document.getElementById(`answer${i}`);
+            if (answer) {
+                answer.value = `Respuesta de prueba ${i}`;
             }
         }
-        console.warn(`⚠️ No se encontró ningún elemento con IDs: ${possibleIds.join(', ')}`);
-        return false;
+        
+        // Secuencia de navegación con delays
+        setTimeout(() => {
+            console.log('Paso 1: Iniciando');
+            startDiagnosis();
+        }, 500);
+        
+        setTimeout(() => {
+            console.log('Paso 2: Pregunta 1 → 2');
+            nextQuestion(1);
+        }, 1500);
+        
+        setTimeout(() => {
+            console.log('Paso 3: Pregunta 2 → 3');
+            nextQuestion(2);
+        }, 2500);
+        
+        setTimeout(() => {
+            console.log('Paso 4: Pregunta 3 → 4');  
+            nextQuestion(3);
+        }, 3500);
+        
+        setTimeout(() => {
+            console.log('Paso 5: Pregunta 4 → 5');  
+            nextQuestion(4);
+        }, 4500);
+        
+        setTimeout(() => {
+            console.log('Paso 6: Pregunta 5 → Datos');  
+            nextQuestion(5);
+        }, 5500);
     }
     
-    // Función auxiliar para actualizar dimensiones con múltiples variaciones
-    function updateDimensionSafely(shortName, fullName, score, comment) {
-        // Generar múltiples posibles IDs para el puntaje
-        const scoreIds = [
-            `${fullName}Score`, `${shortName}Score`, `${fullName}-score`, 
-            `${shortName}-score`, `score-${shortName}`, `score-${fullName}`
-        ];
-        
-        // Generar múltiples posibles IDs para el comentario
-        const commentIds = [
-            `${fullName}Comment`, `${shortName}Comment`, `${fullName}-comment`,
-            `${shortName}-comment`, `comment-${shortName}`, `comment-${fullName}`
-        ];
-        
-        updateElementSafely(scoreIds, `${score || 0}/5`);
-        updateElementSafely(commentIds, comment ? `Análisis: ${comment}` : 'Análisis no disponible');
-    }
-    
-    // Funciones de debugging y testing
+    // Función para probar resultados
     function testResults() {
         console.log('🧪 Ejecutando prueba de resultados...');
         
@@ -1159,47 +1205,7 @@ input {
         mostrarPantalla('resultsScreen');
     }
     
-    function listAllIds() {
-        const allElements = document.querySelectorAll('[id]');
-        const ids = Array.from(allElements).map(el => el.id).sort();
-        console.log('🔍 Todos los IDs disponibles en el DOM:', ids);
-        return ids;
-    }
-    
-    function debugElement(elementId) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            console.log(`✅ Elemento encontrado: ${elementId}`, element);
-            console.log(`   - tagName: ${element.tagName}`);
-            console.log(`   - className: ${element.className}`);
-            console.log(`   - textContent: "${element.textContent}"`);
-        } else {
-            console.log(`❌ Elemento NO encontrado: ${elementId}`);
-        }
-    }
-    
-    // Inicialización cuando se carga la página
-    document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 NIA JavaScript cargado correctamente');
-        
-        // Mostrar pantalla inicial si existe
-        const introScreen = document.getElementById('introScreen');
-        if (introScreen) {
-            mostrarPantalla('introScreen');
-        }
-        
-        // Debug: Listar IDs después de 1 segundo (para asegurar que todo esté cargado)
-        setTimeout(() => {
-            console.log('🔍 Ejecutando análisis de IDs disponibles...');
-            listAllIds();
-        }, 1000);
-    });
-    
-    // Función de compatibilidad para tu estructura actual
-    if (typeof mostrarPantalla === 'undefined') {
-        window.mostrarPantalla = mostrarPantalla;
-    }
-//Para debugging específico:
+    // Función para debuggear estado de preguntas
     function debugQuestions() {
         console.log('🔍 Estado actual de las preguntas:');
         
@@ -1211,7 +1217,13 @@ input {
             console.log(`question${i} display:`, question ? question.style.display : 'NO EXISTE');
         }
     }
-
+    
+    // Inicialización cuando se carga la página
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 NIA JavaScript cargado correctamente');
+        mostrarPantalla('introScreen');
+    });
+    
 
 
 //========= SANITIZADOR: ===============
@@ -1891,41 +1903,6 @@ async function debugearEnvioMAKE() {
         procesarResultadosDiagnostico(datosEjemplo);
     }
     
-    //Testing Específico para Tu Estructura // SOLO PARA TESTING - Comentar en producción - Comentar en producción
-    function testNavigation() {
-        console.log('🧪 Probando navegación paso a paso...');
-        
-        // Llenar respuestas de prueba
-        for (let i = 1; i <= 5; i++) {
-            const answer = document.getElementById(`answer${i}`);
-            if (answer) {
-                answer.value = `Respuesta de prueba ${i}`;
-            }
-        }
-        
-        // Probar secuencia de navegación con delays
-        setTimeout(() => {
-            console.log('Paso 1: Iniciando');
-            startDiagnosis();
-        }, 500);
-        
-        setTimeout(() => {
-            console.log('Paso 2: Pregunta 1 → 2');
-            nextQuestion(1);
-        }, 1500);
-        
-        setTimeout(() => {
-            console.log('Paso 3: Pregunta 2 → 3');
-            nextQuestion(2);
-        }, 2500);
-        
-        setTimeout(() => {
-            console.log('Paso 4: Pregunta 3 → 4');  
-            nextQuestion(3);
-        }, 3500);
-    }
-
-
     
 </script>
 
