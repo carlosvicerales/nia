@@ -8,1023 +8,514 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-/**
- * =================================================================
- * CSS DEFINITIVO DEPURADO - NIA DIAGNÓSTICO
- * =================================================================
- */
-
-/* =============================================
-   Variables y Reset Global
-   ============================================= */
-:root {
-    --color-primary: #AF86FF;
-    --color-secondary: #4FDC9A;
-    --color-bg-dark: #10111A;
-    --color-bg-light: #1A1B26;
-    --color-surface-dark: #212230;
-    --color-text-light-primary: #F0F2F5;
-    --color-text-light-secondary: #A0A3B1;
-    --color-border: rgba(175, 134, 255, 0.15);
-    --color-glow: rgba(175, 134, 255, 0.1);
-}
-
-/* Reset limpio sin conflictos */
-html, body {
-    margin: 0;
-    padding: 0;
-    overflow-x: hidden;
-    box-sizing: border-box;
-    scroll-behavior: smooth;
-}
-
-body {
-    font-family: 'Inter', sans-serif;
-    background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-light) 100%);
-    min-height: 100vh;
-    color: var(--color-text-light-primary);
-}
-
-/* =============================================
-   ESTRUCTURA PRINCIPAL - ALINEACIÓN SUPERIOR
-   ============================================= */
-
-/* Estructura principal sin centrado vertical */
-.min-h-screen {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding-top: 70px; /* Espacio para navbar fija */
-    margin: 0;
-}
-
-/* CLAVE: Alineación superior en todas las pantallas */
-.flex-1.flex.items-center.justify-center {
-    align-items: flex-start !important; /* Solución Problema 4 */
-    justify-content: center;
-    width: 100%;
-    padding: 20px 10px;
-    min-height: auto;
-}
-
-/* =============================================
-   NAVBAR FIJA SIN PADDING LATERAL
-   ============================================= */
-
-/* Solución Problema 5: Barra completamente pegada */
-#progressContainer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    padding: 0;
-    margin: 0;
-    z-index: 1000;
-    background: var(--color-bg-dark);
-}
-
-#progressContainer .max-w-4xl {
-    padding: 16px 20px; /* Solo padding interno necesario */
-    margin: 0 auto;
-    max-width: 100%;
-}
-
-/* =============================================
-   CONTENEDORES - ANCHO DIFERENCIADO
-   ============================================= */
-
-/* PREGUNTAS: Ancho estándar (960px) */
-.container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* RESULTADOS: Ancho ampliado progresivo - Solución Problema 2 */
-#resultsScreen .container {
-    max-width: 1400px;
-    padding: 0 40px;
-    width: 95%;
-}
-
-/* Eliminar restricciones adicionales */
-#resultsScreen .w-full.max-w-2xl {
-    max-width: none !important;
-}
-
-.w-full.max-w-2xl {
-    margin-top: 0;
-    padding-top: 0;
-}
-
-/* =============================================
-   COMPONENTES ESENCIALES
-   ============================================= */
-
-/* Tipografía */
-.main-title {
-    color: var(--color-text-light-primary);
-    text-align: center;
-    margin-bottom: 40px;
-    font-size: 2em;
-    font-weight: 700;
-}
-
-/* Botones */
-.btn-primary {
-    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
-    color: var(--color-bg-dark);
-    padding: 12px 32px;
-    border-radius: 25px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none;
-    display: inline-block;
-    font-weight: 600;
-    border: none;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 25px rgba(79, 220, 154, 0.3);
-}
-
-/* Formularios */
-textarea,
-input[type="text"],
-input[type="email"],
-input[type="tel"] {
-    background: var(--color-bg-light);
-    border: 1px solid var(--color-border);
-    color: var(--color-text-light-primary);
-    width: 100%;
-    font-family: 'Inter', sans-serif;
-    transition: all 0.3s ease;
-    border-radius: 12px;
-    padding: 16px;
-    box-sizing: border-box;
-}
-
-textarea:focus,
-input:focus {
-    outline: none;
-    border-color: var(--color-secondary);
-    box-shadow: 0 0 0 3px rgba(79, 220, 154, 0.1);
-}
-
-textarea {
-    min-height: 120px;
-    resize: vertical;
-}
-
-/* Validación de campos */
-.campo-error {
-    border: 2px solid #ef4444 !important;
-    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-}
-
-.campo-valido {
-    border: 2px solid #10b981 !important;
-    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
-}
-
-.mensaje-error,
-.mensaje-exito {
-    font-size: 12px;
-    margin-top: 4px;
-    margin-bottom: 8px;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-    font-weight: 500;
-}
-
-.mensaje-error { color: #ef4444; }
-.mensaje-exito { color: #10b981; }
-.mensaje-error::before { content: "⚠️"; }
-.mensaje-exito::before { content: "✅"; }
-
-/* Progreso */
-.step-indicator {
-    width: 30px;
-    height: 30px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.step-active {
-    background: var(--color-secondary);
-    color: var(--color-bg-dark);
-}
-
-.step-inactive {
-    background: var(--color-surface-dark);
-    color: var(--color-text-light-secondary);
-}
-
-.progress-bar {
-    height: 4px;
-    background: var(--color-surface-dark);
-    border-radius: 2px;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%);
-    transition: width 0.3s ease;
-}
-
-.loading-spinner {
-    border: 3px solid var(--color-surface-dark);
-    border-top: 3px solid var(--color-secondary);
-    border-radius: 50%;
-    width: 40px;
-    height: 40px;
-    animation: spin 1s linear infinite;
-}
-
-/* =============================================
-   PÁGINA DE RESULTADOS - DISEÑO DASHBOARD
-   ============================================= */
-
-/* Tarjeta superior con gráfico radial */
-.score-header-card {
-    display: flex;
-    background: var(--color-surface-dark);
-    border-radius: 20px;
-    padding: 32px;
-    align-items: center;
-    gap: 32px;
-    border: 1px solid var(--color-border);
-    margin-bottom: 24px;
-}
-
-.score-graphic-col {
-    flex: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.score-title-col {
-    flex: 2;
-}
-
-.score-title-col h2 {
-    margin: 0 0 12px 0;
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--color-text-light-primary);
-}
-
-.score-title-col p {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.6;
-    color: var(--color-text-light-secondary);
-}
-
-/* Gráfico radial */
-.radial-progress-container {
-    position: relative;
-    width: 160px;
-    height: 160px;
-}
-
-.radial-progress-bar {
-    transform: rotate(-90deg);
-}
-
-.radial-progress-bar circle {
-    transition: stroke-dashoffset 1s ease-out;
-}
-
-.radial-progress-text {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    text-align: center;
-}
-
-.radial-score {
-    font-size: 48px;
-    font-weight: 800;
-    color: var(--color-text-light-primary);
-    line-height: 1;
-}
-
-.radial-score-label {
-    font-size: 18px;
-    font-weight: 500;
-    color: var(--color-text-light-secondary);
-}
-
-/* Evaluación detallada */
-.evaluation-details-card {
-    background: var(--color-surface-dark);
-    border-radius: 20px;
-    padding: 32px;
-    border: 1px solid var(--color-border);
-}
-
-.evaluation-details-card h2 {
-    margin: 0 0 24px 0;
-    font-size: 24px;
-    font-weight: 700;
-}
-
-.dimensions-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 20px;
-}
-
-.dimension-metric-card {
-    background: var(--color-bg-light);
-    border-radius: 15px;
-    padding: 20px;
-    border: 1px solid transparent;
-    position: relative;
-    overflow: hidden;
-    transition: all 0.3s ease;
-    --mouse-x: 50%;
-    --mouse-y: 50%;
-}
-
-.dimension-metric-card:before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0; bottom: 0; left: 0;
-    background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--color-glow), transparent 80%);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.dimension-metric-card:hover {
-    border-color: var(--color-border);
-    transform: translateY(-4px);
-}
-
-.dimension-metric-card:hover:before {
-    opacity: 1;
-}
-
-.dimension-header {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 16px;
-}
-
-.dimension-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 8px;
-    background: var(--color-surface-dark);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.dimension-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-text-light-primary);
-}
-
-.dimension-bar-container {
-    width: 100%;
-    height: 8px;
-    background-color: rgba(0,0,0,0.3);
-    border-radius: 4px;
-    margin-bottom: 8px;
-}
-
-.dimension-bar-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%);
-    border-radius: 4px;
-    transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
-}
-
-.dimension-score {
-    font-weight: 600;
-    color: var(--color-text-light-secondary);
-}
-
-.dimension-comment {
-    font-size: 14px;
-    color: var(--color-text-light-secondary);
-    line-height: 1.6;
-}
-
-/* Siguiente paso estratégico */
-.next-step-card {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    background: var(--color-surface-dark);
-    border-radius: 20px;
-    padding: 32px;
-    margin-top: 24px;
-    border: 2px solid var(--color-secondary);
-}
-
-.nia-avatar-col {
-    flex: 1;
-    display: flex;
-    justify-content: center;
-}
-
-.nia-avatar {
-    width: 150px;
-    height: 150px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 3px solid var(--color-secondary);
-    box-shadow: 0 0 30px rgba(79, 220, 154, 0.3);
-}
-
-.next-step-text-col {
-    flex: 2;
-}
-
-.next-step-text-col h2 {
-    margin: 0 0 16px 0;
-    color: var(--color-secondary);
-    font-size: 22px;
-}
-
-.next-step-text-col p {
-    margin: 0;
-    font-size: 16px;
-    line-height: 1.7;
-    color: var(--color-text-light-secondary);
-}
-
-/* CTA final */
-.final-cta-section {
-    display: flex;
-    align-items: center;
-    gap: 32px;
-    margin: 24px 0;
-    padding: 32px;
-    background: var(--color-surface-dark);
-    border-radius: 20px;
-    border: 1px solid var(--color-primary);
-}
-
-.final-cta-text-col {
-    flex: 2;
-    padding-left: 16px;
-}
-
-.final-cta-image-col {
-    flex: 1;
-}
-
-.final-cta-image-col img {
-    width: 100%;
-    border-radius: 15px;
-    height: auto;
-}
-
-.final-cta-text-col h2 {
-   font-size: 22px;
-   margin: 0 0 12px 0;
-}
-
-.final-cta-text-col p {
-    color: var(--color-text-light-secondary);
-    line-height: 1.6;
-    margin: 0 0 16px 0;
-}
-
-.cta-button {
-    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
-    color: #1a1a1a;
-    padding: 12px 24px;
-    border: none;
-    border-radius: 9999px;
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    text-decoration: none;
-    margin-bottom: 16px;
-}
-
-.cta-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 25px rgba(79, 220, 154, 0.2);
-}
-
-.warning {
-    color: #c4b5fd;
-    font-weight: 500;
-    font-size: 14px;
-}
-
-.footer {
-    text-align: center;
-    margin-top: 50px;
-    padding-bottom: 20px;
-    color: var(--color-text-light-secondary);
-}
-
-/* =============================================
-   ANIMACIONES
-   ============================================= */
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-}
-
-.floating-animation { animation: float 3s ease-in-out infinite; }
-.fade-in { animation: fadeIn 0.5s ease-in; }
-
-/* =============================================
-   MEDIA QUERIES DEPURADAS - SIN SOLAPAMIENTO
-   ============================================= */
-
-/* Desktop Extra Grande (1400px+) */
-@media (min-width: 1400px) {
-    #resultsScreen .container {
-        max-width: 1500px;
-        padding: 0 50px;
-    }
-}
-
-/* Desktop Grande (1200px - 1399px) */
-@media (min-width: 1200px) and (max-width: 1399px) {
-    #resultsScreen .container {
-        max-width: 1300px;
-        padding: 0 40px;
-    }
-}
-
-/* Desktop Mediano (1024px - 1199px) */
-@media (min-width: 1024px) and (max-width: 1199px) {
-    #resultsScreen .container {
-        max-width: 1100px;
-        padding: 0 30px;
-    }
-    
-    .score-header-card, 
-    .next-step-card, 
-    .final-cta-section {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .final-cta-section {
-        flex-direction: column-reverse;
-    }
-    
-    .final-cta-text-col {
-        padding-left: 0;
-    }
-}
-
-/* Tablet (769px - 1023px) */
-@media (min-width: 769px) and (max-width: 1023px) {
-    #resultsScreen .container {
-        max-width: 950px;
-        padding: 0 25px;
-    }
-    
-    .score-header-card, 
-    .next-step-card, 
-    .final-cta-section {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .final-cta-section {
-        flex-direction: column-reverse;
-    }
-    
-    .final-cta-text-col {
-        padding-left: 0;
-    }
-}
-
-/* Móvil (768px y menos) - Solución Problema 3 */
-@media (max-width: 768px) {
-    /* Alineamiento superior garantizado */
-    .flex-1.flex.items-center.justify-center {
-        align-items: flex-start !important;
-        padding: 10px;
-        min-height: auto;
-    }
-    
-    /* Padding lateral optimizado */
-    .container {
-        padding: 0 15px;
-        max-width: 100%;
-    }
-    
-    #resultsScreen .container {
-        padding: 15px;
-        max-width: 100%;
-        width: 100%;
-    }
-    
-    /* Elementos internos */
-    .score-header-card,
-    .evaluation-details-card,
-    .next-step-card,
-    .final-cta-section {
-        padding: 20px 15px;
-        margin: 15px 0;
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .final-cta-section {
-        flex-direction: column-reverse;
-    }
-    
-    .final-cta-text-col {
-        padding-left: 0;
-    }
-    
-    /* Navbar móvil */
-    #progressContainer .max-w-4xl {
-        padding: 12px 15px;
-    }
-    
-    /* Eliminar efectos hover en móvil */
-    .dimension-metric-card:hover {
-        transform: none;
-    }
-    
-    .dimension-metric-card:before {
-        display: none;
-    }
-    
-    textarea {
-        min-height: 100px;
-    }
-}
-
-
+    :root {
+            --color-primary: #AF86FF;
+            --color-secondary: #4FDC9A;
+            --color-bg-dark: #10111A;
+            --color-bg-light: #1A1B26;
+            --color-surface-dark: #212230;
+            --color-text-light-primary: #F0F2F5;
+            --color-text-light-secondary: #A0A3B1;
+            --color-border: rgba(175, 134, 255, 0.15);
+            --color-glow: rgba(175, 134, 255, 0.1);
+        }
+        
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-light) 100%);
+            min-height: 100vh;
+            color: var(--color-text-light-primary);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Contenedor principal para toda la aplicación */
+        .app-wrapper {
+            width: 100%;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 120px 20px 20px 20px; /* Espacio para la barra de progreso fija y padding general */
+            box-sizing: border-box;
+        }
+        
+        /* Contenedor de contenido con ancho variable */
+        .content-container {
+            width: 100%;
+            max-width: 800px; /* Ancho por defecto para preguntas */
+            box-sizing: border-box;
+        }
+        
+        /* Ancho ampliado para la pantalla de resultados */
+        #resultsScreen .content-container {
+            max-width: 1200px;
+        }
+
+        .main-title {
+            color: var(--color-text-light-primary);
+            text-align: center;
+            margin-bottom: 40px;
+            font-size: 2em;
+            font-weight: 700;
+        }
+        
+        .screen {
+            width: 100%;
+            display: none; /* Oculto por defecto */
+        }
+        #introScreen {
+            display: block; /* Visible al inicio */
+        }
+
+        /* =============================================
+           Componentes Generales (Intro, Preguntas, Formularios)
+           ============================================= */
+        .intro-content, .question-content {
+            text-align: center;
+        }
+
+        .btn-nav {
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            font-weight: 600;
+            border: none;
+            padding: 12px 28px;
+            border-radius: 9999px;
+            font-size: 1rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+            color: var(--color-bg-dark);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(79, 220, 154, 0.2);
+        }
+        
+        .btn-secondary {
+            background: var(--color-surface-dark);
+            color: var(--color-text-light-secondary);
+            border: 1px solid var(--color-border);
+        }
+        .btn-secondary:hover {
+            background: var(--color-bg-light);
+            color: var(--color-text-light-primary);
+        }
+
+        textarea, input[type="text"] {
+            background: var(--color-bg-light);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-light-primary);
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            padding: 16px;
+            box-sizing: border-box;
+            margin-top: 1.5rem;
+        }
+
+        textarea:focus, input[type="text"]:focus {
+            outline: none;
+            border-color: var(--color-secondary);
+            box-shadow: 0 0 0 3px rgba(79, 220, 154, 0.1);
+        }
+        
+        textarea { min-height: 120px; resize: vertical; }
+
+        .navigation-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        /* --- Barra de Progreso --- */
+        #progressContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            width: 100%;
+            z-index: 1000;
+            background: var(--color-bg-dark);
+            padding: 1rem;
+            box-sizing: border-box;
+        }
+        #progressContainer .progress-wrapper { max-width: 800px; margin: 0 auto; }
+        .progress-bar { height: 4px; background: var(--color-surface-dark); border-radius: 2px; overflow: hidden; margin-bottom: 1rem; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%); transition: width 0.3s ease; }
+        .steps-container { display: flex; justify-content: center; align-items: center; gap: 1rem; }
+        .step-indicator { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: all 0.3s ease; font-weight: 600; }
+        .step-active { background: var(--color-secondary); color: var(--color-bg-dark); }
+        .step-inactive { background: var(--color-surface-dark); color: var(--color-text-light-secondary); }
+        .step-completed { background: #374151; color: #9CA3AF; } /* Gris oscuro para completados */
+        
+        /* --- Spinner de Carga --- */
+        .loading-spinner { border: 3px solid var(--color-surface-dark); border-top: 3px solid var(--color-secondary); border-radius: 50%; width: 40px; height: 40px; animation: spin 1s linear infinite; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+        /* =============================================
+           PÁGINA DE RESULTADOS (DISEÑO DASHBOARD)
+           ============================================= */
+        #resultsScreen .content-container { padding-top: 0; }
+        .card { background: var(--color-surface-dark); border-radius: 20px; padding: 32px; border: 1px solid var(--color-border); margin-bottom: 24px; }
+        
+        /* --- 1) Tarjeta Superior (Puntuación + Brechas) --- */
+        .score-header-card { display: flex; align-items: center; gap: 32px; }
+        .score-graphic-col { flex: 1; display: flex; align-items: center; justify-content: center; }
+        .score-title-col { flex: 2; }
+        .score-title-col h2 { margin: 0 0 12px 0; font-size: 28px; font-weight: 700; color: var(--color-text-light-primary); }
+        .score-title-col p { margin: 0; font-size: 16px; line-height: 1.6; color: var(--color-text-light-secondary); }
+        .radial-progress-container { position: relative; width: 160px; height: 160px; }
+        .radial-progress-bar { transform: rotate(-90deg); }
+        .radial-progress-bar circle { transition: stroke-dashoffset 1s ease-out; }
+        .radial-progress-text { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; }
+        .radial-score { font-size: 48px; font-weight: 800; color: var(--color-text-light-primary); line-height: 1; }
+        .radial-score-label { font-size: 18px; font-weight: 500; color: var(--color-text-light-secondary); }
+
+        /* --- 2) Detalle de Evaluación (Tema Oscuro con Iconos) --- */
+        .evaluation-details-card h2 { margin: 0 0 24px 0; font-size: 24px; font-weight: 700; }
+        .dimensions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+        .dimension-metric-card { background: var(--color-bg-light); border-radius: 15px; padding: 20px; border: 1px solid transparent; position: relative; overflow: hidden; transition: all 0.3s ease; }
+        .dimension-metric-card:before { content: ''; position: absolute; top: 0; right: 0; bottom: 0; left: 0; background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--color-glow), transparent 80%); opacity: 0; transition: opacity 0.3s ease; }
+        .dimension-metric-card:hover { border-color: var(--color-border); transform: translateY(-4px); }
+        .dimension-metric-card:hover:before { opacity: 1; }
+        .dimension-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+        .dimension-title-group { display: flex; align-items: center; gap: 12px; }
+        .dimension-icon { width: 40px; height: 40px; border-radius: 8px; background: var(--color-surface-dark); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+        .dimension-icon i { font-size: 18px; color: var(--color-primary); }
+        .dimension-header h3 { margin: 0; font-size: 18px; font-weight: 600; color: var(--color-text-light-primary); }
+        .dimension-score { font-weight: 600; color: var(--color-text-light-primary); font-size: 16px; white-space: nowrap; }
+        .dimension-bar-container { width: 100%; height: 8px; background-color: rgba(0,0,0,0.3); border-radius: 4px; margin-bottom: 8px; }
+        .dimension-bar-fill { height: 100%; background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%); border-radius: 4px; transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1); }
+        .dimension-comment { font-size: 14px; color: var(--color-text-light-secondary); line-height: 1.6; }
+        .cta-button-card { display: flex; align-items: center; justify-content: center; gap: 12px; background: var(--color-surface-dark); color: var(--color-text-light-primary); border-radius: 15px; padding: 20px; text-decoration: none; font-weight: 600; transition: all 0.3s ease; border: 1px solid var(--color-border); }
+        .cta-button-card:hover { background: var(--color-bg-light); transform: translateY(-4px); }
+        .cta-button-card .icon-placeholder { width: 30px; height: 30px; background: var(--color-bg-light); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+
+        /* --- 3) Siguiente Paso Estratégico --- */
+        .next-step-card { display: flex; align-items: center; gap: 32px; border-width: 2px; border-style: solid; border-color: var(--color-secondary); }
+        .nia-avatar-col { flex: 1; display: flex; justify-content: center; }
+        .nia-avatar { width: 150px; height: 150px; border-radius: 50%; object-fit: cover; border: 3px solid var(--color-secondary); box-shadow: 0 0 30px rgba(79, 220, 154, 0.3); }
+        .next-step-text-col { flex: 2; }
+        .next-step-text-col h2 { margin: 0 0 16px 0; color: var(--color-secondary); font-size: 22px; }
+        .next-step-text-col p { margin: 0; font-size: 16px; line-height: 1.7; color: var(--color-text-light-secondary); }
+
+        /* --- 4) CTA Final --- */
+        .final-cta-section { display: flex; align-items: center; gap: 32px; border-width: 2px; border-style: solid; border-color: var(--color-primary); }
+        .final-cta-text-col { flex: 2; padding-left: 16px; }
+        .final-cta-image-col { flex: 1; }
+        .final-cta-image-col img { width: 100%; border-radius: 15px; height: auto; }
+        .final-cta-text-col h2 { font-size: 22px; margin: 0 0 12px 0; }
+        .final-cta-text-col p { color: var(--color-text-light-secondary); line-height: 1.6; margin: 0 0 16px 0; }
+        .cta-button { background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%); color: #1a1a1a; padding: 12px 24px; border: none; border-radius: 9999px; font-size: 16px; font-weight: 600; cursor: pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; display: inline-flex; align-items: center; gap: 8px; text-decoration: none; margin-bottom: 16px; }
+        .cta-button:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(79, 220, 154, 0.2); }
+        .warning { color: #c4b5fd; font-weight: 500; font-size: 14px; }
+        
+        /* --- Footer --- */
+        .footer { text-align: center; margin-top: 50px; padding-bottom: 20px; color: var(--color-text-light-secondary); }
+        .footer-nia { font-weight: 700; background: linear-gradient(to right, var(--color-secondary), var(--color-primary)); -webkit-background-clip: text; color: transparent; }
+
+        /* =============================================
+           Responsividad
+           ============================================= */
+        @media (max-width: 1024px) {
+            .score-header-card, .next-step-card, .final-cta-section { flex-direction: column; text-align: center; }
+            .final-cta-section { flex-direction: column-reverse; }
+            .final-cta-text-col { padding-left: 0; }
+        }
+        @media (max-width: 768px) {
+            .app-wrapper { padding-top: 80px; padding-left: 10px; padding-right: 10px; }
+            textarea { min-height: 100px; }
+            .content-container, #resultsScreen .content-container { padding: 0; }
+            .card, .score-header-card, .evaluation-details-card, .next-step-card, .final-cta-section { padding: 20px; }
+            .main-title { font-size: 1.5em; }
+        }
     </style>
 </head>
-<body class="text-white">
-    <div class="min-h-screen flex flex-col">
+<body>
+    <div class="app-wrapper">
         <!-- Progress Bar -->
-        <div id="progressContainer" class="w-full bg-gray-800 p-4" style="display: none;">
-            <div class="max-w-4xl mx-auto">
-                <div class="progress-bar mb-4">
+        <div id="progressContainer" style="display: none;">
+            <div class="progress-wrapper">
+                <div class="progress-bar">
                     <div id="progressBar" class="progress-fill" style="width: 0%"></div>
                 </div>
-                <div class="flex justify-between items-center">
-                    <div class="flex space-x-4">
-                        <div id="step1" class="step-indicator step-active">1</div>
-                        <div id="step2" class="step-indicator step-inactive">2</div>
-                        <div id="step3" class="step-indicator step-inactive">3</div>
-                        <div id="step4" class="step-indicator step-inactive">4</div>
-                        <div id="step5" class="step-indicator step-inactive">5</div>
-                        <div id="step6" class="step-indicator step-inactive">📋</div>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <div class="steps-container">
+                        <div id="step1" class="step-indicator">1</div>
+                        <div id="step2" class="step-indicator">2</div>
+                        <div id="step3" class="step-indicator">3</div>
+                        <div id="step4" class="step-indicator">4</div>
+                        <div id="step5" class="step-indicator">5</div>
+                        <div id="step6" class="step-indicator"><i class="fa-solid fa-list-check"></i></div>
                     </div>
-                    <div class="text-sm text-gray-400">
+                    <div style="font-size: 0.875rem; color: var(--color-text-light-secondary);">
                         Paso <span id="currentStep">1</span> de 6
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="flex-1 flex items-center justify-center p-4">
-            <div class="w-full max-w-2xl">
-                <!-- Intro Screen -->
-                <div id="introScreen" class="text-center fade-in">
-                    <div class="glass-effect rounded-3xl p-8 md:p-12">
-                        <div class="mb-8 floating-animation">
-                            <img src="img/nia.png" 
-                                 alt="NIA - Asesora Virtual" 
-                                 class="nia-avatar mx-auto mb-6">
+        <!-- Intro Screen -->
+        <div id="introScreen" class="screen">
+            <div class="content-container">
+                <div class="intro-content">
+                    <img src="img/nia.png" alt="NIA - Asesora Virtual" style="margin: 0 auto 1.5rem auto; width: 150px; height: 150px; border-radius: 50%; border: 3px solid var(--color-secondary); box-shadow: 0 0 30px rgba(79, 220, 154, 0.3);">
+                    <h1 style="font-size: 2.25rem; font-weight: 700; margin-bottom: 1.5rem; background-image: linear-gradient(to right, #50DB9A, #AF86FF); -webkit-background-clip: text; color: transparent;">
+                        🌟 Hola, soy NIA
+                    </h1>
+                    <p style="font-size: 1.25rem; color: #D1D5DB; margin-bottom: 1.5rem;">
+                        Agente de IA entrenada para realizar el más completo
+                        <span style="font-weight: 700; background-image: linear-gradient(to right, #50DB9A, #AF86FF); -webkit-background-clip: text; color: transparent;">
+                            Diagnóstico Inteligente de tu narrativa comercial
+                        </span>.
+                    </p>
+                    <p style="color: #9CA3AF; font-size: 0.875rem; margin-bottom: 1.5rem;">
+                        Responde sólo 5 preguntas clave, y sabrás de forma personalizada si tu narrativa actual 
+                        <span style="font-weight: 700;">refleja el valor</span> que entregas, y si estás ayudando a 
+                        <span style="font-weight: 700;">atraer y convertir a los clientes correctos</span>.
+                    </p>
+                    <button onclick="startDiagnosis()" class="btn-nav btn-primary" style="font-size: 1.125rem;">
+                        <i class="fas fa-rocket"></i>
+                        <span>Iniciar Diagnóstico</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Question Screens -->
+        <div id="questionScreens" class="screen">
+            <div class="content-container">
+                <div class="question-content">
+                    <!-- Question 1 -->
+                    <div id="question1" class="question-screen">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Para comenzar cuéntame ¿qué tipo de empresas o clientes atiendes actualmente?</h2>
+                        <p style="color: #9CA3AF; font-size: 0.875rem;">Necesito entender tu universo de clientes para evaluar si tu mensaje les habla directamente.</p>
+                        <textarea id="answer1" placeholder="Ejemplo: Empresas de manufactura con 50-200 empleados que buscan automatizar sus procesos"></textarea>
+                        <div class="navigation-buttons">
+                            <button onclick="nextQuestion(2)" class="btn-nav btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
                         </div>
-                        
-                        <h1 class="text-2xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent" style="background-image: linear-gradient(to right, #50DB9A, #AF86FF);">
-                            🌟 Hola, soy NIA
-                        </h1>
-                        <p class="text-xl text-gray-300 mb-6">
-                            Agente de IA entrenada para realizar el más completo
-                            <span class="bg-clip-text text-transparent font-bold" style="background-image: linear-gradient(to right, #50DB9A, #AF86FF);">
-                                Diagnóstico Inteligente de tu narrativa comercial
-                            </span>.
-                        </p>
-
-                        
-                        <p class="text-gray-400 text-sm mb-6">
-                            Responde sólo 5 preguntas clave, y sabrás de forma personalizada si tu narrativa actual 
-                            <span class="font-bold">refleja el valor</span> que entregas, y si estás ayudando a 
-                            <span class="font-bold">atraer y convertir a los clientes correctos</span>.
-                        </p>
-
-                   <!---     
-                        <p class="text-lg text-gray-300 mb-8">
-                            ¿List@ para empezar?
-                        </p>
-                    --->    
-                        
-                        <button onclick="startDiagnosis()" class="btn-primary text-lg">
-                            <i class="fas fa-rocket mr-2"></i>
-                            Iniciar Diagnóstico
+                    </div>
+                    <!-- Other questions -->
+                    <div id="question2" class="question-screen" style="display: none;">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Ahora indícame ¿Qué problema principal resuelves para esos clientes?</h2>
+                        <p style="color: #9CA3AF; font-size: 0.875rem;">Aquí está el corazón de tu propuesta. Quiero ver si conectas con el dolor real de tus clientes.</p>
+                        <textarea id="answer2" placeholder="Ejemplo: Reducir costos operativos por falta de automatización en procesos manuales repetitivos"></textarea>
+                        <div class="navigation-buttons">
+                            <button onclick="prevQuestion(1)" class="btn-nav btn-secondary"><i class="fas fa-arrow-left"></i> Atrás</button>
+                            <button onclick="nextQuestion(3)" class="btn-nav btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                    <div id="question3" class="question-screen" style="display: none;">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Cuéntame ¿Qué resultado o transformación logran tus clientes al trabajar contigo?</h2>
+                        <p style="color: #9CA3AF; font-size: 0.875rem;">Tu cliente necesita visualizar el destino, no solo el viaje. Muéstrame qué prometes.</p>
+                        <textarea id="answer3" placeholder="Ejemplo: Aumentan eficiencia 30% y reducen errores humanos en 90 días"></textarea>
+                        <div class="navigation-buttons">
+                            <button onclick="prevQuestion(2)" class="btn-nav btn-secondary"><i class="fas fa-arrow-left"></i> Atrás</button>
+                            <button onclick="nextQuestion(4)" class="btn-nav btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                    <div id="question4" class="question-screen" style="display: none;">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Muy bien! ahora ¿Por qué tus clientes te eligen a ti y no a otro proveedor?</h2>
+                        <p style="color: #9CA3AF; font-size: 0.875rem;">Aquí hay algo valioso, pero necesito saber si lo estás comunicando con fuerza.</p>
+                        <textarea id="answer4" placeholder="Ejemplo: Somos los únicos con 15 años de experiencia específica en su sector"></textarea>
+                        <div class="navigation-buttons">
+                            <button onclick="prevQuestion(3)" class="btn-nav btn-secondary"><i class="fas fa-arrow-left"></i> Atrás</button>
+                            <button onclick="nextQuestion(5)" class="btn-nav btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                    <div id="question5" class="question-screen" style="display: none;">
+                        <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">Finalmente, escribe cómo sueles presentar tu negocio o propuesta comercial</h2>
+                        <p style="color: #9CA3AF; font-size: 0.875rem;">Esta es tu narrativa actual. Sé honest@: escribe exactamente como te presentas ahora.</p>
+                        <textarea id="answer5" placeholder="Ejemplo: Ayudamos a empresas manufactureras a automatizar procesos y reducir costos operativos..."></textarea>
+                        <div class="navigation-buttons">
+                            <button onclick="prevQuestion(4)" class="btn-nav btn-secondary"><i class="fas fa-arrow-left"></i> Atrás</button>
+                            <button onclick="showDataCollection()" class="btn-nav btn-primary">Siguiente <i class="fas fa-arrow-right"></i></button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Data Collection Screen -->
+        <div id="dataScreen" class="screen">
+            <div class="content-container">
+                <div class="question-content">
+                    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">🎯 Perfecto, ya tengo todo lo necesario para tu diagnóstico</h2>
+                    <p style="color: #9CA3AF; margin-bottom: 1.5rem;">Antes de entregarte tu evaluación personalizada, necesito algunos datos para hacer el análisis más preciso:</p>
+                    <div style="display: grid; grid-template-columns: 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+                        <input type="text" id="firstName" placeholder="Tu nombre" required>
+                        <input type="text" id="lastName" placeholder="Tu apellido" required>
+                        <input type="text" id="email" placeholder="tu@email.com" required>
+                        <input type="text" id="whatsapp" placeholder="+56912345678" required>
+                    </div>
+                    <div class="navigation-buttons">
+                        <button onclick="prevQuestion(5)" class="btn-nav btn-secondary"><i class="fas fa-arrow-left"></i> Atrás</button>
+                        <button onclick="generateDiagnosis()" class="btn-nav btn-primary" style="font-size: 1.125rem;">
+                            <i class="fas fa-magic"></i><span>Generar Mi Diagnóstico</span>
                         </button>
                     </div>
                 </div>
+            </div>
+        </div>
 
-                <!-- Question Screens -->
-                <div id="questionScreens" style="display: none;">
-                    <!-- Question 1 -->
-                    <div id="question1" class="question-screen fade-in">
-                        <div class="glass-effect rounded-3xl p-8">
-                            <div class="text-center mb-8">
-                                <img src="img/nia.png" 
-                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
-                                <h2 class="text-2xl font-bold mb-4">Para comenzar cuéntame ¿qué tipo de empresas o clientes atiendes actualmente?</h2>
-                                <p class="text-gray-400 text-sm mb-6">Necesito entender tu universo de clientes para evaluar si tu mensaje les habla directamente.</p>
-                            </div>
-                            <textarea id="answer1" placeholder="Ejemplo: Empresas de manufactura con 50-200 empleados que buscan automatizar sus procesos"></textarea>
-                            <div class="text-center mt-6">
-                                <button onclick="nextQuestion(2)" class="btn-primary">
-                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
+        <!-- Loading Screen -->
+        <div id="loadingScreen" class="screen">
+            <div class="content-container">
+                <div class="question-content">
+                    <h2 style="font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem;">🧠 Analizando tu narrativa...</h2>
+                    <p style="color: #9CA3AF; margin-bottom: 1.5rem;">NIA está procesando tus respuestas para crear tu diagnóstico personalizado</p>
+                    <div class="loading-spinner" style="margin: 0 auto 1rem auto;"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANTALLA DE RESULTADOS -->
+        <div id="resultsScreen" class="screen">
+            <div class="content-container">
+                <h1 class="main-title">✨ <span id="userFirstNameResult"></span>, tu diagnóstico está listo</h1>
+
+                <!-- 1) Div Superior: Puntuación y Brechas -->
+                <div class="score-header-card card">
+                    <div class="score-graphic-col">
+                        <div class="radial-progress-container">
+                            <svg class="radial-progress-bar" width="160" height="160" viewBox="0 0 160 160">
+                                <defs>
+                                    <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="var(--color-secondary)" />
+                                        <stop offset="100%" stop-color="var(--color-primary)" />
+                                    </linearGradient>
+                                </defs>
+                                <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="12"></circle>
+                                <circle id="progress-circle" cx="80" cy="80" r="70" fill="none" stroke="url(#progressGradient)" stroke-width="12" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="440"></circle>
+                            </svg>
+                            <div class="radial-progress-text">
+                                <div id="score-value" class="radial-score"></div>
+                                <div class="radial-score-label">puntos</div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Question 2 -->
-                    <div id="question2" class="question-screen" style="display: none;">
-                        <div class="glass-effect rounded-3xl p-8">
-                            <div class="text-center mb-8">
-                                <img src="img/nia.png" 
-                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
-                                <h2 class="text-2xl font-bold mb-4">Ahora indícame ¿Qué problema principal resuelves para esos clientes?</h2>
-                                <p class="text-gray-400 text-sm mb-6">Aquí está el corazón de tu propuesta. Quiero ver si conectas con el dolor real de tus clientes.</p>
-                            </div>
-                            <textarea id="answer2" placeholder="Ejemplo: Reducir costos operativos por falta de automatización en procesos manuales repetitivos"></textarea>
-                            <div class="text-center mt-6">
-                                <button onclick="nextQuestion(3)" class="btn-primary">
-                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Question 3 -->
-                    <div id="question3" class="question-screen" style="display: none;">
-                        <div class="glass-effect rounded-3xl p-8">
-                            <div class="text-center mb-8">
-                                <img src="img/nia.png" 
-                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
-                                <h2 class="text-2xl font-bold mb-4">Cuéntame ¿Qué resultado o transformación logran tus clientes al trabajar contigo?</h2>
-                                <p class="text-gray-400 text-sm mb-6">Tu cliente necesita visualizar el destino, no solo el viaje. Muéstrame qué prometes.</p>
-                            </div>
-                            <textarea id="answer3" placeholder="Ejemplo: Aumentan eficiencia 30% y reducen errores humanos en 90 días"></textarea>
-                            <div class="text-center mt-6">
-                                <button onclick="nextQuestion(4)" class="btn-primary">
-                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Question 4 -->
-                    <div id="question4" class="question-screen" style="display: none;">
-                        <div class="glass-effect rounded-3xl p-8">
-                            <div class="text-center mb-8">
-                                <img src="img/nia.png" 
-                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
-                                <h2 class="text-2xl font-bold mb-4">Muy bien! ahora ¿Por qué tus clientes te eligen a ti y no a otro proveedor?</h2>
-                                <p class="text-gray-400 text-sm mb-6">Aquí hay algo valioso, pero necesito saber si lo estás comunicando con fuerza.</p>
-                            </div>
-                            <textarea id="answer4" placeholder="Ejemplo: Somos los únicos con 15 años de experiencia específica en su sector"></textarea>
-                            <div class="text-center mt-6">
-                                <button onclick="nextQuestion(5)" class="btn-primary">
-                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Question 5 -->
-                    <div id="question5" class="question-screen" style="display: none;">
-                        <div class="glass-effect rounded-3xl p-8">
-                            <div class="text-center mb-8">
-                                <img src="img/nia.png" 
-                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
-                                <h2 class="text-2xl font-bold mb-4">Finalmente, escribe cómo sueles presentar tu negocio o propuesta comercial</h2>
-                                <p class="text-gray-400 text-sm mb-6">Esta es tu narrativa actual. Sé honest@: escribe exactamente como te presentas ahora.</p>
-                            </div>
-                            <textarea id="answer5" placeholder="Ejemplo: Ayudamos a empresas manufactureras a automatizar procesos y reducir costos operativos..."></textarea>
-                            <div class="text-center mt-6">
-                                <button onclick="showDataCollection()" class="btn-primary">
-                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
-                                </button>
-                            </div>
-                        </div>
+                    <div class="score-title-col">
+                        <h2 id="totalScoreResult"></h2>
+                        <p id="principalesBrechasText"></p>
                     </div>
                 </div>
 
-                <!-- Data Collection Screen -->
-                <div id="dataScreen" style="display: none;">
-                    <div class="glass-effect rounded-3xl p-8 fade-in">
-                        <div class="text-center mb-8">
-                            <img src="img/nia.png" 
-                                 alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
-                            <h2 class="text-2xl font-bold mb-4">🎯 Perfecto, ya tengo todo lo necesario para tu diagnóstico</h2>
-                            <p class="text-gray-400 mb-6">Antes de entregarte tu evaluación personalizada, necesito algunos datos para hacer el análisis más preciso:</p>
-                            <p class="text-sm text-gray-500 mb-6">Tu diagnóstico será 100% personalizado y lo recibirás al instante.</p>
+                <!-- 2) Div Detalle de Evaluación -->
+                <div class="evaluation-details-card card">
+                    <h2>Detalle de tu Evaluación</h2>
+                    <div class="dimensions-grid">
+                        <div class="dimension-metric-card">
+                            <div class="dimension-header">
+                                <div class="dimension-title-group">
+                                    <div class="dimension-icon"><i class="fa-solid fa-users"></i></div>
+                                    <h3>Foco en el cliente y su dolor</h3>
+                                </div>
+                                <span id="focoClienteScore" class="dimension-score"></span>
+                            </div>
+                            <div class="dimension-bar-container"><div id="focoClienteBar" class="dimension-bar-fill"></div></div>
+                            <p id="focoClienteComment" class="dimension-comment"></p>
                         </div>
-                        
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-2">Nombre</label>
-                                <input type="text" id="firstName" placeholder="Tu nombre" required>
+                        <div class="dimension-metric-card">
+                            <div class="dimension-header">
+                                <div class="dimension-title-group">
+                                    <div class="dimension-icon"><i class="fa-solid fa-wand-magic-sparkles"></i></div>
+                                    <h3>Transformación y resultado</h3>
+                                </div>
+                                <span id="promesaTransformacionScore" class="dimension-score"></span>
                             </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-2">Apellido</label>
-                                <input type="text" id="lastName" placeholder="Tu apellido" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-2">Email</label>
-                                <input type="text" id="email" placeholder="tu@email.com" required>
-                            </div>
-                            <div>
-                                <label class="block text-sm text-gray-400 mb-2">WhatsApp</label>
-                                <input type="text" id="whatsapp" placeholder="+56912345678" required>
-                            </div>
+                            <div class="dimension-bar-container"><div id="promesaTransformacionBar" class="dimension-bar-fill"></div></div>
+                            <p id="promesaTransformacionComment" class="dimension-comment"></p>
                         </div>
-                        
-                        <div class="text-center">
-                            <button onclick="generateDiagnosis()" class="btn-primary text-lg">
-                                <i class="fas fa-magic mr-2"></i>
-                                Generar Mi Diagnóstico
-                            </button>
+                        <div class="dimension-metric-card">
+                            <div class="dimension-header">
+                                <div class="dimension-title-group">
+                                    <div class="dimension-icon"><i class="fa-solid fa-chess-rook"></i></div>
+                                    <h3>Autoridad y confianza</h3>
+                                </div>
+                                <span id="autoridadConfianzaScore" class="dimension-score"></span>
+                            </div>
+                            <div class="dimension-bar-container"><div id="autoridadConfianzaBar" class="dimension-bar-fill"></div></div>
+                            <p id="autoridadConfianzaComment" class="dimension-comment"></p>
                         </div>
+                        <div class="dimension-metric-card">
+                            <div class="dimension-header">
+                                <div class="dimension-title-group">
+                                    <div class="dimension-icon"><i class="fa-solid fa-star"></i></div>
+                                    <h3>Diferenciación de tu oferta</h3>
+                                </div>
+                                <span id="diferenciacionScore" class="dimension-score"></span>
+                            </div>
+                            <div class="dimension-bar-container"><div id="diferenciacionBar" class="dimension-bar-fill"></div></div>
+                            <p id="diferenciacionComment" class="dimension-comment"></p>
+                        </div>
+                        <div class="dimension-metric-card">
+                            <div class="dimension-header">
+                               <div class="dimension-title-group">
+                                    <div class="dimension-icon"><i class="fa-solid fa-gift"></i></div>
+                                    <h3>El valor percibido de tu oferta</h3>
+                                </div>
+                                <span id="ofertaValorScore" class="dimension-score"></span>
+                            </div>
+                            <div class="dimension-bar-container"><div id="ofertaValorBar" class="dimension-bar-fill"></div></div>
+                            <p id="ofertaValorComment" class="dimension-comment"></p>
+                        </div>
+                        <a href="#final-cta" class="cta-button-card">
+                            <span class="icon-placeholder">📄</span>
+                            <span>Recibe el detalle de cada pilar y el paso a paso para mejorar tu narrativa</span>
+                        </a>
                     </div>
                 </div>
 
-                <!-- Loading Screen -->
-                <div id="loadingScreen" style="display: none;">
-                    <div class="glass-effect rounded-3xl p-12 text-center fade-in">
-                        <div class="mb-8">
-                            <img src="img/nia.png" 
-                                 alt="NIA" class="w-20 h-20 rounded-full mx-auto mb-6 border-2 border-green-400 pulse-animation">
-                        </div>
-                        <h2 class="text-2xl font-bold mb-4">🧠 Analizando tu narrativa...</h2>
-                        <p class="text-gray-400 mb-6">NIA está procesando tus respuestas para crear tu diagnóstico personalizado</p>
-                        <div class="loading-spinner mx-auto mb-4"></div>
-                        <p class="text-sm text-gray-500">Esto tomará unos segundos</p>
+                <!-- 3) Div Siguiente Paso Estratégico -->
+                <div id="nextStepBlock" class="next-step-card card">
+                    <div class="nia-avatar-col">
+                        <img src="img/nia.png" alt="Avatar de NIA" class="nia-avatar" onerror="this.onerror=null;this.src='https://placehold.co/150x150/AF86FF/1A1B26?text=NIA';">
                     </div>
-                </div>
-
-                <!-- PANTALLA DE RESULTADOS -->
-                <div id="resultsScreen" class="screen" style="display: block;">
-                    <div class="container">
-                        <h1 class="main-title">✨ <span id="userFirstName">Carlos</span>, tu diagnóstico está listo</h1>
-            
-                        <!-- 1) Div Superior: Puntuación y Brechas -->
-                        <div class="score-header-card">
-                            <div class="score-graphic-col">
-                                <div class="radial-progress-container">
-                                    <svg class="radial-progress-bar" width="160" height="160" viewBox="0 0 160 160">
-                                        <defs>
-                                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                                <stop offset="0%" stop-color="var(--color-secondary)" />
-                                                <stop offset="100%" stop-color="var(--color-primary)" />
-                                            </linearGradient>
-                                        </defs>
-                                        <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="12"></circle>
-                                        <circle id="progress-circle" cx="80" cy="80" r="70" fill="none" stroke="url(#progressGradient)" stroke-width="12" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="440"></circle>
-                                    </svg>
-                                    <div class="radial-progress-text">
-                                        <div id="score-value" class="radial-score">21</div>
-                                        <div class="radial-score-label">puntos</div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="score-title-col">
-                                <h2 id="totalScore">Obtuviste 21/25 puntos</h2>
-                                <p id="principalesBrechasText">Tu narrativa es completamente genérica y repetitiva. Sin cliente específico, sin dolor claro, sin diferenciación = invisibilidad total en el mercado. Estás perdiendo clientes AHORA porque no comunicas valor real. Necesitas urgente una narrativa que conecte, convenza y convierta. ⏰</p>
-                            </div>
-                        </div>
-            
-                        <!-- 2) Div Detalle de Evaluación -->
-                        <div class="evaluation-details-card">
-                            <h2>Detalle de tu evaluación</h2>
-                            <div class="dimensions-grid">
-                                <div class="dimension-metric-card">
-                                    <div class="dimension-header">
-                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg></div>
-                                        <h3>Foco en el cliente y su dolor</h3>
-                                    </div>
-                                    <div class="dimension-bar-container"><div id="focoClienteBar" class="dimension-bar-fill" style="width: 100%;"></div></div>
-                                    <p id="focoClienteComment" class="dimension-comment">¡Excelente! Demuestras un profundo entendimiento de las necesidades y problemas de tus clientes.</p>
-                                </div>
-                                 <div class="dimension-metric-card">
-                                    <div class="dimension-header">
-                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg></div>
-                                        <h3>Transformación y resultado</h3>
-                                    </div>
-                                    <div class="dimension-bar-container"><div id="promesaTransformacionBar" class="dimension-bar-fill" style="width: 80%;"></div></div>
-                                    <p id="promesaTransformacionComment" class="dimension-comment">Tu promesa es clara, pero podrías cuantificar más el resultado final para hacerla irresistible.</p>
-                                </div>
-                                <div class="dimension-metric-card">
-                                    <div class="dimension-header">
-                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286Z" /></svg></div>
-                                        <h3>Autoridad y confianza</h3>
-                                    </div>
-                                    <div class="dimension-bar-container"><div id="autoridadConfianzaBar" class="dimension-bar-fill" style="width: 80%;"></div></div>
-                                    <p id="autoridadConfianzaComment" class="dimension-comment">Proyectas confianza. Añadir testimonios en video o estudios de caso podría elevarla al máximo nivel.</p>
-                                </div>
-                                <div class="dimension-metric-card">
-                                    <div class="dimension-header">
-                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.311a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0" /></svg></div>
-                                        <h3>Diferenciación de tu oferta</h3>
-                                    </div>
-                                    <div class="dimension-bar-container"><div id="diferenciacionBar" class="dimension-bar-fill" style="width: 60%;"></div></div>
-                                    <p id="diferenciacionComment" class="dimension-comment">Tu propuesta es única, pero podrías destacar más claramente por qué eres la única opción viable.</p>
-                                </div>
-                                <div class="dimension-metric-card">
-                                    <div class="dimension-header">
-                                       <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg></div>
-                                        <h3>El valor percibido de tu oferta</h3>
-                                    </div>
-                                    <div class="dimension-bar-container"><div id="ofertaValorBar" class="dimension-bar-fill" style="width: 100%;"></div></div>
-                                    <p id="ofertaValorComment" class="dimension-comment">Tu oferta es clara, directa y muy atractiva. ¡Un trabajo impecable!</p>
-                                </div>
-                                <a href="#final-cta" class="cta-button-card">
-                                    <span class="icon-placeholder">📄</span>
-                                    <span>Recibe el detalle de cada pilar y el paso a paso para mejorar tu narrativa</span>
-                                </a>
-                            </div>
-                        </div>
-            
-                        <!-- 3) Div Siguiente Paso Estratégico -->
-                        <div id="nextStepBlock" class="next-step-card">
-                            <div class="nia-avatar-col">
-                                <img src="img/nia.png" alt="Avatar de NIA" class="nia-avatar" onerror="this.onerror=null;this.src='https://placehold.co/150x150/AF86FF/1A1B26?text=NIA';">
-                            </div>
-                            <div class="next-step-text-col">
-                                <h2>Tu siguiente paso estratégico</h2>
-                                <div class="next-step-content">
-                                    <p id="proximopasoText">Enfócate en crear una "Propuesta Única de Valor" (PUV) tan clara y potente que tus competidores parezcan irrelevantes.</p>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <!-- 4) Div CTA Final -->
-                        <div id="final-cta" class="final-cta-section">
-                            <div class="final-cta-text-col">
-                                <h2>¿Quieres el informe detallado y un plan de acción a medida?</h2>
-                                <p>Agenda una sesión gratuita con Carlos y recibe informe más tu plan de acción personalizado, para cerrar tus brechas y transformar tu narrativa en ventas.</p>
-                                <a href="https://calendly.com/tu-link" target="_blank" class="cta-button">
-                                    <i class="fa-regular fa-calendar-days"></i>
-                                    <span>Sesión 1:1 + Plan de acción</span>
-                                </a>
-                                <p class="warning">⚠️ Solo para empresas con ventas activas y compromiso real con su crecimiento.</p>
-                            </div>
-                            <div class="final-cta-image-col">
-                                <img src="img/informe.png" alt="Imagen del informe detallado" onerror="this.onerror=null;this.src='https://placehold.co/600x400/212230/A0A3B1?text=Informe+Detallado';">
-                            </div>
-                        </div>
-                        
-                        <!-- Footer -->
-                        <div class="footer">
-                            <p class="signature">Con cariño,<br><strong>NIA 💜 by Vicerales</strong></p>
+                    <div class="next-step-text-col">
+                        <h2>Tu siguiente paso estratégico</h2>
+                        <div class="next-step-content">
+                            <p id="proximopasoText"></p>
                         </div>
                     </div>
                 </div>
-
                 
-
-        <!-- Footer -->
-        <footer class="text-center py-4 text-gray-500 text-sm">
-            Desarrollado por <a href="https://www.vicerales.com" target="_blank" class="text-purple-400 hover:text-purple-300">Vicerales.com</a>
-        </footer>
+                <!-- 4) Div CTA Final -->
+                <div id="final-cta" class="final-cta-section card">
+                    <div class="final-cta-text-col">
+                        <h2>¿Quieres el informe detallado y un plan de acción a medida?</h2>
+                        <p>Agenda una sesión gratuita con Carlos y recibe informe más tu plan de acción personalizado, para cerrar tus brechas y transformar tu narrativa en ventas.</p>
+                        <a href="https://calendly.com/tu-link" target="_blank" class="cta-button">
+                            <i class="fa-regular fa-calendar-days"></i>
+                            <span>Sesión 1:1 + Plan de acción</span>
+                        </a>
+                        <p class="warning">⚠️ Solo para empresas con ventas activas y compromiso real con su crecimiento.</p>
+                    </div>
+                    <div class="final-cta-image-col">
+                        <img src="img/informe.png" alt="Imagen del informe detallado" onerror="this.onerror=null;this.src='https://placehold.co/600x400/212230/A0A3B1?text=Informe+Detallado';">
+                    </div>
+                </div>
+                
+                <!-- Footer -->
+                <div class="footer">
+                    <p>con <span class="footer-nia">NIA</span> - Desarrollada por <a href="https://www.vicerales.com" target="_blank" style="color: var(--color-primary); text-decoration: none;">Vicerales.com</a></p>
+                </div>
+            </div>
+        </div>
     </div>
 
 <script>
