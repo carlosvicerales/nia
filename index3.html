@@ -1902,7 +1902,36 @@ async function debugearEnvioMAKE() {
         
         procesarResultadosDiagnostico(datosEjemplo);
     }
+
+//Script Conflictivo
+    function encontrarScriptConflictivo() {
+    console.log('🔍 BUSCANDO SCRIPTS CONFLICTIVOS...');
     
+    // Verificar si hay múltiples definiciones de nextQuestion
+    console.log('nextQuestion definido:', typeof window.nextQuestion);
+    console.log('nextQuestion código:', window.nextQuestion.toString().substring(0, 200) + '...');
+    
+    // Buscar todos los scripts en la página
+    const scripts = document.querySelectorAll('script');
+    console.log(`📜 Total scripts encontrados: ${scripts.length}`);
+    
+    scripts.forEach((script, index) => {
+        if (script.src) {
+            console.log(`${index + 1}. Script externo: ${script.src}`);
+        } else if (script.textContent.includes('nextQuestion') || script.textContent.includes('answer1')) {
+            console.log(`${index + 1}. Script interno con nextQuestion/answer1:`, script.textContent.substring(0, 100) + '...');
+        }
+    });
+    
+    // Verificar event listeners en botones
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach((button, index) => {
+        if (button.onclick) {
+            console.log(`🔘 Botón ${index + 1} onclick:`, button.onclick.toString());
+        }
+    });
+}
+
     
 </script>
 
