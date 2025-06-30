@@ -609,83 +609,127 @@ input[type="text"] {
     }
 }
 
-/* --- CORRECCIONES DE ESPACIADO --- */
+/* =============================================
+   CORRECCIONES FINALES DE LAYOUT Y ESPACIADO
+   ============================================= */
 
-/* Reset global para eliminar espacios no deseados */
+/* Reset global limpio */
 html, body {
     margin: 0 !important;
     padding: 0 !important;
     overflow-x: hidden;
+    box-sizing: border-box;
 }
 
-/* Corrección para anclaje vertical (Punto 4) */
+/* Eliminar padding del body que causa problemas */
+body {
+    padding: 0 !important;
+    max-width: none !important;
+}
+
+/* Estructura principal sin centrado vertical forzado */
 .min-h-screen {
-    padding-top: 0 !important;
-    margin-top: 0 !important;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 70px; /* Espacio para navbar fija */
+    margin: 0;
 }
 
-/* Barra de navegación sin padding lateral (Punto 5) */
+/* Área de contenido principal - CLAVE: alineación superior */
+.flex-1.flex.items-center.justify-center {
+    align-items: flex-start !important; /* Cambio crítico: de center a flex-start */
+    justify-content: center;
+    width: 100%;
+    padding: 20px 10px;
+    min-height: auto;
+}
+
+/* Barra de navegación completamente pegada */
 #progressContainer {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    width: 100%;
+    width: 100vw;
     padding: 0 !important;
     margin: 0 !important;
     z-index: 1000;
+    background: var(--color-bg-dark);
 }
 
 #progressContainer .max-w-4xl {
-    padding: 16px 20px; /* Solo padding interno necesario */
+    padding: 16px 20px;
     margin: 0 auto;
+    max-width: 100%;
 }
 
-/* Ancho diferenciado: Preguntas vs Resultados (Punto 2) */
-/* Mantener preguntas en ancho actual */
-.content-width-wrapper {
-    max-width: 672px; /* Ancho actual para preguntas */
+/* ANCHO DIFERENCIADO: Preguntas vs Resultados */
+
+/* Preguntas mantienen ancho actual */
+.container {
+    max-width: 960px;
     margin: 0 auto;
+    padding: 0 20px;
 }
 
-/* Ampliar solo la pantalla de resultados */
+/* Resultados: ANCHO AMPLIADO */
 #resultsScreen .container {
-    max-width: 900px !important; /* Ancho ampliado para resultados */
-    margin: 0 auto;
-    padding: 20px;
+    max-width: 1200px !important;
+    padding: 0 30px !important;
+    width: 95% !important;
 }
 
-/* Ajustes específicos para desktop amplio */
-@media (min-width: 1200px) {
+/* Para pantallas grandes: aún más amplio */
+@media (min-width: 1400px) {
+    #resultsScreen .container {
+        max-width: 1400px !important;
+        padding: 0 40px !important;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
     #resultsScreen .container {
         max-width: 1200px !important;
-        padding: 0px;
+        padding: 0 30px !important;
     }
 }
 
-/* Correcciones para móvil (Punto 3) */
+@media (min-width: 1024px) and (max-width: 1199px) {
+    #resultsScreen .container {
+        max-width: 1000px !important;
+        padding: 0 25px !important;
+    }
+}
+
+/* MÓVIL: Optimización completa */
 @media (max-width: 768px) {
-    /* Reducir padding global en móvil */
+    /* Alineamiento superior en móvil */
     .flex-1.flex.items-center.justify-center {
+        align-items: flex-start !important;
         padding: 10px !important;
+        min-height: auto !important;
     }
     
-    /* Padding lateral optimizado para móvil */
-    #resultsScreen .container {
-        padding: 15px !important;
+    /* Padding lateral optimizado */
+    .container {
+        padding: 0 15px !important;
         max-width: 100% !important;
     }
     
-    /* Ajustar padding de elementos internos */
-    .final-result-container,
-    .dimension-item,
-    .personalized-recommendation,
-    .next-step-block,
-    .cta-section {
-        margin-left: 0 !important;
-        margin-right: 0 !important;
-        padding-left: 15px !important;
-        padding-right: 15px !important;
+    #resultsScreen .container {
+        padding: 15px !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    
+    /* Elementos internos sin padding excesivo */
+    .score-header-card,
+    .evaluation-details-card,
+    .next-step-card,
+    .final-cta-section {
+        padding: 20px 15px !important;
+        margin: 15px 0 !important;
     }
     
     /* Navbar en móvil */
@@ -693,69 +737,38 @@ html, body {
         padding: 12px 15px !important;
     }
     
-    /* Espaciado vertical optimizado */
+    /* Espacio superior correcto */
     .min-h-screen {
-        padding-top: 70px; /* Espacio para navbar fija en móvil */
+        padding-top: 70px !important;
+    }
+    
+    /* Eliminar efectos hover problemáticos en móvil */
+    .dimension-metric-card:hover {
+        transform: none !important;
+    }
+    
+    .dimension-metric-card:before {
+        display: none !important;
     }
 }
 
-/* Correcciones para tablet */
+/* TABLET: Ajustes intermedios */
 @media (max-width: 1024px) and (min-width: 769px) {
     #resultsScreen .container {
-        max-width: 750px !important;
-        padding: 25px;
+        max-width: 900px !important;
+        padding: 0 25px !important;
     }
 }
 
-/* Efectos de hover mejorados para las tarjetas */
-.dimension-item {
-    position: relative;
-    overflow: hidden;
-    --mouse-x: 50%;
-    --mouse-y: 50%;
-}
-
-.dimension-item::before {
-    content: '';
-    position: absolute;
-    top: var(--mouse-y);
-    left: var(--mouse-x);
-    transform: translate(-50%, -50%);
-    width: 200px;
-    height: 200px;
-    background: radial-gradient(circle, rgba(147, 51, 234, 0.1) 0%, transparent 70%);
-    border-radius: 50%;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    pointer-events: none;
-    z-index: 0;
-}
-
-.dimension-item:hover::before {
-    opacity: 1;
-}
-
-.dimension-item > * {
-    position: relative;
-    z-index: 1;
-}
-
-/* Asegurar que el cuerpo principal tenga el padding correcto */
-body {
-    position: relative;
+/* Asegurar que no haya scroll superior */
+.w-full.max-w-2xl {
+    margin-top: 0 !important;
     padding-top: 0 !important;
 }
 
-/* Corrección específica para evitar scroll superior */
-.flex-1 {
-    margin-top: 0 !important;
-    padding-top: 20px;
-}
-
-@media (max-width: 768px) {
-    .flex-1 {
-        padding-top: 10px;
-    }
+/* Para resultados: eliminar restricción de ancho */
+#resultsScreen .w-full.max-w-2xl {
+    max-width: none !important;
 }
 
 
