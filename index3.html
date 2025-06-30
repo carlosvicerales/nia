@@ -609,6 +609,154 @@ input[type="text"] {
     }
 }
 
+/* --- CORRECCIONES DE ESPACIADO --- */
+
+/* Reset global para eliminar espacios no deseados */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+}
+
+/* Corrección para anclaje vertical (Punto 4) */
+.min-h-screen {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+}
+
+/* Barra de navegación sin padding lateral (Punto 5) */
+#progressContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 1000;
+}
+
+#progressContainer .max-w-4xl {
+    padding: 16px 20px; /* Solo padding interno necesario */
+    margin: 0 auto;
+}
+
+/* Ancho diferenciado: Preguntas vs Resultados (Punto 2) */
+/* Mantener preguntas en ancho actual */
+.content-width-wrapper {
+    max-width: 672px; /* Ancho actual para preguntas */
+    margin: 0 auto;
+}
+
+/* Ampliar solo la pantalla de resultados */
+#resultsScreen .container {
+    max-width: 900px !important; /* Ancho ampliado para resultados */
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Ajustes específicos para desktop amplio */
+@media (min-width: 1200px) {
+    #resultsScreen .container {
+        max-width: 1100px !important;
+        padding: 30px;
+    }
+}
+
+/* Correcciones para móvil (Punto 3) */
+@media (max-width: 768px) {
+    /* Reducir padding global en móvil */
+    .flex-1.flex.items-center.justify-center {
+        padding: 10px !important;
+    }
+    
+    /* Padding lateral optimizado para móvil */
+    #resultsScreen .container {
+        padding: 15px !important;
+        max-width: 100% !important;
+    }
+    
+    /* Ajustar padding de elementos internos */
+    .final-result-container,
+    .dimension-item,
+    .personalized-recommendation,
+    .next-step-block,
+    .cta-section {
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 15px !important;
+        padding-right: 15px !important;
+    }
+    
+    /* Navbar en móvil */
+    #progressContainer .max-w-4xl {
+        padding: 12px 15px !important;
+    }
+    
+    /* Espaciado vertical optimizado */
+    .min-h-screen {
+        padding-top: 70px; /* Espacio para navbar fija en móvil */
+    }
+}
+
+/* Correcciones para tablet */
+@media (max-width: 1024px) and (min-width: 769px) {
+    #resultsScreen .container {
+        max-width: 750px !important;
+        padding: 25px;
+    }
+}
+
+/* Efectos de hover mejorados para las tarjetas */
+.dimension-item {
+    position: relative;
+    overflow: hidden;
+    --mouse-x: 50%;
+    --mouse-y: 50%;
+}
+
+.dimension-item::before {
+    content: '';
+    position: absolute;
+    top: var(--mouse-y);
+    left: var(--mouse-x);
+    transform: translate(-50%, -50%);
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(147, 51, 234, 0.1) 0%, transparent 70%);
+    border-radius: 50%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 0;
+}
+
+.dimension-item:hover::before {
+    opacity: 1;
+}
+
+.dimension-item > * {
+    position: relative;
+    z-index: 1;
+}
+
+/* Asegurar que el cuerpo principal tenga el padding correcto */
+body {
+    position: relative;
+    padding-top: 0 !important;
+}
+
+/* Corrección específica para evitar scroll superior */
+.flex-1 {
+    margin-top: 0 !important;
+    padding-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .flex-1 {
+        padding-top: 10px;
+    }
+}
 
 
     </style>
@@ -1251,7 +1399,7 @@ input[type="text"] {
     }
     
     // Función inteligente para mostrar resultados
-   // Función mejorada para mostrar resultados con personalización
+    // Función mejorada para mostrar resultados con personalización
     function displayResults(data) {
         console.log('🎨 Procesando resultados:', data);
         
@@ -1276,6 +1424,23 @@ input[type="text"] {
             const percentage = Math.round((totalScore / 25) * 100);
             
             console.log(`📊 Puntaje calculado: ${totalScore}/25 (${percentage}%)`);
+
+            // En tu función displayResults(), después de calcular totalScore y percentage, agrega:
+            animarRadialProgressBar(totalScore, 25);
+            
+            // También activa los efectos de hover en las tarjetas
+            const metricCards = document.querySelectorAll('.dimension-item');
+            metricCards.forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+
+
             
             // Actualizar elementos principales
             updateElementSafely(['totalScore'], `${totalScore}/25 puntos`);
@@ -1294,11 +1459,44 @@ input[type="text"] {
             
             console.log('✅ Todos los resultados procesados correctamente');
             
-        } catch (error) {
-            console.error('❌ Error en displayResults:', error);
-            alert('Error al mostrar resultados. Revisa la consola para detalles.');
+            } catch (error) {
+                console.error('❌ Error en displayResults:', error);
+                alert('Error al mostrar resultados. Revisa la consola para detalles.');
+            }
         }
-    }
+
+        // Función para animar el gráfico radial (agregar al final de tu JavaScript)
+        function animarRadialProgressBar(score, maxScore) {
+            const circle = document.getElementById('progress-circle');
+            const scoreValueText = document.getElementById('score-value');
+            
+            if (!circle || !scoreValueText) {
+                console.warn('⚠️ Elementos del gráfico radial no encontrados');
+                return;
+            }
+            
+            const radius = circle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            const percentage = Math.max(0, Math.min(100, (score / maxScore) * 100));
+            const offset = circumference - (percentage / 100) * circumference;
+        
+            // Configurar el círculo para iniciar vacío
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference;
+            
+            // Animar después de un pequeño delay
+            setTimeout(() => {
+                circle.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)";
+                circle.style.strokeDashoffset = offset;
+            }, 200);
+            
+            // Actualizar el número central
+            scoreValueText.textContent = score;
+            
+            console.log(`🎯 Gráfico radial animado: ${score}/${maxScore} (${percentage}%)`);
+        }
+
+    
     // --- FUNCIONES DE TESTING ---
     
     // Función para probar navegación completa
@@ -1364,7 +1562,7 @@ input[type="text"] {
             proximo_paso: "Crea 3 micro-historias de éxito. Para un plan a medida, agenda tu sesión 1:1 con Carlos"
         };
         
-        displayResults(testData);
+        (testData);
         mostrarPantalla('resultsScreen');
     }
     
@@ -2041,7 +2239,7 @@ async function debugearEnvioMAKE() {
     
     // Mostrar resultados
     document.getElementById('loadingScreen').style.display = 'none';
-    displayResults(resultadoSimulado);
+    (resultadoSimulado);
     
     console.log('✅ Prueba de display completada');
     }
