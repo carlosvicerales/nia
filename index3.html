@@ -996,62 +996,112 @@ input {
     }
 
 
-    // Función principal para procesar la respuesta de NIA
-    function procesarResultadosDiagnostico(data) {
-    // Calcular puntaje total y porcentaje
-    const totalScore = data.foco_cliente + data.promesa_transformacion + 
-                      data.autoridad_confianza + data.diferenciacion + data.oferta_valor;
-    const percentage = Math.round((totalScore / 25) * 100);
+//----Función principal para procesar la respuesta de NIA
+        function procesarResultadosDiagnostico(data) {
+            console.log('Datos recibidos:', data);
     
-    // Actualizar puntaje total (asumiendo que tienes estos elementos)
-    const totalScoreElement = document.getElementById('totalScore');
-    const scorePercentElement = document.getElementById('scorePercent');
-    
-    if (totalScoreElement) {
-        totalScoreElement.textContent = `${totalScore}/25 puntos`;
-    }
-    if (scorePercentElement) {
-        scorePercentElement.textContent = `${percentage}%`;
-    }
-    
-    // Actualizar cada dimensión
-    actualizarDimension('focoCliente', data.foco_cliente, data.comentario_foco_cliente);
-    actualizarDimension('promesaTransformacion', data.promesa_transformacion, data.comentario_promesa_transformacion);
-    actualizarDimension('autoridadConfianza', data.autoridad_confianza, data.comentario_autoridad_confianza);
-    actualizarDimension('diferenciacion', data.diferenciacion, data.comentario_diferenciacion);
-    actualizarDimension('ofertaValor', data.oferta_valor, data.comentario_oferta_valor);
-    
-    // Actualizar Principales Brechas
-    const principalesBrechasElement = document.getElementById('principalesBrechasText');
-    if (principalesBrechasElement) {
-        principalesBrechasElement.textContent = data.principales_brechas;
-    }
-    
-    // Actualizar Próximo Paso
-    const proximoPasoElement = document.getElementById('proximopasoText');
-    if (proximoPasoElement) {
-        proximoPasoElement.textContent = data.proximo_paso;
-    }
-}
-
-    // Función auxiliar para actualizar cada dimensión
-    function actualizarDimension(dimension, puntaje, comentario) {
-        const scoreElement = document.getElementById(`${dimension}Score`);
-        const commentElement = document.getElementById(`${dimension}Comment`);
+            try {
+                
+        // Calcular puntaje total y porcentaje
+        const totalScore = data.foco_cliente + data.promesa_transformacion + 
+                          data.autoridad_confianza + data.diferenciacion + data.oferta_valor;
+        const percentage = Math.round((totalScore / 25) * 100);
         
-        if (scoreElement) {
-            scoreElement.textContent = `${puntaje}/5`;
+        // Actualizar puntaje total
+        const totalScoreElement = document.getElementById('totalScore');
+        const scorePercentElement = document.getElementById('scorePercent');
+        
+        if (totalScoreElement) {
+            totalScoreElement.textContent = `${totalScore}/25 puntos`;
+        }
+        if (scorePercentElement) {
+            scorePercentElement.textContent = `${percentage}%`;
         }
         
-        if (commentElement) {
-            commentElement.textContent = `Análisis: ${comentario}`;
+        // Actualizar cada dimensión
+        actualizarDimension('focoCliente', data.foco_cliente, data.comentario_foco_cliente);
+        actualizarDimension('promesaTransformacion', data.promesa_transformacion, data.comentario_promesa_transformacion);
+        actualizarDimension('autoridadConfianza', data.autoridad_confianza, data.comentario_autoridad_confianza);
+        actualizarDimension('diferenciacion', data.diferenciacion, data.comentario_diferenciacion);
+        actualizarDimension('ofertaValor', data.oferta_valor, data.comentario_oferta_valor);
+        
+        // Actualizar Principales Brechas
+        const principalesBrechasElement = document.getElementById('principalesBrechasText');
+        if (principalesBrechasElement && data.principales_brechas) {
+            principalesBrechasElement.textContent = data.principales_brechas;
         }
-    }
+        
+        // Actualizar Próximo Paso
+        const proximoPasoElement = document.getElementById('proximopasoText');
+        if (proximoPasoElement && data.proximo_paso) {
+            proximoPasoElement.textContent = data.proximo_paso;
+        }
+        
+        // Mostrar pantalla de resultados
+        const resultsScreen = document.getElementById('resultsScreen');
+        if (resultsScreen) {
+            resultsScreen.style.display = 'block';
+        }
+        
+        console.log('Resultados actualizados correctamente');
+        
+            } catch (error) {
+                console.error('Error procesando resultados:', error);
+                alert('Hubo un problema mostrando los resultados. Por favor intenta nuevamente.');
+            }
+        }
+
+        // Función auxiliar para actualizar cada dimensión
+        function actualizarDimension(dimension, puntaje, comentario) {
+            const scoreElement = document.getElementById(`${dimension}Score`);
+            const commentElement = document.getElementById(`${dimension}Comment`);
+            
+            if (scoreElement) {
+                scoreElement.textContent = `${puntaje}/5`;
+            }
+            
+            if (commentElement && comentario) {
+                commentElement.textContent = `Análisis: ${comentario}`;
+            }
+        }
+        
+        // Modifica tu función de envío existente
+        function enviarDiagnostico() {
+            // Tu código existente de recolección de datos...
+            
+            fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    nombre: nombre,
+                    apellido: apellido,
+                    email: email,
+                    whatsapp: whatsapp,
+                    responses: responses
+                })
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                return response.json(); // Ahora debería funcionar sin errores
+            })
+            .then(data => {
+                console.log('Data received:', data);
+                
+                if (data && data.resultado) {
+                    procesarResultadosDiagnostico(data.resultado);
+                } else {
+                    throw new Error('Estructura de datos incorrecta');
+                }
+            })
+            .catch(error => {
+                console.error('Error final capturado:', error);
+                alert('Hubo un problema procesando tu diagnóstico. Por favor intenta nuevamente.');
+            });
+        }
 
 
-
-
-    
 //========= SANITIZADOR: ===============
     // SISTEMA DE VALIDACIÓN INTEGRAL NIA - VERSIÓN DEFINITIVA CORREGIDA
 document.addEventListener('DOMContentLoaded', function() {
