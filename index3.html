@@ -845,18 +845,18 @@ input {
     // URL de tu webhook - REEMPLAZA con tu URL real
     const webhookUrl = 'https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc'; // Tu webhook actual
     
-    // Función robusta para mostrar una pantalla y ocultar todas las demás
+   // === FUNCIONES CORREGIDAS ===
+
+    // 1. Función de mostrar pantalla con barra de progreso
     function mostrarPantalla(screenId) {
         console.log(`🔄 Cambiando a pantalla: ${screenId}`);
         
-        // Lista de todas las posibles pantallas
         const possibleScreens = [
             'introScreen', 'questionScreens', 'question1', 'question2', 'question3', 
             'question4', 'question5', 'dataScreen', 'loadingScreen', 'resultsScreen', 
             'errorScreen'
         ];
         
-        // Ocultar todas las pantallas posibles
         possibleScreens.forEach(screenName => {
             const screen = document.getElementById(screenName);
             if (screen) {
@@ -864,7 +864,17 @@ input {
             }
         });
         
-        // Mostrar la pantalla solicitada
+        // Manejar barra de progreso
+        const progressContainer = document.getElementById('progressContainer');
+        if (progressContainer) {
+            if (['question1', 'question2', 'question3', 'question4', 'question5', 'dataScreen'].includes(screenId)) {
+                progressContainer.style.display = 'block';
+                updateProgressBar(screenId);
+            } else {
+                progressContainer.style.display = 'none';
+            }
+        }
+        
         const targetScreen = document.getElementById(screenId);
         if (targetScreen) {
             targetScreen.style.display = 'block';
@@ -873,35 +883,77 @@ input {
             console.error(`❌ Pantalla ${screenId} no encontrada`);
         }
     }
-    
-    // Función para iniciar diagnóstico (adaptada a tu estructura actual)
-    function startDiagnosis() {
-        // Intentar diferentes formas de iniciar según tu estructura
-        if (document.getElementById('questionScreens')) {
-            document.getElementById('questionScreens').style.display = 'block';
-            mostrarPantalla('question1');
-        } else {
-            mostrarPantalla('question1');
+
+    // 2. Función de actualizar barra de progreso
+    function updateProgressBar(screenId) {
+        const progressSteps = {
+            'question1': { step: 1, progress: 16 },
+            'question2': { step: 2, progress: 32 },
+            'question3': { step: 3, progress: 48 },
+            'question4': { step: 4, progress: 64 },
+            'question5': { step: 5, progress: 80 },
+            'dataScreen': { step: 6, progress: 100 }
+        };
+        
+        const currentStepInfo = progressSteps[screenId];
+        if (!currentStepInfo) return;
+        
+        const progressBar = document.getElementById('progressBar');
+        if (progressBar) {
+            progressBar.style.width = `${currentStepInfo.progress}%`;
+        }
+        
+        const currentStepElement = document.getElementById('currentStep');
+        if (currentStepElement) {
+            currentStepElement.textContent = currentStepInfo.step;
+        }
+        
+        for (let i = 1; i <= 6; i++) {
+            const stepElement = document.getElementById(`step${i}`);
+            if (stepElement) {
+                if (i <= currentStepInfo.step) {
+                    stepElement.classList.remove('step-inactive');
+                    stepElement.classList.add('step-active');
+                } else {
+                    stepElement.classList.remove('step-active');
+                    stepElement.classList.add('step-inactive');
+                }
+            }
         }
     }
     
-    // Función para navegar entre preguntas (compatible con tu estructura)
-    function nextQuestion(currentQuestionNumber) {
-        const currentAnswerId = `answer${currentQuestionNumber}`;
-        const currentAnswer = document.getElementById(currentAnswerId);
-        
-        if (!currentAnswer || !currentAnswer.value.trim()) {
-            alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
-            return;
+        // 3. Función de navegación corregida
+        function nextQuestion(nextQuestionNumber) {
+            const currentQuestionNumber = nextQuestionNumber - 1;
+            const currentAnswerId = `answer${currentQuestionNumber}`;
+            const currentAnswer = document.getElementById(currentAnswerId);
+            
+            console.log(`🔄 Navegando de pregunta ${currentQuestionNumber} a ${nextQuestionNumber}`);
+            
+            if (!currentAnswer || !currentAnswer.value.trim()) {
+                alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
+                return;
+            }
+            
+            if (nextQuestionNumber <= 5) {
+                mostrarPantalla(`question${nextQuestionNumber}`);
+            } else {
+                mostrarPantalla('dataScreen');
+            }
         }
         
-        const nextQuestionNumber = currentQuestionNumber + 1;
-        if (nextQuestionNumber <= 5) {
-            mostrarPantalla(`question${nextQuestionNumber}`);
-        } else {
-            mostrarPantalla('dataScreen');
+        // 4. Función de inicio mejorada
+        function startDiagnosis() {
+            console.log('🚀 Iniciando diagnóstico...');
+            
+            const questionScreens = document.getElementById('questionScreens');
+            if (questionScreens) {
+                questionScreens.style.display = 'block';
+            }
+            
+            mostrarPantalla('question1');
         }
-    }
+
     
     // Función para mostrar recolección de datos
     function showDataCollection() {
@@ -1789,28 +1841,27 @@ async function debugearEnvioMAKE() {
     
     console.log('✅ Prueba de display completada');
     }
-    // SOLO PARA TESTING - Comentar en producción
-function testearResultados() {
-    const datosEjemplo = {
-        foco_cliente: 3,
-        comentario_foco_cliente: "Tu mensaje identifica el segmento, pero puede profundizar más en el dolor específico.",
-        promesa_transformacion: 4,
-        comentario_promesa_transformacion: "La promesa es clara, pero considera ser más específico en resultados medibles.",
-        autoridad_confianza: 2,
-        comentario_autoridad_confianza: "Necesitas más evidencia social y casos de éxito que refuercen tu credibilidad.",
-        diferenciacion: 3,
-        comentario_diferenciacion: "Tu diferenciación es buena, pero puede ser más única y memorable.",
-        oferta_valor: 4,
-        comentario_oferta_valor: "La propuesta de valor es fuerte, pero optimízala para el ROI percibido.",
-        principales_brechas: "Tu narrativa tiene bases sólidas 💪, pero la autoridad y diferenciación son tus mayores GAPs. Sin ellas, pierdes clientes cada día.",
-        proximo_paso: "Crea 3 micro-historias de éxito. Para un plan a medida, agenda tu sesión 1:1 con Carlos 🚀"
-    };
-    
-    procesarResultadosDiagnostico(datosEjemplo);
-}
 
-// Descomentar para probar:
-// testearResultados();
+    // SOLO PARA TESTING - Comentar en producción
+    function testearResultados() {
+        const datosEjemplo = {
+            foco_cliente: 3,
+            comentario_foco_cliente: "Tu mensaje identifica el segmento, pero puede profundizar más en el dolor específico.",
+            promesa_transformacion: 4,
+            comentario_promesa_transformacion: "La promesa es clara, pero considera ser más específico en resultados medibles.",
+            autoridad_confianza: 2,
+            comentario_autoridad_confianza: "Necesitas más evidencia social y casos de éxito que refuercen tu credibilidad.",
+            diferenciacion: 3,
+            comentario_diferenciacion: "Tu diferenciación es buena, pero puede ser más única y memorable.",
+            oferta_valor: 4,
+            comentario_oferta_valor: "La propuesta de valor es fuerte, pero optimízala para el ROI percibido.",
+            principales_brechas: "Tu narrativa tiene bases sólidas 💪, pero la autoridad y diferenciación son tus mayores GAPs. Sin ellas, pierdes clientes cada día.",
+            proximo_paso: "Crea 3 micro-historias de éxito. Para un plan a medida, agenda tu sesión 1:1 con Carlos 🚀"
+        };
+        
+        procesarResultadosDiagnostico(datosEjemplo);
+    }
+
 
     
 </script>
