@@ -848,92 +848,81 @@ input {
    // === FUNCIONES CORREGIDAS ===
 
     // 1. Función de mostrar pantalla con barra de progreso
+   // Función adaptada a tu estructura HTML específica
     function mostrarPantalla(screenId) {
         console.log(`🔄 Cambiando a pantalla: ${screenId}`);
         
-        const possibleScreens = [
-            'introScreen', 'questionScreens', 'question1', 'question2', 'question3', 
-            'question4', 'question5', 'dataScreen', 'loadingScreen', 'resultsScreen', 
-            'errorScreen'
-        ];
+        // Pantallas principales (nivel superior)
+        const mainScreens = ['introScreen', 'questionScreens', 'dataScreen', 'loadingScreen', 'resultsScreen', 'errorScreen'];
         
-        possibleScreens.forEach(screenName => {
-            const screen = document.getElementById(screenName);
-            if (screen) {
-                screen.style.display = 'none';
+        // Si es una pregunta específica (question1, question2, etc.)
+        if (screenId.startsWith('question') && screenId !== 'questionScreens') {
+            // CLAVE: Mostrar el contenedor de preguntas PRIMERO
+            const questionScreens = document.getElementById('questionScreens');
+            if (questionScreens) {
+                questionScreens.style.display = 'block';
             }
-        });
+            
+            // Ocultar todas las preguntas individuales
+            for (let i = 1; i <= 5; i++) {
+                const questionDiv = document.getElementById(`question${i}`);
+                if (questionDiv) {
+                    questionDiv.style.display = 'none';
+                }
+            }
+            
+            // Mostrar la pregunta específica
+            const targetQuestion = document.getElementById(screenId);
+            if (targetQuestion) {
+                targetQuestion.style.display = 'block';
+                console.log(`✅ Pregunta ${screenId} mostrada`);
+            }
+            
+            // Ocultar otras pantallas principales (excepto questionScreens)
+            mainScreens.forEach(screenName => {
+                if (screenName !== 'questionScreens') {
+                    const screen = document.getElementById(screenName);
+                    if (screen) {
+                        screen.style.display = 'none';
+                    }
+                }
+            });
+            
+        } else {
+            // Para pantallas principales, comportamiento normal
+            mainScreens.forEach(screenName => {
+                const screen = document.getElementById(screenName);
+                if (screen) {
+                    screen.style.display = screenName === screenId ? 'block' : 'none';
+                }
+            });
+        }
         
         // Manejar barra de progreso
-        const progressContainer = document.getElementById('progressContainer');
-        if (progressContainer) {
-            if (['question1', 'question2', 'question3', 'question4', 'question5', 'dataScreen'].includes(screenId)) {
-                progressContainer.style.display = 'block';
-                updateProgressBar(screenId);
-            } else {
-                progressContainer.style.display = 'none';
-            }
-        }
-        
-        const targetScreen = document.getElementById(screenId);
-        if (targetScreen) {
-            targetScreen.style.display = 'block';
-            console.log(`✅ Pantalla ${screenId} mostrada`);
-        } else {
-            console.error(`❌ Pantalla ${screenId} no encontrada`);
-        }
-    }
-
-    // 2. Función de actualizar barra de progreso
-    function updateProgressBar(screenId) {
-        const progressSteps = {
-            'question1': { step: 1, progress: 16 },
-            'question2': { step: 2, progress: 32 },
-            'question3': { step: 3, progress: 48 },
-            'question4': { step: 4, progress: 64 },
-            'question5': { step: 5, progress: 80 },
-            'dataScreen': { step: 6, progress: 100 }
-        };
-        
-        const currentStepInfo = progressSteps[screenId];
-        if (!currentStepInfo) return;
-        
-        const progressBar = document.getElementById('progressBar');
-        if (progressBar) {
-            progressBar.style.width = `${currentStepInfo.progress}%`;
-        }
-        
-        const currentStepElement = document.getElementById('currentStep');
-        if (currentStepElement) {
-            currentStepElement.textContent = currentStepInfo.step;
-        }
-        
-        for (let i = 1; i <= 6; i++) {
-            const stepElement = document.getElementById(`step${i}`);
-            if (stepElement) {
-                if (i <= currentStepInfo.step) {
-                    stepElement.classList.remove('step-inactive');
-                    stepElement.classList.add('step-active');
+            const progressContainer = document.getElementById('progressContainer');
+            if (progressContainer) {
+                if (['question1', 'question2', 'question3', 'question4', 'question5', 'dataScreen'].includes(screenId)) {
+                    progressContainer.style.display = 'block';
+                    updateProgressBar(screenId);
                 } else {
-                    stepElement.classList.remove('step-active');
-                    stepElement.classList.add('step-inactive');
+                    progressContainer.style.display = 'none';
                 }
             }
         }
-    }
-    
-        // 3. Función de navegación corregida
-        function nextQuestion(nextQuestionNumber) {
-            const currentQuestionNumber = nextQuestionNumber - 1;
+
+        // Función corregida para navegar entre preguntas
+        function nextQuestion(currentQuestionNumber) {
             const currentAnswerId = `answer${currentQuestionNumber}`;
             const currentAnswer = document.getElementById(currentAnswerId);
             
-            console.log(`🔄 Navegando de pregunta ${currentQuestionNumber} a ${nextQuestionNumber}`);
+            console.log(`🔄 Navegando de pregunta ${currentQuestionNumber} a ${currentQuestionNumber + 1}`);
             
             if (!currentAnswer || !currentAnswer.value.trim()) {
                 alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
                 return;
             }
+            
+            const nextQuestionNumber = currentQuestionNumber + 1;
             
             if (nextQuestionNumber <= 5) {
                 mostrarPantalla(`question${nextQuestionNumber}`);
@@ -941,18 +930,45 @@ input {
                 mostrarPantalla('dataScreen');
             }
         }
-        
-        // 4. Función de inicio mejorada
-        function startDiagnosis() {
-            console.log('🚀 Iniciando diagnóstico...');
+
+    
+       // Función corregida para navegar entre preguntas
+        function nextQuestion(currentQuestionNumber) {
+            const currentAnswerId = `answer${currentQuestionNumber}`;
+            const currentAnswer = document.getElementById(currentAnswerId);
             
-            const questionScreens = document.getElementById('questionScreens');
-            if (questionScreens) {
-                questionScreens.style.display = 'block';
+            console.log(`🔄 Navegando de pregunta ${currentQuestionNumber} a ${currentQuestionNumber + 1}`);
+            
+            if (!currentAnswer || !currentAnswer.value.trim()) {
+                alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
+                return;
             }
             
-            mostrarPantalla('question1');
+            const nextQuestionNumber = currentQuestionNumber + 1;
+            
+            if (nextQuestionNumber <= 5) {
+                mostrarPantalla(`question${nextQuestionNumber}`);
+            } else {
+                mostrarPantalla('dataScreen');
+            }
         }
+
+       // Función para iniciar diagnóstico respetando tu estructura
+        function startDiagnosis() {
+            console.log('🚀 Iniciando diagnóstico...');
+            mostrarPantalla('question1'); // Esto manejará questionScreens automáticamente
+        }
+        
+        // Función para mostrar recolección de datos
+        function showDataCollection() {
+            const answer5 = document.getElementById('answer5');
+            if (!answer5 || !answer5.value.trim()) {
+                alert('Por favor, completa tu narrativa comercial actual.');
+                return;
+            }
+            mostrarPantalla('dataScreen');
+        }
+
 
     
     // Función para mostrar recolección de datos
@@ -1183,6 +1199,19 @@ input {
     if (typeof mostrarPantalla === 'undefined') {
         window.mostrarPantalla = mostrarPantalla;
     }
+//Para debugging específico:
+    function debugQuestions() {
+        console.log('🔍 Estado actual de las preguntas:');
+        
+        const questionScreens = document.getElementById('questionScreens');
+        console.log('questionScreens display:', questionScreens ? questionScreens.style.display : 'NO EXISTE');
+        
+        for (let i = 1; i <= 5; i++) {
+            const question = document.getElementById(`question${i}`);
+            console.log(`question${i} display:`, question ? question.style.display : 'NO EXISTE');
+        }
+    }
+
 
 
 //========= SANITIZADOR: ===============
@@ -1860,6 +1889,40 @@ async function debugearEnvioMAKE() {
         };
         
         procesarResultadosDiagnostico(datosEjemplo);
+    }
+    
+    //Testing Específico para Tu Estructura // SOLO PARA TESTING - Comentar en producción - Comentar en producción
+    function testNavigation() {
+        console.log('🧪 Probando navegación paso a paso...');
+        
+        // Llenar respuestas de prueba
+        for (let i = 1; i <= 5; i++) {
+            const answer = document.getElementById(`answer${i}`);
+            if (answer) {
+                answer.value = `Respuesta de prueba ${i}`;
+            }
+        }
+        
+        // Probar secuencia de navegación con delays
+        setTimeout(() => {
+            console.log('Paso 1: Iniciando');
+            startDiagnosis();
+        }, 500);
+        
+        setTimeout(() => {
+            console.log('Paso 2: Pregunta 1 → 2');
+            nextQuestion(1);
+        }, 1500);
+        
+        setTimeout(() => {
+            console.log('Paso 3: Pregunta 2 → 3');
+            nextQuestion(2);
+        }, 2500);
+        
+        setTimeout(() => {
+            console.log('Paso 4: Pregunta 3 → 4');  
+            nextQuestion(3);
+        }, 3500);
     }
 
 
