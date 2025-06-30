@@ -8,419 +8,510 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-            min-height: 100vh;
-        }
-        
-        .gradient-bg {
-            background: linear-gradient(135deg, #4FDC9A 0%, #AF86FF 100%);
-        }
-        
-        .glass-effect {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-        }
-        
-        .step-indicator {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .step-active {
-            background: #4FDC9A;
-            color: #1a1a1a;
-        }
-        
-        .step-inactive {
-            background: rgba(255, 255, 255, 0.1);
-            color: #888;
-        }
-        
-        .step-completed {
-            background: #654f8f;
-            color: white;
-        }
-        
-        .progress-bar {
-            height: 4px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #4FDC9A 0%, #AF86FF 100%);
-            transition: width 0.3s ease;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #4FDC9A 0%, #AF86FF 100%);
-            color: #1a1a1a;
-            font-weight: 600;
-            padding: 12px 32px;
-            border-radius: 25px;
-            border: none;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(79, 220, 154, 0.3);
-        }
-        
-        .btn-secondary {
-            background: rgba(175, 134, 255, 0.2);
-            color: #AF86FF;
-            border: 1px solid #AF86FF;
-            font-weight: 500;
-            padding: 10px 24px;
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-        
-        .btn-secondary:hover {
-            background: rgba(175, 134, 255, 0.3);
-            transform: translateY(-1px);
-        }
-        
-        .score-circle {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 700;
-            color: white;
-            margin: 0 auto;
-        }
-        
-        .score-excellent { background: linear-gradient(135deg, #4FDC9A, #58E6A0); }
-        .score-good { background: linear-gradient(135deg, #AF86FF, #C49BFF); }
-        .score-average { background: linear-gradient(135deg, #FFB84D, #FFC766); }
-        .score-poor { background: linear-gradient(135deg, #FF6B6B, #FF8E8E); }
-        
-        .dimension-bar {
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .dimension-fill {
-            height: 100%;
-            border-radius: 4px;
-            transition: width 0.8s ease;
-        }
-        
-        .dimension-5 { background: #4FDC9A; }
-        .dimension-4 { background: #6ED3BA; }
-        .dimension-3 { background: #94B9D9; }
-        .dimension-2 { background: #B89DEB; }
-        .dimension-1 { background: #AF86FF; }
-        
-        .floating-animation {
-            animation: float 3s ease-in-out infinite;
-        }
-        
-        @keyframes float {
-            0%, 100% { transform: translateY(0px); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        .pulse-animation {
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-        
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .nia-avatar {
-            width: 120px;
-            height: 120px;
-            border-radius: 50%;
-            border: 3px solid #4FDC9A;
-            box-shadow: 0 0 30px rgba(79, 220, 154, 0.3);
-        }
-        
-        .loading-spinner {
-            border: 3px solid rgba(255, 255, 255, 0.1);
-            border-top: 3px solid #4FDC9A;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        textarea {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 12px;
-            padding: 16px;
-            width: 100%;
-            min-height: 120px;
-            resize: vertical;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        textarea:focus {
-            outline: none;
-            border-color: #4FDC9A;
-            box-shadow: 0 0 0 3px rgba(79, 220, 154, 0.1);
-        }
-        
-        textarea::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            border-radius: 8px;
-            padding: 12px;
-            width: 100%;
-            font-family: 'Inter', sans-serif;
-        }
-        
-        input:focus {
-            outline: none;
-            border-color: #4FDC9A;
-            box-shadow: 0 0 0 3px rgba(79, 220, 154, 0.1);
-        }
-        
-        input::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-        }
-        
-        @media (max-width: 768px) {
-            .nia-avatar {
-                width: 100px;
-                height: 100px;
-            }
-            
-            textarea {
-                min-height: 100px;
-            }
-        }
+        /**
+ * =================================================================
+ * CSS REFACTORIZADO Y OPTIMIZADO
+ * =================================================================
+ *
+ * Mejoras realizadas:
+ * 1.  Eliminación de selectores y reglas duplicadas.
+ * 2.  Agrupación de estilos relacionados para mayor legibilidad.
+ * 3.  Combinación de todas las reglas @media en un solo bloque.
+ * 4.  Abstracción de estilos comunes para botones y campos de formulario.
+ * 5.  Corrección de animación 'pulse' duplicada y renombrada.
+ *
+ */
 
-        /* Estilos para validación inline */
-        .campo-error {
-            border: 2px solid #ef4444 !important;
-            border-radius: 8px !important;
-            box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-            background-color: rgba(239, 68, 68, 0.05) !important;
-            transition: all 0.3s ease !important;
-        }
-        
-        .mensaje-error {
-            color: #ef4444;
-            font-size: 12px;
-            margin-top: 4px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 500;
-        }
-        
-        .mensaje-error::before {
-            content: "⚠️";
-        }
-        
-        .campo-valido {
-            border: 2px solid #10b981 !important;
-            border-radius: 8px !important;
-            box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
-            transition: all 0.3s ease !important;
-        }
-        
-        .mensaje-exito {
-            color: #10b981;
-            font-size: 12px;
-            margin-top: 4px;
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-weight: 500;
-        }
-        
-        .mensaje-exito::before {
-            content: "✅";
-        }
-        
-/* Estilos para las dimensiones con comentarios */
-        .evaluation-details {
-            margin: 30px 0;
-        }
-        
-        .dimension-item {
-            margin-bottom: 25px;
-            padding: 20px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, #f8f4ff 0%, #e8d5ff 100%);
-            border-left: 4px solid #9333ea;
-            transition: transform 0.2s ease;
-        }
-        
-        .dimension-item:hover {
-            transform: translateY(-2px);
-        }
-        
-        .dimension-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        
-        .dimension-header h3 {
-            margin: 0;
-            color: #4a5568;
-            font-size: 1.1em;
-            font-weight: 600;
-        }
-        
-        .dimension-score {
-            font-weight: bold;
-            color: #9333ea;
-            font-size: 1.3em;
-            background: white;
-            padding: 5px 12px;
-            border-radius: 20px;
-            box-shadow: 0 2px 8px rgba(147, 51, 234, 0.2);
-        }
-        
-        .dimension-comment {
-            font-size: 0.95em;
-            color: #6b7280;
-            font-style: italic;
-            line-height: 1.5;
-            padding: 10px 15px;
-            background: rgba(255, 255, 255, 0.7);
-            border-radius: 8px;
-            border-left: 3px solid #d1d5db;
-        }
-        
-        /* Centrado para contenido */
-        .centered-content {
-            text-align: center;
-            margin: 35px 0;
-        }
-        
-        .centered-content h2 {
-            color: #9333ea;
-            margin-bottom: 20px;
-            font-size: 1.5em;
-        }
-        
-        /* Principales Brechas */
-        .personalized-recommendation {
-            padding: 30px;
-            background: linear-gradient(135deg, #f8f4ff 0%, #e8d5ff 100%);
-            border-radius: 15px;
-            margin: 35px 0;
-            box-shadow: 0 6px 20px rgba(147, 51, 234, 0.15);
-        }
-        
-        .recommendation-content p {
-            font-size: 1.1em;
-            line-height: 1.7;
-            color: #4a5568;
-            font-weight: 500;
-        }
-        
-        /* Próximo Paso destacado */
-        .next-step-block {
-            background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
-            border: 3px solid #f97316;
-            border-radius: 15px;
-            padding: 30px;
-            margin: 30px 0;
-            box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2);
-        }
-        
-        .next-step-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .next-step-icon {
-            font-size: 2em;
-            animation: pulse 2s infinite;
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.1); }
-            100% { transform: scale(1); }
-        }
-        
-        .next-step-block h2 {
-            color: #ea580c;
-            margin: 0;
-            font-size: 1.4em;
-            font-weight: 700;
-        }
-        
-        .next-step-content p {
-            color: #4a5568;
-            font-size: 1.1em;
-            line-height: 1.7;
-            margin: 0;
-            font-weight: 600;
-        }
-        
-        /* Responsividad */
-        @media (max-width: 768px) {
-            .dimension-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .next-step-header {
-                flex-direction: column;
-                gap: 8px;
-            }
-        }
+/* =============================================
+   Estilos Base y Globales
+   ============================================= */
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    min-height: 100vh;
+}
+
+/* =============================================
+   Clases de Utilidad
+   ============================================= */
+.gradient-bg {
+    background: linear-gradient(135deg, #4FDC9A 0%, #AF86FF 100%);
+}
+
+.glass-effect {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.centered-content {
+    text-align: center;
+    margin: 35px 0;
+}
+
+.centered-content h2 {
+    color: #9333ea;
+    margin-bottom: 20px;
+    font-size: 1.5em;
+}
+
+/* =============================================
+   Componentes
+   ============================================= */
+
+/* --- Botones --- */
+.btn-primary,
+.btn-secondary {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 600;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #4FDC9A 0%, #AF86FF 100%);
+    color: #1a1a1a;
+    padding: 12px 32px;
+    border-radius: 25px;
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(79, 220, 154, 0.3);
+}
+
+.btn-secondary {
+    background: rgba(175, 134, 255, 0.2);
+    color: #AF86FF;
+    border: 1px solid #AF86FF;
+    padding: 10px 24px;
+    border-radius: 20px;
+}
+
+.btn-secondary:hover {
+    background: rgba(175, 134, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* --- Formularios (Inputs y Textareas) --- */
+textarea,
+input {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: white;
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+}
+
+textarea:focus,
+input:focus {
+    outline: none;
+    border-color: #4FDC9A;
+    box-shadow: 0 0 0 3px rgba(79, 220, 154, 0.1);
+}
+
+textarea::placeholder,
+input::placeholder {
+    color: rgba(255, 255, 255, 0.5);
+}
+
+textarea {
+    border-radius: 12px;
+    padding: 16px;
+    min-height: 120px;
+    resize: vertical;
+}
+
+input {
+    border-radius: 8px;
+    padding: 12px;
+}
+
+/* --- Validación de Campos --- */
+.campo-error,
+.campo-valido {
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.campo-error {
+    border: 2px solid #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    background-color: rgba(239, 68, 68, 0.05) !important;
+}
+
+.campo-valido {
+    border: 2px solid #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.mensaje-error,
+.mensaje-exito {
+    font-size: 12px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+}
+
+.mensaje-error {
+    color: #ef4444;
+}
+
+.mensaje-exito {
+    color: #10b981;
+}
+
+.mensaje-error::before {
+    content: "⚠️";
+}
+
+.mensaje-exito::before {
+    content: "✅";
+}
+
+/* --- Pasos y Progreso --- */
+.step-indicator {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-active {
+    background: #4FDC9A;
+    color: #1a1a1a;
+}
+
+.step-inactive {
+    background: rgba(255, 255, 255, 0.1);
+    color: #888;
+}
+
+.step-completed {
+    background: #654f8f;
+    color: white;
+}
+
+.progress-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4FDC9A 0%, #AF86FF 100%);
+    transition: width 0.3s ease;
+}
+
+/* --- Elementos de Puntuación y Dimensiones --- */
+.score-circle {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    margin: 0 auto;
+}
+
+.score-excellent { background: linear-gradient(135deg, #4FDC9A, #58E6A0); }
+.score-good { background: linear-gradient(135deg, #AF86FF, #C49BFF); }
+.score-average { background: linear-gradient(135deg, #FFB84D, #FFC766); }
+.score-poor { background: linear-gradient(135deg, #FF6B6B, #FF8E8E); }
+
+.dimension-bar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.dimension-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.8s ease;
+}
+
+.dimension-5 { background: #4FDC9A; }
+.dimension-4 { background: #6ED3BA; }
+.dimension-3 { background: #94B9D9; }
+.dimension-2 { background: #B89DEB; }
+.dimension-1 { background: #AF86FF; }
+
+/* --- Elementos de Reporte y Resultados --- */
+.evaluation-details {
+    margin: 30px 0;
+}
+
+.dimension-item {
+    margin-bottom: 25px;
+    padding: 20px;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8f4ff 0%, #e8d5ff 100%);
+    border-left: 4px solid #9333ea;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.dimension-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(147, 51, 234, 0.1);
+}
+
+.dimension-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.dimension-header h3 {
+    margin: 0;
+    color: #4a5568;
+    font-size: 1.1em;
+    font-weight: 600;
+}
+
+.dimension-score {
+    font-weight: bold;
+    color: #9333ea;
+    font-size: 1.3em;
+    background: white;
+    padding: 5px 12px;
+    border-radius: 20px;
+    box-shadow: 0 2px 8px rgba(147, 51, 234, 0.2);
+}
+
+.dimension-comment {
+    font-size: 0.95em;
+    color: #6b7280;
+    font-style: italic;
+    line-height: 1.5;
+    padding: 10px 15px;
+    background: rgba(255, 255, 255, 0.7);
+    border-radius: 8px;
+    border-left: 3px solid #d1d5db;
+}
+
+.result-summary,
+.personalized-recommendation {
+    padding: 30px;
+    background: linear-gradient(135deg, #f8f4ff 0%, #e8d5ff 100%);
+    border-radius: 15px;
+    margin: 35px 0;
+    box-shadow: 0 6px 20px rgba(147, 51, 234, 0.15);
+}
+
+.result-summary {
+    text-align: center;
+    padding: 25px;
+}
+
+.score-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+#totalScore {
+    font-size: 1.8em;
+    font-weight: bold;
+    color: #9333ea;
+}
+
+.percentage {
+    font-size: 2.5em;
+    font-weight: bold;
+    color: #16a34a;
+}
+
+.recommendation-content p {
+    font-size: 1.1em;
+    line-height: 1.7;
+    color: #4a5568;
+    font-weight: 500;
+}
+
+/* --- Bloque de Próximo Paso --- */
+.next-step-block {
+    background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+    border: 3px solid #f97316;
+    border-radius: 15px;
+    padding: 30px;
+    margin: 30px 0;
+    box-shadow: 0 8px 25px rgba(249, 115, 22, 0.2);
+}
+
+.next-step-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.next-step-icon {
+    font-size: 2em;
+    animation: pulse-scale 2s infinite;
+}
+
+.next-step-block h2 {
+    color: #ea580c;
+    margin: 0;
+    font-size: 1.4em;
+    font-weight: 700;
+}
+
+.next-step-content p {
+    color: #4a5568;
+    font-size: 1.1em;
+    line-height: 1.7;
+    margin: 0;
+    font-weight: 600;
+}
+
+
+/* --- Bloque CTA (Call to Action) --- */
+.cta-section {
+    text-align: center;
+    margin: 40px 0;
+    padding: 30px;
+    background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    border-radius: 15px;
+}
+
+.cta-button {
+    background: linear-gradient(135deg, #9333ea 0%, #7c3aed 100%);
+    color: white;
+    padding: 15px 30px;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1em;
+    font-weight: 600;
+    cursor: pointer;
+    margin: 20px 0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(147, 51, 234, 0.3);
+}
+
+/* --- Varios --- */
+.nia-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    border: 3px solid #4FDC9A;
+    box-shadow: 0 0 30px rgba(79, 220, 154, 0.3);
+}
+
+.loading-spinner {
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid #4FDC9A;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+.warning {
+    color: #dc2626;
+    font-weight: 600;
+    margin: 15px 0;
+}
+
+.signature {
+    margin-top: 30px;
+    color: #6b7280;
+    font-style: italic;
+}
+
+
+/* =============================================
+   Animaciones (Keyframes)
+   ============================================= */
+.floating-animation {
+    animation: float 3s ease-in-out infinite;
+}
+
+.pulse-animation {
+    animation: pulse-opacity 2s ease-in-out infinite;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-opacity {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes pulse-scale {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* =============================================
+   Diseño Responsivo (Media Queries)
+   ============================================= */
+@media (max-width: 768px) {
+    .nia-avatar {
+        width: 100px;
+        height: 100px;
+    }
+
+    textarea {
+        min-height: 100px;
+    }
+
+    .dimension-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 5px;
+    }
+
+    .next-step-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .score-display {
+        flex-direction: column;
+    }
+}
+
 
 
 
