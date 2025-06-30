@@ -631,10 +631,14 @@ textarea {
 /* =============================================
    MEDIA QUERIES UNIFICADOS - SIN SOLAPAMIENTOS
    ============================================= */
-
-/* Desktop Extra Grande (1600px+) - PROBLEMA 1 RESUELTO */
+/* Desktop Extra Grande (1600px+) */
 @media (min-width: 1600px) {
     #resultsScreen .container {
+        max-width: 1600px;
+        padding: 0 60px;
+    }
+    /* NUEVO: Ampliar el contenedor general */
+    .container {
         max-width: 1600px;
         padding: 0 60px;
     }
@@ -646,11 +650,21 @@ textarea {
         max-width: 1500px;
         padding: 0 50px;
     }
+    /* NUEVO: Ampliar el contenedor general */
+    .container {
+        max-width: 1500px;
+        padding: 0 50px;
+    }
 }
 
 /* Desktop Mediano (1200px - 1399px) */
 @media (min-width: 1200px) and (max-width: 1399px) {
     #resultsScreen .container {
+        max-width: 1300px;
+        padding: 0 40px;
+    }
+    /* NUEVO: Ampliar el contenedor general */
+    .container {
         max-width: 1300px;
         padding: 0 40px;
     }
@@ -662,67 +676,15 @@ textarea {
         max-width: 1100px;
         padding: 0 30px;
     }
-    
-    /* Cambiar a columna en este breakpoint */
-    .score-header-card, 
-    .next-step-card, 
-    .final-cta-section {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .final-cta-section {
-        flex-direction: column-reverse;
-    }
-    
-    .final-cta-text-col {
-        padding-left: 0;
-    }
-}
-
-/* Tablet (769px - 1023px) - PROBLEMA 2 RESUELTO */
-@media (min-width: 769px) and (max-width: 1023px) {
-    #resultsScreen .container {
-        max-width: 950px; /* Menor que desktop mínimo (1100px) */
-        padding: 0 25px;
-    }
-    
-    .score-header-card, 
-    .next-step-card, 
-    .final-cta-section {
-        flex-direction: column;
-        text-align: center;
-    }
-    
-    .final-cta-section {
-        flex-direction: column-reverse;
-    }
-    
-    .final-cta-text-col {
-        padding-left: 0;
-    }
-}
-
-/* Móvil (768px y menos) - PROBLEMAS 3 Y 4 RESUELTOS */
-@media (max-width: 768px) {
-    /* CORRECCIÓN CRÍTICA: Alineación superior garantizada */
-    .flex-1.flex.items-center.justify-center {
-        align-items: flex-start !important;
-        padding: 10px;
-        min-height: auto;
-    }
-    
-    /* Contenedores optimizados para móvil */
+    /* NUEVO: Ampliar el contenedor general */
     .container {
-        padding: 0 15px;
-        max-width: 100%;
+        max-width: 1100px;
+        padding: 0 30px;
     }
     
-    #resultsScreen .container {
-        padding: 15px;
-        max-width: 100%;
-        width: 100%;
-    }
+    /* Resto de reglas existentes... */
+}
+
     
     /* Elementos internos con espaciado optimizado */
     .score-header-card,
