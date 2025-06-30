@@ -987,26 +987,57 @@ input {
         mostrarPantalla('question1');
     }
     
-    // Función corregida para navegar entre preguntas
-    function nextQuestion(currentQuestionNumber) {
+  // Función blindada contra conflictos externos para navegar entre preguntas
+    function nextQuestionSegura(currentQuestionNumber) {
+        const timestamp = Date.now();
+        console.log(`🔒 [${timestamp}] VALIDACIÓN SEGURA - Pregunta ${currentQuestionNumber}`);
+        
         const currentAnswerId = `answer${currentQuestionNumber}`;
         const currentAnswer = document.getElementById(currentAnswerId);
         
-        console.log(`🔄 Navegando de pregunta ${currentQuestionNumber} a ${currentQuestionNumber + 1}`);
+        // Logging detallado para debugging
+        console.log(`🔍 [${timestamp}] Elemento: ${currentAnswerId}`, currentAnswer);
         
-        if (!currentAnswer || !currentAnswer.value.trim()) {
-            alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
-            return;
+        if (!currentAnswer) {
+            console.error(`❌ [${timestamp}] Elemento ${currentAnswerId} no encontrado`);
+            alert(`Error técnico: No se encuentra la pregunta ${currentQuestionNumber}`);
+            return false;
         }
         
+        const valorRaw = currentAnswer.value;
+        const valorLimpio = valorRaw.trim();
+        
+        console.log(`📝 [${timestamp}] Valor RAW: "${valorRaw}"`);
+        console.log(`📝 [${timestamp}] Valor LIMPIO: "${valorLimpio}"`);
+        console.log(`📝 [${timestamp}] Es válido: ${valorLimpio.length > 0}`);
+        
+        if (!valorLimpio || valorLimpio.length === 0) {
+            console.warn(`⚠️ [${timestamp}] Validación fallida para pregunta ${currentQuestionNumber}`);
+            alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
+            return false;
+        }
+        
+        console.log(`✅ [${timestamp}] Validación exitosa para pregunta ${currentQuestionNumber}`);
+        
+        // Prevenir ejecuciones múltiples
         const nextQuestionNumber = currentQuestionNumber + 1;
         
-        if (nextQuestionNumber <= 5) {
-            mostrarPantalla(`question${nextQuestionNumber}`);
-        } else {
-            mostrarPantalla('dataScreen');
-        }
+        // Usar setTimeout para evitar conflictos de timing
+        setTimeout(() => {
+            if (nextQuestionNumber <= 5) {
+                mostrarPantalla(`question${nextQuestionNumber}`);
+            } else {
+                mostrarPantalla('dataScreen');
+            }
+            console.log(`🎯 [${timestamp}] Navegación completada a ${nextQuestionNumber <= 5 ? `question${nextQuestionNumber}` : 'dataScreen'}`);
+        }, 50);
+        
+        return true;
     }
+    
+    // Sobrescribir la función original para evitar conflictos
+    window.nextQuestion = nextQuestionSegura;
+
     
     // Función para mostrar recolección de datos
     function showDataCollection() {
@@ -1931,6 +1962,36 @@ async function debugearEnvioMAKE() {
         }
     });
 }
+
+
+    // Función para configurar navegación segura
+    function configurarNavegacionSegura() {
+        console.log('🔧 Configurando navegación segura...');
+        
+        // Remover todos los onclick existentes y agregar event listeners
+        for (let i = 1; i <= 5; i++) {
+            const questionDiv = document.getElementById(`question${i}`);
+            if (questionDiv) {
+                const button = questionDiv.querySelector('button[onclick*="nextQuestion"]');
+                if (button) {
+                    // Remover onclick existente
+                    button.removeAttribute('onclick');
+                    
+                    // Agregar event listener seguro
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        nextQuestionSegura(i);
+                    });
+                    
+                    console.log(`✅ Configurado botón seguro para pregunta ${i}`);
+                }
+            }
+        }
+    }
+    
+    // Ejecutar cuando se carga la página
+    document.addEventListener('DOMContentLoaded', configurarNavegacionSegura);
 
     
 </script>
