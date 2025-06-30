@@ -10,11 +10,11 @@
     <style>
 /**
  * =================================================================
- * CSS COMPLETO, DEPURADO Y UNIFICADO
+ * CSS COMPLETO, DEPURADO Y UNIFICADO (VERSIÓN FINAL)
  * =================================================================
  *
- * Mejoras realizadas:
- * 1.  Integración de los nuevos estilos de la página de resultados.
+ * Mejoras:
+ * 1.  Integración de los nuevos estilos de la página de resultados tipo dashboard.
  * 2.  Eliminación de clases y estilos redundantes u obsoletos.
  * 3.  Organización y limpieza general del código.
  * 4.  Uso de variables CSS para una paleta de colores consistente.
@@ -22,54 +22,51 @@
  */
 
 /* =============================================
-   Estilos Base y Globales
+   Variables y Estilos Base
    ============================================= */
 :root {
     --color-primary: #AF86FF;
     --color-secondary: #4FDC9A;
-    --color-bg-dark: #1a1a1a;
-    --color-bg-light: #2d2d2d;
-    --color-text-primary: #e5e7eb;
-    --color-text-secondary: #9ca3af;
-    --color-surface-1: rgba(35, 35, 45, 0.7);
-    --color-surface-2: rgba(255, 255, 255, 0.05);
-    --color-border: rgba(255, 255, 255, 0.1);
+    --color-bg-dark: #10111A;
+    --color-bg-light: #1A1B26;
+    --color-surface-dark: #212230;
+    --color-text-light-primary: #F0F2F5;
+    --color-text-light-secondary: #A0A3B1;
+    --color-border: rgba(175, 134, 255, 0.15);
+    --color-glow: rgba(175, 134, 255, 0.1);
+}
+
+html {
+    scroll-behavior: smooth;
 }
 
 body {
     font-family: 'Inter', sans-serif;
     background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-light) 100%);
     min-height: 100vh;
-    color: var(--color-text-primary);
+    color: var(--color-text-light-primary);
     padding: 20px;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 960px;
     margin: 0 auto;
+    padding: 0 20px;
 }
 
 /* =============================================
    Tipografía y Títulos
    ============================================= */
 .main-title {
-    color: var(--color-text-primary);
+    color: var(--color-text-light-primary);
     text-align: center;
     margin-bottom: 40px;
-    font-size: 1.8em;
+    font-size: 2em;
     font-weight: 700;
 }
 
-.sub-section-title {
-    color: var(--color-text-primary);
-    font-weight: 600;
-    font-size: 1.3em;
-    margin-top: 40px;
-    margin-bottom: 20px;
-}
-
 /* =============================================
-   Componentes Generales
+   Componentes Generales del Sitio
    ============================================= */
 
 /* --- Botones --- */
@@ -110,13 +107,15 @@ body {
 
 /* --- Formularios (Inputs y Textareas) --- */
 textarea,
-input[type="text"] { /* Aplicar a text, se pueden añadir otros tipos como email, password, etc. */
-    background: var(--color-surface-2);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: var(--color-text-primary);
+input[type="text"] {
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-light-primary);
     width: 100%;
     font-family: 'Inter', sans-serif;
     transition: all 0.3s ease;
+    border-radius: 12px;
+    padding: 16px;
 }
 
 textarea:focus,
@@ -128,18 +127,15 @@ input[type="text"]:focus {
 
 textarea::placeholder,
 input[type="text"]::placeholder {
-    color: var(--color-text-secondary);
+    color: var(--color-text-light-secondary);
 }
 
 textarea {
-    border-radius: 12px;
-    padding: 16px;
     min-height: 120px;
     resize: vertical;
 }
 
 input[type="text"] {
-    border-radius: 8px;
     padding: 12px;
 }
 
@@ -172,21 +168,10 @@ input[type="text"] {
     font-weight: 500;
 }
 
-.mensaje-error {
-    color: #ef4444;
-}
-
-.mensaje-exito {
-    color: #10b981;
-}
-
-.mensaje-error::before {
-    content: "⚠️";
-}
-
-.mensaje-exito::before {
-    content: "✅";
-}
+.mensaje-error { color: #ef4444; }
+.mensaje-exito { color: #10b981; }
+.mensaje-error::before { content: "⚠️"; }
+.mensaje-exito::before { content: "✅"; }
 
 /* --- Pasos y Progreso (Wizard/Stepper) --- */
 .step-indicator {
@@ -204,18 +189,18 @@ input[type="text"] {
 }
 
 .step-inactive {
-    background: var(--color-surface-2);
-    color: var(--color-text-secondary);
+    background: var(--color-surface-dark);
+    color: var(--color-text-light-secondary);
 }
 
 .step-completed {
     background: var(--color-primary);
-    color: var(--color-text-primary);
+    color: var(--color-text-light-primary);
 }
 
 .progress-bar {
     height: 4px;
-    background: var(--color-surface-2);
+    background: var(--color-surface-dark);
     border-radius: 2px;
     overflow: hidden;
 }
@@ -227,23 +212,8 @@ input[type="text"] {
 }
 
 /* --- Varios --- */
-.glass-effect {
-    background: var(--color-surface-1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border: 1px solid var(--color-border);
-}
-
-.nia-avatar {
-    width: 200px;
-    height: 200px;
-    border-radius: 50%;
-    border: 3px solid var(--color-secondary);
-    box-shadow: 0 0 30px rgba(79, 220, 154, 0.3);
-}
-
 .loading-spinner {
-    border: 3px solid var(--color-surface-2);
+    border: 3px solid var(--color-surface-dark);
     border-top: 3px solid var(--color-secondary);
     border-radius: 50%;
     width: 40px;
@@ -252,69 +222,156 @@ input[type="text"] {
 }
 
 /* =============================================
-   PÁGINA DE RESULTADOS
+   PÁGINA DE RESULTADOS (DISEÑO DASHBOARD)
    ============================================= */
 
-/* --- Contenedor de Resultado Final --- */
-.final-result-container {
+/* --- 1) Tarjeta Superior (Puntuación + Brechas) --- */
+.score-header-card {
+    display: flex;
+    background: var(--color-surface-dark);
+    border-radius: 20px;
+    padding: 32px;
+    align-items: center;
+    gap: 32px;
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+}
+
+.score-graphic-col {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-title-col {
+    flex: 2;
+}
+
+.score-title-col h2 {
+    margin: 0 0 12px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-light-primary);
+}
+
+.score-title-col p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-light-secondary);
+}
+
+.radial-progress-container {
+    position: relative;
+    width: 160px;
+    height: 160px;
+}
+
+.radial-progress-bar {
+    transform: rotate(-90deg);
+}
+
+.radial-progress-bar circle {
+    transition: stroke-dashoffset 1s ease-out;
+}
+
+.radial-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
-    margin: 35px 0;
 }
 
-.result-label {
-    font-size: 18px;
-    color: var(--color-text-secondary);
-    font-weight: 500;
-    margin-bottom: 8px;
-}
-
-#totalScore {
+.radial-score {
     font-size: 48px;
     font-weight: 800;
-    line-height: 1.1;
-    background: linear-gradient(to right, var(--color-secondary), var(--color-primary));
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+    color: var(--color-text-light-primary);
+    line-height: 1;
 }
 
-/* --- Diseño de Dimensiones en tarjetas individuales --- */
-.evaluation-details {
-    margin: 20px 0;
-    display: flex;
-    flex-direction: column;
-    gap: 20px; 
+.radial-score-label {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--color-text-light-secondary);
 }
 
-.dimension-item {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-    padding: 20px;
-    background: var(--color-surface-1);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 15px;
+/* --- 2) Detalle de Evaluación (Tema Oscuro con Iconos) --- */
+.evaluation-details-card {
+    background: var(--color-surface-dark);
+    border-radius: 20px;
+    padding: 32px;
     border: 1px solid var(--color-border);
+}
+
+.evaluation-details-card h2 {
+    margin: 0 0 24px 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.dimensions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.dimension-metric-card {
+    background: var(--color-bg-light);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.dimension-metric-card:before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--color-glow), transparent 80%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dimension-metric-card:hover {
+    border-color: var(--color-border);
+    transform: translateY(-4px);
+}
+
+.dimension-metric-card:hover:before {
+    opacity: 1;
 }
 
 .dimension-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.dimension-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--color-surface-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dimension-icon svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-primary);
 }
 
 .dimension-header h3 {
     margin: 0;
-    color: #f3f4f6;
-    font-size: 1.1em;
-    font-weight: 500;
-}
-
-.dimension-score {
+    font-size: 18px;
     font-weight: 600;
-    color: var(--color-text-primary);
-    font-size: 1.1em;
+    color: var(--color-text-light-primary);
 }
 
 .dimension-bar-container {
@@ -322,7 +379,7 @@ input[type="text"] {
     height: 8px;
     background-color: rgba(0,0,0,0.3);
     border-radius: 4px;
-    overflow: hidden;
+    margin-bottom: 8px;
 }
 
 .dimension-bar-fill {
@@ -332,109 +389,142 @@ input[type="text"] {
     transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
 }
 
+.dimension-score {
+    font-weight: 600;
+    color: var(--color-text-light-secondary);
+}
+
 .dimension-comment {
-    font-size: 0.9em;
-    color: var(--color-text-primary);
-    line-height: 1.5;
-    padding-left: 0;
+    font-size: 14px;
+    color: var(--color-text-light-secondary);
+    line-height: 1.6;
 }
 
-/* --- Bloques de Recomendación --- */
-.personalized-recommendation, .next-step-block {
-    padding: 30px;
-    border-radius: 15px;
-    margin: 35px 0;
-    text-align: center;
-}
-
-.personalized-recommendation {
-    background: var(--color-surface-1);
-    border: 1px solid var(--color-primary);
-}
-
-.personalized-recommendation h2, .next-step-block h2 {
-    margin:0;
-    margin-bottom: 15px;
-    color: var(--color-primary);
-    font-size: 1.3em;
-}
-
-.recommendation-content p, .next-step-content p {
-    font-size: 1.1em;
-    line-height: 1.7;
-    color: var(--color-text-primary);
-    font-weight: 500;
-}
-
-.next-step-block {
-    background: linear-gradient(135deg, rgba(79, 220, 154, 0.1) 0%, rgba(175, 134, 255, 0.1) 100%);
-    border: 2px solid var(--color-secondary);
-}
-
-.next-step-block h2 {
-    color: var(--color-secondary);
-}
-
-.next-step-icon {
-    font-size: 2em;
-    display: block;
-    margin-bottom: 10px;
-    animation: pulse-scale 2s infinite ease-in-out;
-}
-
-/* --- Bloque CTA (Call to Action) en 2 Columnas --- */
-.cta-section {
-    display: flex;
-    align-items: center;
-    gap: 30px;
-    margin: 40px 0;
-    padding: 30px;
-    background: var(--color-surface-2);
-    border-radius: 15px;
-    border-top: 1px solid var(--color-border);
-}
-
-.cta-image-col {
-    flex: 1;
-    background-color: rgba(0,0,0,0.2);
-    border-radius: 10px;
-    height: 250px;
+.cta-button-card {
     display: flex;
     align-items: center;
     justify-content: center;
-    color: var(--color-text-secondary);
-    font-style: italic;
-    border: 1px dashed var(--color-border);
+    gap: 12px;
+    background: var(--color-bg-light);
+    color: var(--color-text-light-primary);
+    border-radius: 15px;
+    padding: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
 }
 
-.cta-text-col {
+.cta-button-card:hover {
+    background: var(--color-surface-dark);
+    transform: translateY(-4px);
+}
+
+.cta-button-card .icon-placeholder {
+    width: 30px;
+    height: 30px;
+    background: var(--color-surface-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+/* --- 3) Siguiente Paso Estratégico --- */
+.next-step-card {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    background: var(--color-surface-dark);
+    border-radius: 20px;
+    padding: 32px;
+    margin-top: 24px;
+    border: 2px solid var(--color-secondary);
+}
+
+.nia-avatar-col {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+.nia-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-secondary);
+    box-shadow: 0 0 30px rgba(79, 220, 154, 0.3);
+}
+
+.next-step-text-col {
     flex: 2;
-    text-align: left;
 }
 
-.cta-text-col h2 {
-   color: var(--color-text-primary);
-   font-size: 1.5em;
-   margin-top: 0;
+.next-step-text-col h2 {
+    margin: 0 0 16px 0;
+    color: var(--color-secondary);
+    font-size: 22px;
 }
-.cta-text-col p {
-    color: var(--color-text-secondary);
+
+.next-step-text-col p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--color-text-light-secondary);
+}
+
+/* --- 4) CTA Final --- */
+.final-cta-section {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin: 24px 0;
+    padding: 32px;
+    background: var(--color-surface-dark);
+    border-radius: 20px;
+    border: 1px solid var(--color-primary);
+}
+
+.final-cta-text-col {
+    flex: 2;
+    padding-left: 16px; /* Padding izquierdo para el texto */
+}
+
+.final-cta-image-col {
+    flex: 1;
+}
+
+.final-cta-image-col img {
+    width: 100%;
+    border-radius: 15px;
+    height: auto;
+}
+
+.final-cta-text-col h2 {
+   font-size: 22px;
+   margin: 0 0 12px 0;
+}
+.final-cta-text-col p {
+    color: var(--color-text-light-secondary);
     line-height: 1.6;
+    margin: 0 0 16px 0;
 }
 
 .cta-button {
     background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
     color: #1a1a1a;
-    padding: 12px 32px;
+    padding: 12px 24px;
     border: none;
-    border-radius: 9999px; /* Botón tipo píldora */
-    font-size: 1.1em;
+    border-radius: 9999px;
+    font-size: 16px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 15px;
     transition: transform 0.2s ease, box-shadow 0.2s ease;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
     text-decoration: none;
+    margin-bottom: 16px; /* Espacio inferior para separar del warning */
 }
 
 .cta-button:hover {
@@ -443,10 +533,9 @@ input[type="text"] {
 }
 
 .warning {
-    color: #c4b5fd; /* Color lila suave */
+    color: #c4b5fd;
     font-weight: 500;
-    font-size: 0.875rem; /* Texto más pequeño */
-    margin-top: 15px;
+    font-size: 14px;
 }
 
 /* --- Footer --- */
@@ -454,8 +543,7 @@ input[type="text"] {
     text-align: center;
     margin-top: 50px;
     padding-bottom: 20px;
-    color: var(--color-text-secondary);
-    font-style: normal;
+    color: var(--color-text-light-secondary);
 }
 
 /* =============================================
@@ -502,26 +590,22 @@ input[type="text"] {
 /* =============================================
    Diseño Responsivo (Media Queries)
    ============================================= */
-@media (max-width: 768px) {
-    .nia-avatar {
-        width: 200px;
-        height: 200px;
+@media (max-width: 1024px) {
+    .score-header-card, .next-step-card, .final-cta-section {
+        flex-direction: column;
+        text-align: center;
     }
+    .final-cta-section {
+        flex-direction: column-reverse;
+    }
+    .final-cta-text-col {
+        padding-left: 0;
+    }
+}
 
+@media (max-width: 768px) {
     textarea {
         min-height: 100px;
-    }
-
-    .cta-section {
-        flex-direction: column;
-        padding: 20px;
-    }
-    .cta-image-col {
-        width: 100%;
-        height: 150px;
-    }
-    .dimension-item {
-        padding: 15px;
     }
 }
 
@@ -741,119 +825,113 @@ input[type="text"] {
                 </div>
 
                 <!-- PANTALLA DE RESULTADOS -->
-                <div id="resultsScreen" class="screen" style="display: none;">
+                <div id="resultsScreen" class="screen" style="display: block;">
                     <div class="container">
                         <h1 class="main-title">✨ <span id="userFirstName">Carlos</span>, tu diagnóstico está listo</h1>
-                
-                        <!-- Resultado Final -->
-                        <div class="final-result-container">
-                            <p class="result-label">Resultado final</p>
-                            <div id="totalScore">--/25 puntos</div>
-                            <div id="scorePercent" class="percentage-display">--%</div>
+            
+                        <!-- 1) Div Superior: Puntuación y Brechas -->
+                        <div class="score-header-card">
+                            <div class="score-graphic-col">
+                                <div class="radial-progress-container">
+                                    <svg class="radial-progress-bar" width="160" height="160" viewBox="0 0 160 160">
+                                        <defs>
+                                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stop-color="var(--color-secondary)" />
+                                                <stop offset="100%" stop-color="var(--color-primary)" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="12"></circle>
+                                        <circle id="progress-circle" cx="80" cy="80" r="70" fill="none" stroke="url(#progressGradient)" stroke-width="12" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="440"></circle>
+                                    </svg>
+                                    <div class="radial-progress-text">
+                                        <div id="score-value" class="radial-score">21</div>
+                                        <div class="radial-score-label">puntos</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="score-title-col">
+                                <h2 id="totalScore">Obtuviste 21/25 puntos</h2>
+                                <p id="principalesBrechasText">Tu narrativa es completamente genérica y repetitiva. Sin cliente específico, sin dolor claro, sin diferenciación = invisibilidad total en el mercado. Estás perdiendo clientes AHORA porque no comunicas valor real. Necesitas urgente una narrativa que conecte, convenza y convierta. ⏰</p>
+                            </div>
+                        </div>
+            
+                        <!-- 2) Div Detalle de Evaluación -->
+                        <div class="evaluation-details-card">
+                            <h2>Detalle de tu Evaluación</h2>
+                            <div class="dimensions-grid">
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg></div>
+                                        <h3>Foco en el Cliente y su Dolor</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="focoClienteBar" class="dimension-bar-fill" style="width: 100%;"></div></div>
+                                    <p id="focoClienteComment" class="dimension-comment">¡Excelente! Demuestras un profundo entendimiento de las necesidades y problemas de tus clientes.</p>
+                                </div>
+                                 <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg></div>
+                                        <h3>Promesa de Transformación</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="promesaTransformacionBar" class="dimension-bar-fill" style="width: 80%;"></div></div>
+                                    <p id="promesaTransformacionComment" class="dimension-comment">Tu promesa es clara, pero podrías cuantificar más el resultado final para hacerla irresistible.</p>
+                                </div>
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286Z" /></svg></div>
+                                        <h3>Autoridad y Confianza</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="autoridadConfianzaBar" class="dimension-bar-fill" style="width: 80%;"></div></div>
+                                    <p id="autoridadConfianzaComment" class="dimension-comment">Proyectas confianza. Añadir testimonios en video o estudios de caso podría elevarla al máximo nivel.</p>
+                                </div>
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.311a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0" /></svg></div>
+                                        <h3>Diferenciación</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="diferenciacionBar" class="dimension-bar-fill" style="width: 60%;"></div></div>
+                                    <p id="diferenciacionComment" class="dimension-comment">Tu propuesta es única, pero podrías destacar más claramente por qué eres la única opción viable.</p>
+                                </div>
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                       <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg></div>
+                                        <h3>Oferta de Valor</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="ofertaValorBar" class="dimension-bar-fill" style="width: 100%;"></div></div>
+                                    <p id="ofertaValorComment" class="dimension-comment">Tu oferta es clara, directa y muy atractiva. ¡Un trabajo impecable!</p>
+                                </div>
+                                <a href="#final-cta" class="cta-button-card">
+                                    <span class="icon-placeholder">📄</span>
+                                    <span>Recibir Informe Completo y Plan de Acción</span>
+                                </a>
+                            </div>
+                        </div>
+            
+                        <!-- 3) Div Siguiente Paso Estratégico -->
+                        <div id="nextStepBlock" class="next-step-card">
+                            <div class="nia-avatar-col">
+                                <img src="img/nia.png" alt="Avatar de NIA" class="nia-avatar" onerror="this.onerror=null;this.src='https://placehold.co/150x150/AF86FF/1A1B26?text=NIA';">
+                            </div>
+                            <div class="next-step-text-col">
+                                <h2>Tu Siguiente Paso Estratégico</h2>
+                                <div class="next-step-content">
+                                    <p id="proximopasoText">Enfócate en crear una "Propuesta Única de Valor" (PUV) tan clara y potente que tus competidores parezcan irrelevantes.</p>
+                                </div>
+                            </div>
                         </div>
                         
-                        <h2 class="sub-section-title">Acá el detalle de tu evaluación</h2>
-                        <div class="evaluation-details">
-                            <!-- Foco en el Cliente y su Dolor -->
-                            <div class="dimension-item">
-                                <div class="dimension-header">
-                                    <h3>Foco en el Cliente y su Dolor</h3>
-                                    <span id="focoClienteScore" class="dimension-score">--/5</span>
-                                </div>
-                                <div class="dimension-bar-container">
-                                   <div id="focoClienteBar" class="dimension-bar-fill" style="width: 0%;"></div>
-                                </div>
-                                <div class="dimension-comment">
-                                    <span id="focoClienteComment">Analizando tu enfoque en el cliente...</span>
-                                </div>
-                            </div>
-                
-                            <!-- Promesa de Transformación -->
-                            <div class="dimension-item">
-                                <div class="dimension-header">
-                                    <h3>Promesa de Transformación</h3>
-                                    <span id="promesaTransformacionScore" class="dimension-score">--/5</span>
-                                </div>
-                                 <div class="dimension-bar-container">
-                                   <div id="promesaTransformacionBar" class="dimension-bar-fill" style="width: 0%;"></div>
-                                </div>
-                                <div class="dimension-comment">
-                                     <span id="promesaTransformacionComment">Evaluando tu promesa de valor...</span>
-                                </div>
-                            </div>
-                
-                            <!-- Autoridad y Confianza -->
-                            <div class="dimension-item">
-                                <div class="dimension-header">
-                                    <h3>Autoridad y Confianza</h3>
-                                    <span id="autoridadConfianzaScore" class="dimension-score">--/5</span>
-                                </div>
-                                 <div class="dimension-bar-container">
-                                   <div id="autoridadConfianzaBar" class="dimension-bar-fill" style="width: 0%;"></div>
-                                </div>
-                                <div class="dimension-comment">
-                                     <span id="autoridadConfianzaComment">Midiendo tu credibilidad...</span>
-                                </div>
-                            </div>
-                
-                            <!-- Diferenciación -->
-                            <div class="dimension-item">
-                                <div class="dimension-header">
-                                    <h3>Diferenciación</h3>
-                                    <span id="diferenciacionScore" class="dimension-score">--/5</span>
-                                </div>
-                                 <div class="dimension-bar-container">
-                                   <div id="diferenciacionBar" class="dimension-bar-fill" style="width: 0%;"></div>
-                                </div>
-                                <div class="dimension-comment">
-                                     <span id="diferenciacionComment">Analizando tu diferenciación...</span>
-                                </div>
-                            </div>
-                
-                            <!-- Oferta de Valor -->
-                            <div class="dimension-item">
-                                <div class="dimension-header">
-                                    <h3>Oferta de Valor</h3>
-                                    <span id="ofertaValorScore" class="dimension-score">--/5</span>
-                                </div>
-                                 <div class="dimension-bar-container">
-                                   <div id="ofertaValorBar" class="dimension-bar-fill" style="width: 0%;"></div>
-                                </div>
-                                <div class="dimension-comment">
-                                     <span id="ofertaValorComment">Evaluando tu propuesta de valor...</span>
-                                </div>
-                            </div>
-                        </div>
-                
-                        <!-- Principales Brechas -->
-                        <div id="personalizedRecommendation" class="personalized-recommendation">
-                            <h2>Principales Brechas</h2>
-                            <div class="recommendation-content">
-                                <p id="principalesBrechasText">Analizando tus principales oportunidades de mejora...</p>
-                            </div>
-                        </div>
-                
-                        <!-- Tu Siguiente Paso Estratégico -->
-                        <div id="nextStepBlock" class="next-step-block">
-                            <span class="next-step-icon">🚀</span>
-                            <h2>Tu Siguiente Paso Estratégico</h2>
-                            <div class="next-step-content">
-                                <p id="proximopasoText">Preparando tu recomendación personalizada...</p>
-                            </div>
-                        </div>
-                
-                        <!-- CTA Final -->
-                        <div class="cta-section">
-                            <div class="cta-image-col">
-                                <span>[Imagen de Informe Completo]</span>
-                            </div>
-                            <div class="cta-text-col">
-                                <h2>¿Quieres tu informe completo?🚀</h2>
-                                <p>Agenda una 🗓️ sesión estratégica gratuita con Carlos, y en sólo 45 minutos recibirás la retroalimentación completa de tu narrativa y te mostrará un plan claro y personalizado para que más clientes valoren tu marca.</p>
-                                <p class="warning">⚠️ Solo para empresas con ventas activas y compromiso real con su crecimiento.</p>
+                        <!-- 4) Div CTA Final -->
+                        <div id="final-cta" class="final-cta-section">
+                            <div class="final-cta-text-col">
+                                <h2>¿Quieres el análisis detallado de pilar?</h2>
+                                <p>Agenda una sesión gratuita con Carlos y recibe tu informe completo más tu plan de acción personalizado, para cerrar tus brechas y transformar tu narrativa en ventas.</p>
                                 <a href="https://calendly.com/tu-link" target="_blank" class="cta-button">
-                                    Postular a la Sesión 1:1 + Informe avanzado
+                                    <i class="fa-regular fa-calendar-days"></i>
+                                    <span>Postular a la Sesión 1:1 + Plan de Acción</span>
                                 </a>
+                                <p class="warning">⚠️ Solo para empresas con ventas activas y compromiso real con su crecimiento.</p>
+                            </div>
+                            <div class="final-cta-image-col">
+                                <img src="img/informe.png" alt="Imagen del informe detallado" onerror="this.onerror=null;this.src='https://placehold.co/600x400/212230/A0A3B1?text=Informe+Detallado';">
                             </div>
                         </div>
                         
