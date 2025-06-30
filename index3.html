@@ -637,27 +637,23 @@
                 </div>
 
                 <!-- Results Screen -->
-                <div id="resultsScreen" style="display: none;">
-                    <div class="glass-effect rounded-3xl p-8 fade-in">
-                        <div class="text-center mb-8">
-                            <h2 class="text-3xl font-bold mb-4">✨ <span id="resultName"></span> tu diagnóstico está listo</h2>
-                            <div class="mb-6 text-center">
-                                <p class="text-lg text-gray-400 mb-2">Resultado final</p>
-                                <p class="text-5xl font-extrabold text-transparent bg-clip-text" style="background-image: linear-gradient(to right, #50DB9A, #AF86FF);">
-                                    <span id="totalScore">--</span>/25 puntos
-                                </p>
-                            </div>
-                            <div id="scoreCircle" class="hidden">
-                                <span id="scorePercentage">--%</span>
+                <div id="resultsScreen" class="screen" style="display: none;">
+                    <div class="container">
+                        <h1 class="section-title">✨ tu diagnóstico está listo</h1>
+        
+                        <!-- Resultado final -->
+                        <div class="result-summary">
+                            <h2>Resultado final</h2>
+                            <div class="score-display">
+                                <span id="totalScore">--/25 puntos</span>
+                                <div class="percentage">
+                                    <span id="scorePercent">--%</span>
+                                </div>
                             </div>
                         </div>
-
-                        <div class="mb-8">
-                            <h3 class="text-xl font-bold mb-3">Acá el detalle de tu evaluación</h3>
-
-                            
-                          <!--Acá el detalle de tu evaluación -->
-
+                
+                        <h2 class="section-title">Acá el detalle de tu evaluación</h2>
+                        
                         <div class="evaluation-details">
                             <!-- Foco en el Cliente y su Dolor -->
                             <div class="dimension-item">
@@ -669,7 +665,7 @@
                                     Analizando tu enfoque en el cliente...
                                 </div>
                             </div>
-                        
+                
                             <!-- Promesa de Transformación -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
@@ -680,7 +676,7 @@
                                     Evaluando tu promesa de valor...
                                 </div>
                             </div>
-                        
+                
                             <!-- Autoridad y Confianza -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
@@ -691,7 +687,7 @@
                                     Midiendo tu credibilidad...
                                 </div>
                             </div>
-                        
+                
                             <!-- Diferenciación -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
@@ -702,7 +698,7 @@
                                     Analizando tu diferenciación...
                                 </div>
                             </div>
-                        
+                
                             <!-- Oferta de Valor -->
                             <div class="dimension-item">
                                 <div class="dimension-header">
@@ -714,13 +710,7 @@
                                 </div>
                             </div>
                         </div>
-
-                            <!--div id="dimensionsResults" class="space-y-4">
-                            
-                            <!-- Dimensions will be populated by JavaScript -->
-                            </div>
-                        </div>
-
+                
                         <!-- Principales Brechas -->
                         <div id="personalizedRecommendation" class="personalized-recommendation centered-content">
                             <h2>Principales Brechas</h2>
@@ -728,7 +718,7 @@
                                 <p id="principalesBrechasText">Analizando tus principales oportunidades de mejora...</p>
                             </div>
                         </div>
-                        
+                
                         <!-- Tu Siguiente Paso Estratégico -->
                         <div id="nextStepBlock" class="next-step-block centered-content">
                             <div class="next-step-header">
@@ -739,36 +729,19 @@
                                 <p id="proximopasoText">Preparando tu recomendación personalizada...</p>
                             </div>
                         </div>
-
-                        
-                                <!-- Personalized recommendation will be populated by AI -->
-                            </div>
-                        </div>
-
-                        <div class="text-center space-y-4">
-                            <p class="text-2xl font-bold text-gray-200 mb-6">¿Quieres tene tu informe completo?🚀</p>
-                            <p class="text-gray-300 mb-6">
-                                Agenda una 
-                                <span class="font-bold text-white">🗓️ sesión estratégica gratuita con Carlos</span>, y en sólo 45 minutos recibirás la restroalimentación completa de tu narrativa y te mostrará un plan claro y personalizado para que más clientes valoren tu marca.
-                            </p>
-                            <p class="text-purple-300 text-sm mb-6">⚠️ Solo para empresas con ventas activas y compromiso real con su crecimiento.</p>
-                            
-                            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                                <a href="https://calendly.com/chenriquezlobos/sesionestrategica" class="btn-primary" target="_blank" rel="noopener">
-                                    <i class="fas fa-calendar-alt mr-2"></i>
-                                    Postular a la Sesión 1:1 + Informe avanzado
-                                </a>
-                            </div>
-                        </div>
-
-                        <div class="text-center mt-12">
-                            <p class="text-gray-400 mb-2">Con cariño,</p>
-                            <p class="text-purple-400 font-semibold">NIA 💜 by Vicerales</p>
+                
+                        <!-- CTA Final -->
+                        <div class="cta-section">
+                            <h2>¿Quieres tener tu informe completo?🚀</h2>
+                            <p>Agenda una 🗓️ sesión estratégica gratuita con Carlos, y en sólo 45 minutos recibirás la retroalimentación completa de tu narrativa y te mostrará un plan claro y personalizado para que más clientes valoren tu marca.</p>
+                            <p class="warning">⚠️ Solo para empresas con ventas activas y compromiso real con su crecimiento.</p>
+                            <button onclick="window.open('https://calendly.com/tu-link', '_blank')" class="cta-button">
+                                Postular a la Sesión 1:1 + Informe avanzado
+                            </button>
+                            <p class="signature">Con cariño,<br><strong>NIA 💜 by Vicerales</strong></p>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
         <!-- Footer -->
         <footer class="text-center py-4 text-gray-500 text-sm">
