@@ -71,11 +71,10 @@ body {
 .w-full.max-w-2xl {
     margin-top: 0;
     padding-top: 0;
-    max-width: none !important; /* ← AÑADE ESTA LÍNEA CRÍTICA */
 }
 
 #resultsScreen .w-full.max-w-2xl {
-    max-width: none !important;
+    max-width: none !important; /* MANTENER: Solo para resultados */
 }
 
 /* =============================================
@@ -106,12 +105,11 @@ body {
 
 /* PREGUNTAS: Ancho estándar */
 .container {
-    max-width: 900px;
+    max-width: 9000px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
-/* RESULTADOS: Ancho base ampliado */
 #resultsScreen .container {
     max-width: 1400px;
     padding: 0 20px;
@@ -632,91 +630,188 @@ textarea {
 /* =============================================
    MEDIA QUERIES UNIFICADOS - SIN SOLAPAMIENTOS
    ============================================= */
+/* Desktop (1024px+) - Control del contenedor principal */
+@media (min-width: 1024px) {
+    /* CLAVE: Controlar el contenedor padre para contenido general */
+    .w-full.max-w-2xl {
+        max-width: 1000px !important; /* Tu ancho deseado */
+        margin: 0 auto;
+    }
+    
+    /* El container general toma el 100% de su padre (1000px) */
+    .container {
+        max-width: 100%;
+        padding: 0 30px;
+    }
+    
+    /* Resultados mantienen su expansión */
+    #resultsScreen .container {
+        max-width: 1100px;
+        padding: 0 30px;
+    }
+    
+    /* ELEMENTOS EN 2 COLUMNAS - REAFIRMACIÓN EXPLÍCITA */
+    .score-header-card,
+    .next-step-card,
+    .final-cta-section {
+        display: flex;
+        flex-direction: row !important; /* Forzar fila en desktop */
+        align-items: center;
+        text-align: left;
+        gap: 32px;
+        padding: 32px;
+    }
+    
+    .final-cta-section {
+        flex-direction: row !important; /* Imagen a la derecha */
+    }
+    
+    .final-cta-text-col {
+        padding-left: 16px;
+    }
+    
+    /* Proporciones de columnas */
+    .score-graphic-col { flex: 1; }
+    .score-title-col { flex: 2; }
+    .nia-avatar-col { flex: 1; }
+    .next-step-text-col { flex: 2; }
+    .final-cta-text-col { flex: 2; }
+    .final-cta-image-col { flex: 1; }
+}
+
+/* Desktop Mediano (1200px+) */
+@media (min-width: 1200px) {
+    .w-full.max-w-2xl {
+        max-width: 1000px !important; /* Mantener 1000px */
+    }
+    
+    .container {
+        padding: 0 40px;
+    }
+    
+    #resultsScreen .container {
+        max-width: 1300px;
+        padding: 0 40px;
+    }
+}
+
+/* Desktop Grande (1400px+) */
+@media (min-width: 1400px) {
+    .w-full.max-w-2xl {
+        max-width: 1000px !important; /* Mantener 1000px */
+    }
+    
+    .container {
+        padding: 0 50px;
+    }
+    
+    #resultsScreen .container {
+        max-width: 1500px;
+        padding: 0 50px;
+    }
+}
+
 /* Desktop Extra Grande (1600px+) */
 @media (min-width: 1600px) {
+    .w-full.max-w-2xl {
+        max-width: 1000px !important; /* Mantener 1000px */
+    }
+    
+    .container {
+        padding: 0 60px;
+    }
+    
     #resultsScreen .container {
         max-width: 1600px;
         padding: 0 60px;
     }
-    /* NUEVO: Ampliar el contenedor general */
-    .container {
-        max-width: 1600px;
-        padding: 0 60px;
-    }
 }
 
-/* Desktop Grande (1400px - 1599px) */
-@media (min-width: 1400px) and (max-width: 1599px) {
-    #resultsScreen .container {
-        max-width: 1500px;
-        padding: 0 50px;
-    }
-    /* NUEVO: Ampliar el contenedor general */
-    .container {
-        max-width: 1500px;
-        padding: 0 50px;
-    }
-}
-
-/* Desktop Mediano (1200px - 1399px) */
-@media (min-width: 1200px) and (max-width: 1399px) {
-    #resultsScreen .container {
-        max-width: 1300px;
-        padding: 0 40px;
-    }
-    /* NUEVO: Ampliar el contenedor general */
-    .container {
-        max-width: 1300px;
-        padding: 0 40px;
-    }
-}
-
-/* Desktop Pequeño (1024px - 1199px) */
-@media (min-width: 1024px) and (max-width: 1199px) {
-    #resultsScreen .container {
-        max-width: 1100px;
-        padding: 0 30px;
-    }
-    /* NUEVO: Ampliar el contenedor general */
-    .container {
-        max-width: 1100px;
-        padding: 0 30px;
+/* Tablet (769px - 1023px) */
+@media (min-width: 769px) and (max-width: 1023px) {
+    .w-full.max-w-2xl {
+        max-width: 900px !important;
+        margin: 0 auto;
     }
     
-    /* Resto de reglas existentes... */
+    .container {
+        max-width: 100%;
+        padding: 0 25px;
+    }
+    
+    #resultsScreen .container {
+        max-width: 950px;
+        padding: 0 25px;
+    }
+    
+    /* CAMBIO A COLUMNA ÚNICA */
+    .score-header-card,
+    .next-step-card,
+    .final-cta-section {
+        flex-direction: column !important;
+        text-align: center;
+    }
+    
+    .final-cta-section {
+        flex-direction: column-reverse !important;
+    }
+    
+    .final-cta-text-col {
+        padding-left: 0;
+    }
 }
 
+/* Móvil (768px y menos) */
+@media (max-width: 768px) {
+    .flex-1.flex.items-center.justify-center {
+        align-items: flex-start !important;
+        padding: 10px;
+        min-height: auto;
+    }
     
-    /* Elementos internos con espaciado optimizado */
+    .w-full.max-w-2xl {
+        max-width: 100% !important;
+        margin: 0 auto;
+    }
+    
+    .container {
+        padding: 0 15px;
+        max-width: 100%;
+    }
+    
+    #resultsScreen .container {
+        padding: 15px;
+        max-width: 100%;
+        width: 100%;
+    }
+    
+    /* COLUMNA ÚNICA EN MÓVIL */
     .score-header-card,
     .evaluation-details-card,
     .next-step-card,
     .final-cta-section {
         padding: 20px 15px;
         margin: 15px 0;
-        flex-direction: column;
+        flex-direction: column !important;
         text-align: center;
     }
     
     .final-cta-section {
-        flex-direction: column-reverse;
+        flex-direction: column-reverse !important;
     }
     
     .final-cta-text-col {
         padding-left: 0;
     }
     
-    /* Navbar móvil */
     #progressContainer .max-w-4xl {
         padding: 12px 15px;
     }
     
-    /* Formularios móvil */
     textarea {
         min-height: 100px;
     }
     
-    /* Eliminar efectos hover en móvil */
     .dimension-metric-card:hover {
         transform: none;
     }
