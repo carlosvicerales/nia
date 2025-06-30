@@ -71,6 +71,7 @@ body {
 .w-full.max-w-2xl {
     margin-top: 0;
     padding-top: 0;
+    max-width: none !important; /* ← AÑADE ESTA LÍNEA CRÍTICA */
 }
 
 #resultsScreen .w-full.max-w-2xl {
@@ -725,6 +726,23 @@ textarea {
     }
 }
 
+/* TEMPORAL - PARA DEBUGGING */
+[class*="max-w-"] {
+    border: 2px solid red !important;
+    position: relative;
+}
+
+[class*="max-w-"]:before {
+    content: attr(class);
+    position: absolute;
+    top: -20px;
+    left: 0;
+    background: red;
+    color: white;
+    font-size: 10px;
+    padding: 2px;
+    z-index: 9999;
+}
 
 
 
