@@ -10,19 +10,12 @@
     <style>
 /**
  * =================================================================
- * CSS COMPLETO, DEPURADO Y UNIFICADO (VERSIÓN FINAL)
+ * CSS DEFINITIVO DEPURADO - NIA DIAGNÓSTICO
  * =================================================================
- *
- * Mejoras:
- * 1.  Integración de los nuevos estilos de la página de resultados tipo dashboard.
- * 2.  Eliminación de clases y estilos redundantes u obsoletos.
- * 3.  Organización y limpieza general del código.
- * 4.  Uso de variables CSS para una paleta de colores consistente.
- *
  */
 
 /* =============================================
-   Variables y Estilos Base
+   Variables y Reset Global
    ============================================= */
 :root {
     --color-primary: #AF86FF;
@@ -36,7 +29,12 @@
     --color-glow: rgba(175, 134, 255, 0.1);
 }
 
-html {
+/* Reset limpio sin conflictos */
+html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    box-sizing: border-box;
     scroll-behavior: smooth;
 }
 
@@ -45,18 +43,86 @@ body {
     background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-light) 100%);
     min-height: 100vh;
     color: var(--color-text-light-primary);
-    padding: 20px;
 }
 
+/* =============================================
+   ESTRUCTURA PRINCIPAL - ALINEACIÓN SUPERIOR
+   ============================================= */
+
+/* Estructura principal sin centrado vertical */
+.min-h-screen {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 70px; /* Espacio para navbar fija */
+    margin: 0;
+}
+
+/* CLAVE: Alineación superior en todas las pantallas */
+.flex-1.flex.items-center.justify-center {
+    align-items: flex-start !important; /* Solución Problema 4 */
+    justify-content: center;
+    width: 100%;
+    padding: 20px 10px;
+    min-height: auto;
+}
+
+/* =============================================
+   NAVBAR FIJA SIN PADDING LATERAL
+   ============================================= */
+
+/* Solución Problema 5: Barra completamente pegada */
+#progressContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    padding: 0;
+    margin: 0;
+    z-index: 1000;
+    background: var(--color-bg-dark);
+}
+
+#progressContainer .max-w-4xl {
+    padding: 16px 20px; /* Solo padding interno necesario */
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+/* =============================================
+   CONTENEDORES - ANCHO DIFERENCIADO
+   ============================================= */
+
+/* PREGUNTAS: Ancho estándar (960px) */
 .container {
     max-width: 960px;
     margin: 0 auto;
     padding: 0 20px;
 }
 
+/* RESULTADOS: Ancho ampliado progresivo - Solución Problema 2 */
+#resultsScreen .container {
+    max-width: 1400px;
+    padding: 0 40px;
+    width: 95%;
+}
+
+/* Eliminar restricciones adicionales */
+#resultsScreen .w-full.max-w-2xl {
+    max-width: none !important;
+}
+
+.w-full.max-w-2xl {
+    margin-top: 0;
+    padding-top: 0;
+}
+
 /* =============================================
-   Tipografía y Títulos
+   COMPONENTES ESENCIALES
    ============================================= */
+
+/* Tipografía */
 .main-title {
     color: var(--color-text-light-primary);
     text-align: center;
@@ -65,13 +131,12 @@ body {
     font-weight: 700;
 }
 
-/* =============================================
-   Componentes Generales del Sitio
-   ============================================= */
-
-/* --- Botones --- */
-.btn-primary,
-.btn-secondary {
+/* Botones */
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+    color: var(--color-bg-dark);
+    padding: 12px 32px;
+    border-radius: 25px;
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
@@ -80,34 +145,16 @@ body {
     border: none;
 }
 
-.btn-primary {
-    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
-    color: var(--color-bg-dark);
-    padding: 12px 32px;
-    border-radius: 25px;
-}
-
 .btn-primary:hover {
     transform: translateY(-2px);
     box-shadow: 0 10px 25px rgba(79, 220, 154, 0.3);
 }
 
-.btn-secondary {
-    background: rgba(175, 134, 255, 0.2);
-    color: var(--color-primary);
-    border: 1px solid var(--color-primary);
-    padding: 10px 24px;
-    border-radius: 20px;
-}
-
-.btn-secondary:hover {
-    background: rgba(175, 134, 255, 0.3);
-    transform: translateY(-1px);
-}
-
-/* --- Formularios (Inputs y Textareas) --- */
+/* Formularios */
 textarea,
-input[type="text"] {
+input[type="text"],
+input[type="email"],
+input[type="tel"] {
     background: var(--color-bg-light);
     border: 1px solid var(--color-border);
     color: var(--color-text-light-primary);
@@ -116,18 +163,14 @@ input[type="text"] {
     transition: all 0.3s ease;
     border-radius: 12px;
     padding: 16px;
+    box-sizing: border-box;
 }
 
 textarea:focus,
-input[type="text"]:focus {
+input:focus {
     outline: none;
     border-color: var(--color-secondary);
     box-shadow: 0 0 0 3px rgba(79, 220, 154, 0.1);
-}
-
-textarea::placeholder,
-input[type="text"]::placeholder {
-    color: var(--color-text-light-secondary);
 }
 
 textarea {
@@ -135,21 +178,10 @@ textarea {
     resize: vertical;
 }
 
-input[type="text"] {
-    padding: 12px;
-}
-
-/* --- Validación de Campos --- */
-.campo-error,
-.campo-valido {
-    border-radius: 8px !important;
-    transition: all 0.3s ease !important;
-}
-
+/* Validación de campos */
 .campo-error {
     border: 2px solid #ef4444 !important;
     box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
-    background-color: rgba(239, 68, 68, 0.05) !important;
 }
 
 .campo-valido {
@@ -173,7 +205,7 @@ input[type="text"] {
 .mensaje-error::before { content: "⚠️"; }
 .mensaje-exito::before { content: "✅"; }
 
-/* --- Pasos y Progreso (Wizard/Stepper) --- */
+/* Progreso */
 .step-indicator {
     width: 30px;
     height: 30px;
@@ -193,11 +225,6 @@ input[type="text"] {
     color: var(--color-text-light-secondary);
 }
 
-.step-completed {
-    background: var(--color-primary);
-    color: var(--color-text-light-primary);
-}
-
 .progress-bar {
     height: 4px;
     background: var(--color-surface-dark);
@@ -211,7 +238,6 @@ input[type="text"] {
     transition: width 0.3s ease;
 }
 
-/* --- Varios --- */
 .loading-spinner {
     border: 3px solid var(--color-surface-dark);
     border-top: 3px solid var(--color-secondary);
@@ -222,10 +248,10 @@ input[type="text"] {
 }
 
 /* =============================================
-   PÁGINA DE RESULTADOS (DISEÑO DASHBOARD)
+   PÁGINA DE RESULTADOS - DISEÑO DASHBOARD
    ============================================= */
 
-/* --- 1) Tarjeta Superior (Puntuación + Brechas) --- */
+/* Tarjeta superior con gráfico radial */
 .score-header-card {
     display: flex;
     background: var(--color-surface-dark);
@@ -262,6 +288,7 @@ input[type="text"] {
     color: var(--color-text-light-secondary);
 }
 
+/* Gráfico radial */
 .radial-progress-container {
     position: relative;
     width: 160px;
@@ -297,7 +324,7 @@ input[type="text"] {
     color: var(--color-text-light-secondary);
 }
 
-/* --- 2) Detalle de Evaluación (Tema Oscuro con Iconos) --- */
+/* Evaluación detallada */
 .evaluation-details-card {
     background: var(--color-surface-dark);
     border-radius: 20px;
@@ -325,6 +352,8 @@ input[type="text"] {
     position: relative;
     overflow: hidden;
     transition: all 0.3s ease;
+    --mouse-x: 50%;
+    --mouse-y: 50%;
 }
 
 .dimension-metric-card:before {
@@ -361,11 +390,6 @@ input[type="text"] {
     align-items: center;
     justify-content: center;
 }
-.dimension-icon svg {
-    width: 20px;
-    height: 20px;
-    color: var(--color-primary);
-}
 
 .dimension-header h3 {
     margin: 0;
@@ -400,37 +424,7 @@ input[type="text"] {
     line-height: 1.6;
 }
 
-.cta-button-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    background: var(--color-bg-light);
-    color: var(--color-text-light-primary);
-    border-radius: 15px;
-    padding: 20px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-}
-
-.cta-button-card:hover {
-    background: var(--color-surface-dark);
-    transform: translateY(-4px);
-}
-
-.cta-button-card .icon-placeholder {
-    width: 30px;
-    height: 30px;
-    background: var(--color-surface-dark);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 14px;
-}
-
-/* --- 3) Siguiente Paso Estratégico --- */
+/* Siguiente paso estratégico */
 .next-step-card {
     display: flex;
     align-items: center;
@@ -447,6 +441,7 @@ input[type="text"] {
     display: flex;
     justify-content: center;
 }
+
 .nia-avatar {
     width: 150px;
     height: 150px;
@@ -473,7 +468,7 @@ input[type="text"] {
     color: var(--color-text-light-secondary);
 }
 
-/* --- 4) CTA Final --- */
+/* CTA final */
 .final-cta-section {
     display: flex;
     align-items: center;
@@ -487,7 +482,7 @@ input[type="text"] {
 
 .final-cta-text-col {
     flex: 2;
-    padding-left: 16px; /* Padding izquierdo para el texto */
+    padding-left: 16px;
 }
 
 .final-cta-image-col {
@@ -504,6 +499,7 @@ input[type="text"] {
    font-size: 22px;
    margin: 0 0 12px 0;
 }
+
 .final-cta-text-col p {
     color: var(--color-text-light-secondary);
     line-height: 1.6;
@@ -524,7 +520,7 @@ input[type="text"] {
     align-items: center;
     gap: 8px;
     text-decoration: none;
-    margin-bottom: 16px; /* Espacio inferior para separar del warning */
+    margin-bottom: 16px;
 }
 
 .cta-button:hover {
@@ -538,7 +534,6 @@ input[type="text"] {
     font-size: 14px;
 }
 
-/* --- Footer --- */
 .footer {
     text-align: center;
     margin-top: 50px;
@@ -547,22 +542,11 @@ input[type="text"] {
 }
 
 /* =============================================
-   Animaciones (Keyframes)
+   ANIMACIONES
    ============================================= */
 @keyframes float {
     0%, 100% { transform: translateY(0px); }
     50% { transform: translateY(-10px); }
-}
-
-@keyframes pulse-opacity {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-@keyframes pulse-scale {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.05); }
-    100% { transform: scale(1); }
 }
 
 @keyframes fadeIn {
@@ -575,200 +559,132 @@ input[type="text"] {
     100% { transform: rotate(360deg); }
 }
 
-.floating-animation {
-    animation: float 3s ease-in-out infinite;
-}
-
-.pulse-animation {
-    animation: pulse-opacity 2s ease-in-out infinite;
-}
-
-.fade-in {
-    animation: fadeIn 0.5s ease-in;
-}
+.floating-animation { animation: float 3s ease-in-out infinite; }
+.fade-in { animation: fadeIn 0.5s ease-in; }
 
 /* =============================================
-   Diseño Responsivo (Media Queries)
+   MEDIA QUERIES DEPURADAS - SIN SOLAPAMIENTO
    ============================================= */
-@media (max-width: 1024px) {
-    .score-header-card, .next-step-card, .final-cta-section {
+
+/* Desktop Extra Grande (1400px+) */
+@media (min-width: 1400px) {
+    #resultsScreen .container {
+        max-width: 1500px;
+        padding: 0 50px;
+    }
+}
+
+/* Desktop Grande (1200px - 1399px) */
+@media (min-width: 1200px) and (max-width: 1399px) {
+    #resultsScreen .container {
+        max-width: 1300px;
+        padding: 0 40px;
+    }
+}
+
+/* Desktop Mediano (1024px - 1199px) */
+@media (min-width: 1024px) and (max-width: 1199px) {
+    #resultsScreen .container {
+        max-width: 1100px;
+        padding: 0 30px;
+    }
+    
+    .score-header-card, 
+    .next-step-card, 
+    .final-cta-section {
         flex-direction: column;
         text-align: center;
     }
+    
     .final-cta-section {
         flex-direction: column-reverse;
     }
+    
     .final-cta-text-col {
         padding-left: 0;
     }
 }
 
+/* Tablet (769px - 1023px) */
+@media (min-width: 769px) and (max-width: 1023px) {
+    #resultsScreen .container {
+        max-width: 950px;
+        padding: 0 25px;
+    }
+    
+    .score-header-card, 
+    .next-step-card, 
+    .final-cta-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .final-cta-section {
+        flex-direction: column-reverse;
+    }
+    
+    .final-cta-text-col {
+        padding-left: 0;
+    }
+}
+
+/* Móvil (768px y menos) - Solución Problema 3 */
 @media (max-width: 768px) {
-    textarea {
-        min-height: 100px;
-    }
-}
-
-/* =============================================
-   CORRECCIONES FINALES DE LAYOUT Y ESPACIADO
-   ============================================= */
-
-/* Reset global limpio */
-html, body {
-    margin: 0 !important;
-    padding: 0 !important;
-    overflow-x: hidden;
-    box-sizing: border-box;
-}
-
-/* Eliminar padding del body que causa problemas */
-body {
-    padding: 0 !important;
-    max-width: none !important;
-}
-
-/* Estructura principal sin centrado vertical forzado */
-.min-h-screen {
-    display: flex;
-    flex-direction: column;
-    width: 100%;
-    padding-top: 70px; /* Espacio para navbar fija */
-    margin: 0;
-}
-
-/* Área de contenido principal - CLAVE: alineación superior */
-.flex-1.flex.items-center.justify-center {
-    align-items: flex-start !important; /* Cambio crítico: de center a flex-start */
-    justify-content: center;
-    width: 100%;
-    padding: 20px 10px;
-    min-height: auto;
-}
-
-/* Barra de navegación completamente pegada */
-#progressContainer {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    width: 100vw;
-    padding: 0 !important;
-    margin: 0 !important;
-    z-index: 1000;
-    background: var(--color-bg-dark);
-}
-
-#progressContainer .max-w-4xl {
-    padding: 16px 20px;
-    margin: 0 auto;
-    max-width: 100%;
-}
-
-/* ANCHO DIFERENCIADO: Preguntas vs Resultados */
-
-/* Preguntas mantienen ancho actual */
-.container {
-    max-width: 960px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Resultados: ANCHO AMPLIADO */
-#resultsScreen .container {
-    max-width: 1200px !important;
-    padding: 0 30px !important;
-    width: 95% !important;
-}
-
-/* Para pantallas grandes: aún más amplio */
-@media (min-width: 1400px) {
-    #resultsScreen .container {
-        max-width: 1400px !important;
-        padding: 0 40px !important;
-    }
-}
-
-@media (min-width: 1200px) and (max-width: 1399px) {
-    #resultsScreen .container {
-        max-width: 1200px !important;
-        padding: 0 30px !important;
-    }
-}
-
-@media (min-width: 1024px) and (max-width: 1199px) {
-    #resultsScreen .container {
-        max-width: 1000px !important;
-        padding: 0 25px !important;
-    }
-}
-
-/* MÓVIL: Optimización completa */
-@media (max-width: 768px) {
-    /* Alineamiento superior en móvil */
+    /* Alineamiento superior garantizado */
     .flex-1.flex.items-center.justify-center {
         align-items: flex-start !important;
-        padding: 10px !important;
-        min-height: auto !important;
+        padding: 10px;
+        min-height: auto;
     }
     
     /* Padding lateral optimizado */
     .container {
-        padding: 0 15px !important;
-        max-width: 100% !important;
+        padding: 0 15px;
+        max-width: 100%;
     }
     
     #resultsScreen .container {
-        padding: 15px !important;
-        max-width: 100% !important;
-        width: 100% !important;
+        padding: 15px;
+        max-width: 100%;
+        width: 100%;
     }
     
-    /* Elementos internos sin padding excesivo */
+    /* Elementos internos */
     .score-header-card,
     .evaluation-details-card,
     .next-step-card,
     .final-cta-section {
-        padding: 20px 15px !important;
-        margin: 15px 0 !important;
+        padding: 20px 15px;
+        margin: 15px 0;
+        flex-direction: column;
+        text-align: center;
     }
     
-    /* Navbar en móvil */
+    .final-cta-section {
+        flex-direction: column-reverse;
+    }
+    
+    .final-cta-text-col {
+        padding-left: 0;
+    }
+    
+    /* Navbar móvil */
     #progressContainer .max-w-4xl {
-        padding: 12px 15px !important;
+        padding: 12px 15px;
     }
     
-    /* Espacio superior correcto */
-    .min-h-screen {
-        padding-top: 70px !important;
-    }
-    
-    /* Eliminar efectos hover problemáticos en móvil */
+    /* Eliminar efectos hover en móvil */
     .dimension-metric-card:hover {
-        transform: none !important;
+        transform: none;
     }
     
     .dimension-metric-card:before {
-        display: none !important;
+        display: none;
     }
-}
-
-/* TABLET: Ajustes intermedios */
-@media (max-width: 1024px) and (min-width: 769px) {
-    #resultsScreen .container {
-        max-width: 900px !important;
-        padding: 0 25px !important;
+    
+    textarea {
+        min-height: 100px;
     }
-}
-
-/* Asegurar que no haya scroll superior */
-.w-full.max-w-2xl {
-    margin-top: 0 !important;
-    padding-top: 0 !important;
-}
-
-/* Para resultados: eliminar restricción de ancho */
-#resultsScreen .w-full.max-w-2xl {
-    max-width: none !important;
 }
 
 
