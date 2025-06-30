@@ -282,6 +282,129 @@
         .mensaje-exito::before {
             content: "✅";
         }
+        /* Estilos para las dimensiones con comentarios */
+        .dimension-item {
+            margin-bottom: 25px;
+            padding: 15px;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #9333ea;
+        }
+        
+        .dimension-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        
+        .dimension-header h3 {
+            margin: 0;
+            color: #333;
+            font-size: 1.1em;
+        }
+        
+        .dimension-score {
+            font-weight: bold;
+            color: #9333ea;
+            font-size: 1.2em;
+        }
+        
+        .dimension-comment {
+            font-size: 0.9em;
+            color: #666;
+            font-style: italic;
+            line-height: 1.4;
+            padding-left: 10px;
+            border-left: 2px solid #e0e0e0;
+        }
+        
+        /* Centrado para Principales Brechas */
+        .centered-content {
+            text-align: center;
+            margin: 30px 0;
+        }
+        
+        .centered-content h2 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #9333ea;
+        }
+        
+        .personalized-recommendation {
+            padding: 25px;
+            background: linear-gradient(135deg, #f8f4ff 0%, #e8d5ff 100%);
+            border-radius: 12px;
+            margin: 30px 0;
+        }
+        
+        .recommendation-content p {
+            text-align: center;
+            font-size: 1.05em;
+            line-height: 1.6;
+            color: #4a5568;
+        }
+        
+        /* Estilos destacados para Próximo Paso */
+        .next-step-block {
+            background: linear-gradient(135deg, #fff7ed 0%, #fed7aa 100%);
+            border: 2px solid #f97316;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 25px 0;
+            box-shadow: 0 4px 15px rgba(249, 115, 22, 0.15);
+            position: relative;
+        }
+        
+        .next-step-header {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .next-step-icon {
+            font-size: 1.8em;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+        
+        .next-step-block h2 {
+            color: #ea580c;
+            margin: 0;
+            font-size: 1.4em;
+            font-weight: 700;
+        }
+        
+        .next-step-content p {
+            color: #4a5568;
+            font-size: 1.05em;
+            line-height: 1.6;
+            margin: 0;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        /* Responsividad */
+        @media (max-width: 768px) {
+            .dimension-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .next-step-header {
+                flex-direction: column;
+                gap: 8px;
+            }
+        }
+
 
     </style>
 </head>
@@ -513,37 +636,105 @@
 
                         <div class="mb-8">
                             <h3 class="text-xl font-bold mb-3">Acá el detalle de tu evaluación</h3>
-                            <div id="dimensionsResults" class="space-y-4">
-                                <!-- Dimensions will be populated by JavaScript -->
+                            <!-- Estructura para cada dimensión -->
+                            <div class="dimension-item">
+                                <div class="dimension-header">
+                                    <h3>Foco en el Cliente y su Dolor</h3>
+                                    <span class="dimension-score" id="focoClienteScore">--/5</span>
+                                </div>
+                                <div class="dimension-comment" id="focoClienteComment">
+                                    <!-- Comentario de IA aparecerá aquí -->
+                                </div>
+                            </div>
+                            
+                            <div class="dimension-item">
+                                <div class="dimension-header">
+                                    <h3>Promesa de Transformación</h3>
+                                    <span class="dimension-score" id="promesaTransformacionScore">--/5</span>
+                                </div>
+                                <div class="dimension-comment" id="promesaTransformacionComment">
+                                    <!-- Comentario de IA aparecerá aquí -->
+                                </div>
+                            </div>
+                            
+                            <div class="dimension-item">
+                                <div class="dimension-header">
+                                    <h3>Autoridad y Confianza</h3>
+                                    <span class="dimension-score" id="autoridadConfianzaScore">--/5</span>
+                                </div>
+                                <div class="dimension-comment" id="autoridadConfianzaComment">
+                                    <!-- Comentario de IA aparecerá aquí -->
+                                </div>
+                            </div>
+                            
+                            <div class="dimension-item">
+                                <div class="dimension-header">
+                                    <h3>Diferenciación</h3>
+                                    <span class="dimension-score" id="diferenciacionScore">--/5</span>
+                                </div>
+                                <div class="dimension-comment" id="diferenciacionComment">
+                                    <!-- Comentario de IA aparecerá aquí -->
+                                </div>
+                            </div>
+                            
+                            <div class="dimension-item">
+                                <div class="dimension-header">
+                                    <h3>Oferta de Valor</h3>
+                                    <span class="dimension-score" id="ofertaValorScore">--/5</span>
+                                </div>
+                                <div class="dimension-comment" id="ofertaValorComment">
+                                    <!-- Comentario de IA aparecerá aquí -->
+                                </div>
+                            </div>
+                            Antiguio div
+                            <!--div id="dimensionsResults" class="space-y-4">
+                            
+                            <!-- Dimensions will be populated by JavaScript -->
                             </div>
                         </div>
 
                         <div class="mb-8 p-6 glass-effect rounded-xl">
                             <h3 class="text-xl font-bold mb-4 text-purple-400"><span id="personalizedRecommendationTitle">Recomendación personalizada</span></h3>
-                            <div id="personalizedRecommendation" class="text-gray-300 leading-relaxed">
+                            <div id="personalizedRecommendation" class="personalized-recommendation centered-content">
+                                <h2>Principales Brechas</h2>
+                                <div class="recommendation-content">
+                                    <p id="principalesBrechasText"></p>
+                                </div>
+                            </div>
+                            <div id="nextStepBlock" class="next-step-block centered-content">
+                                <div class="next-step-header">
+                                    <span class="next-step-icon">🚀</span>
+                                    <h2>Tu Siguiente Paso Estratégico</h2>
+                                </div>
+                                <div class="next-step-content">
+                                    <p id="proximopasoText"></p>
+                                </div>
+                            </div>
+
+                        
                                 <!-- Personalized recommendation will be populated by AI -->
                             </div>
                         </div>
 
                         <div class="text-center space-y-4">
-                            <p class="text-2xl font-bold text-gray-200 mb-6">¿Quieres llevarlo más lejos?🚀</p>
+                            <p class="text-2xl font-bold text-gray-200 mb-6">¿Quieres tene tu informe completo?🚀</p>
                             <p class="text-gray-300 mb-6">
-                                Si ya sabes que una mejor narrativa mejorará tu proceso comercial, entonces agenda una 
-                                <span class="font-bold text-white">🗓️ sesión estratégica gratuita con Carlos</span>, que en sólo 45 minutos, te mostrará un plan claro y personalizado para que más clientes valoren tu marca.
+                                Agenda una 
+                                <span class="font-bold text-white">🗓️ sesión estratégica gratuita con Carlos</span>, y en sólo 45 minutos recibirás la restroalimentación completa de tu narrativa y te mostrará un plan claro y personalizado para que más clientes valoren tu marca.
                             </p>
                             <p class="text-purple-300 text-sm mb-6">⚠️ Solo para empresas con ventas activas y compromiso real con su crecimiento.</p>
                             
                             <div class="flex flex-col sm:flex-row gap-4 justify-center">
                                 <a href="https://calendly.com/chenriquezlobos/sesionestrategica" class="btn-primary" target="_blank" rel="noopener">
                                     <i class="fas fa-calendar-alt mr-2"></i>
-                                    Postular a la Sesión 1:1
+                                    Postular a la Sesión 1:1 + Informe avanzado
                                 </a>
                             </div>
                         </div>
 
                         <div class="text-center mt-12">
                             <p class="text-gray-400 mb-2">Con cariño,</p>
-                            <p class="text-purple-400 font-semibold">NIA 💜</p>
+                            <p class="text-purple-400 font-semibold">NIA 💜 by Vicerales</p>
                         </div>
                     </div>
                 </div>
