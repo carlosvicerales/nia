@@ -1,0 +1,2355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagnóstico Inteligente de tu Narrativa Comercial - NIA</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+/**
+ * =================================================================
+ * CSS COMPLETO, DEPURADO Y UNIFICADO (VERSIÓN FINAL)
+ * =================================================================
+ *
+ * Mejoras:
+ * 1.  Integración de los nuevos estilos de la página de resultados tipo dashboard.
+ * 2.  Eliminación de clases y estilos redundantes u obsoletos.
+ * 3.  Organización y limpieza general del código.
+ * 4.  Uso de variables CSS para una paleta de colores consistente.
+ *
+ */
+
+/* =============================================
+   Variables y Estilos Base
+   ============================================= */
+:root {
+    --color-primary: #AF86FF;
+    --color-secondary: #4FDC9A;
+    --color-bg-dark: #10111A;
+    --color-bg-light: #1A1B26;
+    --color-surface-dark: #212230;
+    --color-text-light-primary: #F0F2F5;
+    --color-text-light-secondary: #A0A3B1;
+    --color-border: rgba(175, 134, 255, 0.15);
+    --color-glow: rgba(175, 134, 255, 0.1);
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background: linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-light) 100%);
+    min-height: 100vh;
+    color: var(--color-text-light-primary);
+    padding: 20px;
+}
+
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* =============================================
+   Tipografía y Títulos
+   ============================================= */
+.main-title {
+    color: var(--color-text-light-primary);
+    text-align: center;
+    margin-bottom: 40px;
+    font-size: 2em;
+    font-weight: 700;
+}
+
+/* =============================================
+   Componentes Generales del Sitio
+   ============================================= */
+
+/* --- Botones --- */
+.btn-primary,
+.btn-secondary {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 600;
+    border: none;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+    color: var(--color-bg-dark);
+    padding: 12px 32px;
+    border-radius: 25px;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(79, 220, 154, 0.3);
+}
+
+.btn-secondary {
+    background: rgba(175, 134, 255, 0.2);
+    color: var(--color-primary);
+    border: 1px solid var(--color-primary);
+    padding: 10px 24px;
+    border-radius: 20px;
+}
+
+.btn-secondary:hover {
+    background: rgba(175, 134, 255, 0.3);
+    transform: translateY(-1px);
+}
+
+/* --- Formularios (Inputs y Textareas) --- */
+textarea,
+input[type="text"] {
+    background: var(--color-bg-light);
+    border: 1px solid var(--color-border);
+    color: var(--color-text-light-primary);
+    width: 100%;
+    font-family: 'Inter', sans-serif;
+    transition: all 0.3s ease;
+    border-radius: 12px;
+    padding: 16px;
+}
+
+textarea:focus,
+input[type="text"]:focus {
+    outline: none;
+    border-color: var(--color-secondary);
+    box-shadow: 0 0 0 3px rgba(79, 220, 154, 0.1);
+}
+
+textarea::placeholder,
+input[type="text"]::placeholder {
+    color: var(--color-text-light-secondary);
+}
+
+textarea {
+    min-height: 120px;
+    resize: vertical;
+}
+
+input[type="text"] {
+    padding: 12px;
+}
+
+/* --- Validación de Campos --- */
+.campo-error,
+.campo-valido {
+    border-radius: 8px !important;
+    transition: all 0.3s ease !important;
+}
+
+.campo-error {
+    border: 2px solid #ef4444 !important;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1) !important;
+    background-color: rgba(239, 68, 68, 0.05) !important;
+}
+
+.campo-valido {
+    border: 2px solid #10b981 !important;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1) !important;
+}
+
+.mensaje-error,
+.mensaje-exito {
+    font-size: 12px;
+    margin-top: 4px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 500;
+}
+
+.mensaje-error { color: #ef4444; }
+.mensaje-exito { color: #10b981; }
+.mensaje-error::before { content: "⚠️"; }
+.mensaje-exito::before { content: "✅"; }
+
+/* --- Pasos y Progreso (Wizard/Stepper) --- */
+.step-indicator {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.step-active {
+    background: var(--color-secondary);
+    color: var(--color-bg-dark);
+}
+
+.step-inactive {
+    background: var(--color-surface-dark);
+    color: var(--color-text-light-secondary);
+}
+
+.step-completed {
+    background: var(--color-primary);
+    color: var(--color-text-light-primary);
+}
+
+.progress-bar {
+    height: 4px;
+    background: var(--color-surface-dark);
+    border-radius: 2px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+    transition: width 0.3s ease;
+}
+
+/* --- Varios --- */
+.loading-spinner {
+    border: 3px solid var(--color-surface-dark);
+    border-top: 3px solid var(--color-secondary);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+}
+
+/* =============================================
+   PÁGINA DE RESULTADOS (DISEÑO DASHBOARD)
+   ============================================= */
+
+/* --- 1) Tarjeta Superior (Puntuación + Brechas) --- */
+.score-header-card {
+    display: flex;
+    background: var(--color-surface-dark);
+    border-radius: 20px;
+    padding: 32px;
+    align-items: center;
+    gap: 32px;
+    border: 1px solid var(--color-border);
+    margin-bottom: 24px;
+}
+
+.score-graphic-col {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.score-title-col {
+    flex: 2;
+}
+
+.score-title-col h2 {
+    margin: 0 0 12px 0;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--color-text-light-primary);
+}
+
+.score-title-col p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--color-text-light-secondary);
+}
+
+.radial-progress-container {
+    position: relative;
+    width: 160px;
+    height: 160px;
+}
+
+.radial-progress-bar {
+    transform: rotate(-90deg);
+}
+
+.radial-progress-bar circle {
+    transition: stroke-dashoffset 1s ease-out;
+}
+
+.radial-progress-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+}
+
+.radial-score {
+    font-size: 48px;
+    font-weight: 800;
+    color: var(--color-text-light-primary);
+    line-height: 1;
+}
+
+.radial-score-label {
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--color-text-light-secondary);
+}
+
+/* --- 2) Detalle de Evaluación (Tema Oscuro con Iconos) --- */
+.evaluation-details-card {
+    background: var(--color-surface-dark);
+    border-radius: 20px;
+    padding: 32px;
+    border: 1px solid var(--color-border);
+}
+
+.evaluation-details-card h2 {
+    margin: 0 0 24px 0;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.dimensions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+.dimension-metric-card {
+    background: var(--color-bg-light);
+    border-radius: 15px;
+    padding: 20px;
+    border: 1px solid transparent;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.dimension-metric-card:before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0; bottom: 0; left: 0;
+    background: radial-gradient(circle at var(--mouse-x) var(--mouse-y), var(--color-glow), transparent 80%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.dimension-metric-card:hover {
+    border-color: var(--color-border);
+    transform: translateY(-4px);
+}
+
+.dimension-metric-card:hover:before {
+    opacity: 1;
+}
+
+.dimension-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.dimension-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    background: var(--color-surface-dark);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.dimension-icon svg {
+    width: 20px;
+    height: 20px;
+    color: var(--color-primary);
+}
+
+.dimension-header h3 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-light-primary);
+}
+
+.dimension-bar-container {
+    width: 100%;
+    height: 8px;
+    background-color: rgba(0,0,0,0.3);
+    border-radius: 4px;
+    margin-bottom: 8px;
+}
+
+.dimension-bar-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+    border-radius: 4px;
+    transition: width 0.8s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.dimension-score {
+    font-weight: 600;
+    color: var(--color-text-light-secondary);
+}
+
+.dimension-comment {
+    font-size: 14px;
+    color: var(--color-text-light-secondary);
+    line-height: 1.6;
+}
+
+.cta-button-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    background: var(--color-bg-light);
+    color: var(--color-text-light-primary);
+    border-radius: 15px;
+    padding: 20px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.cta-button-card:hover {
+    background: var(--color-surface-dark);
+    transform: translateY(-4px);
+}
+
+.cta-button-card .icon-placeholder {
+    width: 30px;
+    height: 30px;
+    background: var(--color-surface-dark);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+/* --- 3) Siguiente Paso Estratégico --- */
+.next-step-card {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    background: var(--color-surface-dark);
+    border-radius: 20px;
+    padding: 32px;
+    margin-top: 24px;
+    border: 2px solid var(--color-secondary);
+}
+
+.nia-avatar-col {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+.nia-avatar {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--color-secondary);
+    box-shadow: 0 0 30px rgba(79, 220, 154, 0.3);
+}
+
+.next-step-text-col {
+    flex: 2;
+}
+
+.next-step-text-col h2 {
+    margin: 0 0 16px 0;
+    color: var(--color-secondary);
+    font-size: 22px;
+}
+
+.next-step-text-col p {
+    margin: 0;
+    font-size: 16px;
+    line-height: 1.7;
+    color: var(--color-text-light-secondary);
+}
+
+/* --- 4) CTA Final --- */
+.final-cta-section {
+    display: flex;
+    align-items: center;
+    gap: 32px;
+    margin: 24px 0;
+    padding: 32px;
+    background: var(--color-surface-dark);
+    border-radius: 20px;
+    border: 1px solid var(--color-primary);
+}
+
+.final-cta-text-col {
+    flex: 2;
+    padding-left: 16px; /* Padding izquierdo para el texto */
+}
+
+.final-cta-image-col {
+    flex: 1;
+}
+
+.final-cta-image-col img {
+    width: 100%;
+    border-radius: 15px;
+    height: auto;
+}
+
+.final-cta-text-col h2 {
+   font-size: 22px;
+   margin: 0 0 12px 0;
+}
+.final-cta-text-col p {
+    color: var(--color-text-light-secondary);
+    line-height: 1.6;
+    margin: 0 0 16px 0;
+}
+
+.cta-button {
+    background: linear-gradient(135deg, var(--color-secondary) 0%, var(--color-primary) 100%);
+    color: #1a1a1a;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 9999px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    margin-bottom: 16px; /* Espacio inferior para separar del warning */
+}
+
+.cta-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(79, 220, 154, 0.2);
+}
+
+.warning {
+    color: #c4b5fd;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+/* --- Footer --- */
+.footer {
+    text-align: center;
+    margin-top: 50px;
+    padding-bottom: 20px;
+    color: var(--color-text-light-secondary);
+}
+
+/* =============================================
+   Animaciones (Keyframes)
+   ============================================= */
+@keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-opacity {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+@keyframes pulse-scale {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.floating-animation {
+    animation: float 3s ease-in-out infinite;
+}
+
+.pulse-animation {
+    animation: pulse-opacity 2s ease-in-out infinite;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+/* =============================================
+   Diseño Responsivo (Media Queries)
+   ============================================= */
+@media (max-width: 1024px) {
+    .score-header-card, .next-step-card, .final-cta-section {
+        flex-direction: column;
+        text-align: center;
+    }
+    .final-cta-section {
+        flex-direction: column-reverse;
+    }
+    .final-cta-text-col {
+        padding-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    textarea {
+        min-height: 100px;
+    }
+}
+
+/* =============================================
+   CORRECCIONES FINALES DE LAYOUT Y ESPACIADO
+   ============================================= */
+
+/* Reset global limpio */
+html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+/* Eliminar padding del body que causa problemas */
+body {
+    padding: 0 !important;
+    max-width: none !important;
+}
+
+/* Estructura principal sin centrado vertical forzado */
+.min-h-screen {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    padding-top: 70px; /* Espacio para navbar fija */
+    margin: 0;
+}
+
+/* Área de contenido principal - CLAVE: alineación superior */
+.flex-1.flex.items-center.justify-center {
+    align-items: flex-start !important; /* Cambio crítico: de center a flex-start */
+    justify-content: center;
+    width: 100%;
+    padding: 20px 10px;
+    min-height: auto;
+}
+
+/* Barra de navegación completamente pegada */
+#progressContainer {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100vw;
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 1000;
+    background: var(--color-bg-dark);
+}
+
+#progressContainer .max-w-4xl {
+    padding: 16px 20px;
+    margin: 0 auto;
+    max-width: 100%;
+}
+
+/* ANCHO DIFERENCIADO: Preguntas vs Resultados */
+
+/* Preguntas mantienen ancho actual */
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Resultados: ANCHO AMPLIADO */
+#resultsScreen .container {
+    max-width: 1200px !important;
+    padding: 0 30px !important;
+    width: 95% !important;
+}
+
+/* Para pantallas grandes: aún más amplio */
+@media (min-width: 1400px) {
+    #resultsScreen .container {
+        max-width: 1400px !important;
+        padding: 0 40px !important;
+    }
+}
+
+@media (min-width: 1200px) and (max-width: 1399px) {
+    #resultsScreen .container {
+        max-width: 1200px !important;
+        padding: 0 30px !important;
+    }
+}
+
+@media (min-width: 1024px) and (max-width: 1199px) {
+    #resultsScreen .container {
+        max-width: 1000px !important;
+        padding: 0 25px !important;
+    }
+}
+
+/* MÓVIL: Optimización completa */
+@media (max-width: 768px) {
+    /* Alineamiento superior en móvil */
+    .flex-1.flex.items-center.justify-center {
+        align-items: flex-start !important;
+        padding: 10px !important;
+        min-height: auto !important;
+    }
+    
+    /* Padding lateral optimizado */
+    .container {
+        padding: 0 15px !important;
+        max-width: 100% !important;
+    }
+    
+    #resultsScreen .container {
+        padding: 15px !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    
+    /* Elementos internos sin padding excesivo */
+    .score-header-card,
+    .evaluation-details-card,
+    .next-step-card,
+    .final-cta-section {
+        padding: 20px 15px !important;
+        margin: 15px 0 !important;
+    }
+    
+    /* Navbar en móvil */
+    #progressContainer .max-w-4xl {
+        padding: 12px 15px !important;
+    }
+    
+    /* Espacio superior correcto */
+    .min-h-screen {
+        padding-top: 70px !important;
+    }
+    
+    /* Eliminar efectos hover problemáticos en móvil */
+    .dimension-metric-card:hover {
+        transform: none !important;
+    }
+    
+    .dimension-metric-card:before {
+        display: none !important;
+    }
+}
+
+/* TABLET: Ajustes intermedios */
+@media (max-width: 1024px) and (min-width: 769px) {
+    #resultsScreen .container {
+        max-width: 900px !important;
+        padding: 0 25px !important;
+    }
+}
+
+/* Asegurar que no haya scroll superior */
+.w-full.max-w-2xl {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+/* Para resultados: eliminar restricción de ancho */
+#resultsScreen .w-full.max-w-2xl {
+    max-width: none !important;
+}
+
+
+    </style>
+</head>
+<body class="text-white">
+    <div class="min-h-screen flex flex-col">
+        <!-- Progress Bar -->
+        <div id="progressContainer" class="w-full bg-gray-800 p-4" style="display: none;">
+            <div class="max-w-4xl mx-auto">
+                <div class="progress-bar mb-4">
+                    <div id="progressBar" class="progress-fill" style="width: 0%"></div>
+                </div>
+                <div class="flex justify-between items-center">
+                    <div class="flex space-x-4">
+                        <div id="step1" class="step-indicator step-active">1</div>
+                        <div id="step2" class="step-indicator step-inactive">2</div>
+                        <div id="step3" class="step-indicator step-inactive">3</div>
+                        <div id="step4" class="step-indicator step-inactive">4</div>
+                        <div id="step5" class="step-indicator step-inactive">5</div>
+                        <div id="step6" class="step-indicator step-inactive">📋</div>
+                    </div>
+                    <div class="text-sm text-gray-400">
+                        Paso <span id="currentStep">1</span> de 6
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="flex-1 flex items-center justify-center p-4">
+            <div class="w-full max-w-2xl">
+                <!-- Intro Screen -->
+                <div id="introScreen" class="text-center fade-in">
+                    <div class="glass-effect rounded-3xl p-8 md:p-12">
+                        <div class="mb-8 floating-animation">
+                            <img src="img/nia.png" 
+                                 alt="NIA - Asesora Virtual" 
+                                 class="nia-avatar mx-auto mb-6">
+                        </div>
+                        
+                        <h1 class="text-2xl md:text-4xl font-bold mb-6 bg-clip-text text-transparent" style="background-image: linear-gradient(to right, #50DB9A, #AF86FF);">
+                            🌟 Hola, soy NIA
+                        </h1>
+                        <p class="text-xl text-gray-300 mb-6">
+                            Agente de IA entrenada para realizar el más completo
+                            <span class="bg-clip-text text-transparent font-bold" style="background-image: linear-gradient(to right, #50DB9A, #AF86FF);">
+                                Diagnóstico Inteligente de tu narrativa comercial
+                            </span>.
+                        </p>
+
+                        
+                        <p class="text-gray-400 text-sm mb-6">
+                            Responde sólo 5 preguntas clave, y sabrás de forma personalizada si tu narrativa actual 
+                            <span class="font-bold">refleja el valor</span> que entregas, y si estás ayudando a 
+                            <span class="font-bold">atraer y convertir a los clientes correctos</span>.
+                        </p>
+
+                   <!---     
+                        <p class="text-lg text-gray-300 mb-8">
+                            ¿List@ para empezar?
+                        </p>
+                    --->    
+                        
+                        <button onclick="startDiagnosis()" class="btn-primary text-lg">
+                            <i class="fas fa-rocket mr-2"></i>
+                            Iniciar Diagnóstico
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Question Screens -->
+                <div id="questionScreens" style="display: none;">
+                    <!-- Question 1 -->
+                    <div id="question1" class="question-screen fade-in">
+                        <div class="glass-effect rounded-3xl p-8">
+                            <div class="text-center mb-8">
+                                <img src="img/nia.png" 
+                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
+                                <h2 class="text-2xl font-bold mb-4">Para comenzar cuéntame ¿qué tipo de empresas o clientes atiendes actualmente?</h2>
+                                <p class="text-gray-400 text-sm mb-6">Necesito entender tu universo de clientes para evaluar si tu mensaje les habla directamente.</p>
+                            </div>
+                            <textarea id="answer1" placeholder="Ejemplo: Empresas de manufactura con 50-200 empleados que buscan automatizar sus procesos"></textarea>
+                            <div class="text-center mt-6">
+                                <button onclick="nextQuestion(2)" class="btn-primary">
+                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div id="question2" class="question-screen" style="display: none;">
+                        <div class="glass-effect rounded-3xl p-8">
+                            <div class="text-center mb-8">
+                                <img src="img/nia.png" 
+                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
+                                <h2 class="text-2xl font-bold mb-4">Ahora indícame ¿Qué problema principal resuelves para esos clientes?</h2>
+                                <p class="text-gray-400 text-sm mb-6">Aquí está el corazón de tu propuesta. Quiero ver si conectas con el dolor real de tus clientes.</p>
+                            </div>
+                            <textarea id="answer2" placeholder="Ejemplo: Reducir costos operativos por falta de automatización en procesos manuales repetitivos"></textarea>
+                            <div class="text-center mt-6">
+                                <button onclick="nextQuestion(3)" class="btn-primary">
+                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div id="question3" class="question-screen" style="display: none;">
+                        <div class="glass-effect rounded-3xl p-8">
+                            <div class="text-center mb-8">
+                                <img src="img/nia.png" 
+                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
+                                <h2 class="text-2xl font-bold mb-4">Cuéntame ¿Qué resultado o transformación logran tus clientes al trabajar contigo?</h2>
+                                <p class="text-gray-400 text-sm mb-6">Tu cliente necesita visualizar el destino, no solo el viaje. Muéstrame qué prometes.</p>
+                            </div>
+                            <textarea id="answer3" placeholder="Ejemplo: Aumentan eficiencia 30% y reducen errores humanos en 90 días"></textarea>
+                            <div class="text-center mt-6">
+                                <button onclick="nextQuestion(4)" class="btn-primary">
+                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div id="question4" class="question-screen" style="display: none;">
+                        <div class="glass-effect rounded-3xl p-8">
+                            <div class="text-center mb-8">
+                                <img src="img/nia.png" 
+                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
+                                <h2 class="text-2xl font-bold mb-4">Muy bien! ahora ¿Por qué tus clientes te eligen a ti y no a otro proveedor?</h2>
+                                <p class="text-gray-400 text-sm mb-6">Aquí hay algo valioso, pero necesito saber si lo estás comunicando con fuerza.</p>
+                            </div>
+                            <textarea id="answer4" placeholder="Ejemplo: Somos los únicos con 15 años de experiencia específica en su sector"></textarea>
+                            <div class="text-center mt-6">
+                                <button onclick="nextQuestion(5)" class="btn-primary">
+                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div id="question5" class="question-screen" style="display: none;">
+                        <div class="glass-effect rounded-3xl p-8">
+                            <div class="text-center mb-8">
+                                <img src="img/nia.png" 
+                                     alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
+                                <h2 class="text-2xl font-bold mb-4">Finalmente, escribe cómo sueles presentar tu negocio o propuesta comercial</h2>
+                                <p class="text-gray-400 text-sm mb-6">Esta es tu narrativa actual. Sé honest@: escribe exactamente como te presentas ahora.</p>
+                            </div>
+                            <textarea id="answer5" placeholder="Ejemplo: Ayudamos a empresas manufactureras a automatizar procesos y reducir costos operativos..."></textarea>
+                            <div class="text-center mt-6">
+                                <button onclick="showDataCollection()" class="btn-primary">
+                                    Siguiente <i class="fas fa-arrow-right ml-2"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Data Collection Screen -->
+                <div id="dataScreen" style="display: none;">
+                    <div class="glass-effect rounded-3xl p-8 fade-in">
+                        <div class="text-center mb-8">
+                            <img src="img/nia.png" 
+                                 alt="NIA" class="w-16 h-16 rounded-full mx-auto mb-4 border-2 border-green-400">
+                            <h2 class="text-2xl font-bold mb-4">🎯 Perfecto, ya tengo todo lo necesario para tu diagnóstico</h2>
+                            <p class="text-gray-400 mb-6">Antes de entregarte tu evaluación personalizada, necesito algunos datos para hacer el análisis más preciso:</p>
+                            <p class="text-sm text-gray-500 mb-6">Tu diagnóstico será 100% personalizado y lo recibirás al instante.</p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">Nombre</label>
+                                <input type="text" id="firstName" placeholder="Tu nombre" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">Apellido</label>
+                                <input type="text" id="lastName" placeholder="Tu apellido" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">Email</label>
+                                <input type="text" id="email" placeholder="tu@email.com" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm text-gray-400 mb-2">WhatsApp</label>
+                                <input type="text" id="whatsapp" placeholder="+56912345678" required>
+                            </div>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button onclick="generateDiagnosis()" class="btn-primary text-lg">
+                                <i class="fas fa-magic mr-2"></i>
+                                Generar Mi Diagnóstico
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Loading Screen -->
+                <div id="loadingScreen" style="display: none;">
+                    <div class="glass-effect rounded-3xl p-12 text-center fade-in">
+                        <div class="mb-8">
+                            <img src="img/nia.png" 
+                                 alt="NIA" class="w-20 h-20 rounded-full mx-auto mb-6 border-2 border-green-400 pulse-animation">
+                        </div>
+                        <h2 class="text-2xl font-bold mb-4">🧠 Analizando tu narrativa...</h2>
+                        <p class="text-gray-400 mb-6">NIA está procesando tus respuestas para crear tu diagnóstico personalizado</p>
+                        <div class="loading-spinner mx-auto mb-4"></div>
+                        <p class="text-sm text-gray-500">Esto tomará unos segundos</p>
+                    </div>
+                </div>
+
+                <!-- PANTALLA DE RESULTADOS -->
+                <div id="resultsScreen" class="screen" style="display: block;">
+                    <div class="container">
+                        <h1 class="main-title">✨ <span id="userFirstName">Carlos</span>, tu diagnóstico está listo</h1>
+            
+                        <!-- 1) Div Superior: Puntuación y Brechas -->
+                        <div class="score-header-card">
+                            <div class="score-graphic-col">
+                                <div class="radial-progress-container">
+                                    <svg class="radial-progress-bar" width="160" height="160" viewBox="0 0 160 160">
+                                        <defs>
+                                            <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                <stop offset="0%" stop-color="var(--color-secondary)" />
+                                                <stop offset="100%" stop-color="var(--color-primary)" />
+                                            </linearGradient>
+                                        </defs>
+                                        <circle cx="80" cy="80" r="70" fill="none" stroke="rgba(0,0,0,0.2)" stroke-width="12"></circle>
+                                        <circle id="progress-circle" cx="80" cy="80" r="70" fill="none" stroke="url(#progressGradient)" stroke-width="12" stroke-linecap="round" stroke-dasharray="440" stroke-dashoffset="440"></circle>
+                                    </svg>
+                                    <div class="radial-progress-text">
+                                        <div id="score-value" class="radial-score">21</div>
+                                        <div class="radial-score-label">puntos</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="score-title-col">
+                                <h2 id="totalScore">Obtuviste 21/25 puntos</h2>
+                                <p id="principalesBrechasText">Tu narrativa es completamente genérica y repetitiva. Sin cliente específico, sin dolor claro, sin diferenciación = invisibilidad total en el mercado. Estás perdiendo clientes AHORA porque no comunicas valor real. Necesitas urgente una narrativa que conecte, convenza y convierta. ⏰</p>
+                            </div>
+                        </div>
+            
+                        <!-- 2) Div Detalle de Evaluación -->
+                        <div class="evaluation-details-card">
+                            <h2>Detalle de tu evaluación</h2>
+                            <div class="dimensions-grid">
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg></div>
+                                        <h3>Foco en el cliente y su dolor</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="focoClienteBar" class="dimension-bar-fill" style="width: 100%;"></div></div>
+                                    <p id="focoClienteComment" class="dimension-comment">¡Excelente! Demuestras un profundo entendimiento de las necesidades y problemas de tus clientes.</p>
+                                </div>
+                                 <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg></div>
+                                        <h3>Transformación y resultado</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="promesaTransformacionBar" class="dimension-bar-fill" style="width: 80%;"></div></div>
+                                    <p id="promesaTransformacionComment" class="dimension-comment">Tu promesa es clara, pero podrías cuantificar más el resultado final para hacerla irresistible.</p>
+                                </div>
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286Z" /></svg></div>
+                                        <h3>Autoridad y confianza</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="autoridadConfianzaBar" class="dimension-bar-fill" style="width: 80%;"></div></div>
+                                    <p id="autoridadConfianzaComment" class="dimension-comment">Proyectas confianza. Añadir testimonios en video o estudios de caso podría elevarla al máximo nivel.</p>
+                                </div>
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.311a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0" /></svg></div>
+                                        <h3>Diferenciación de tu oferta</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="diferenciacionBar" class="dimension-bar-fill" style="width: 60%;"></div></div>
+                                    <p id="diferenciacionComment" class="dimension-comment">Tu propuesta es única, pero podrías destacar más claramente por qué eres la única opción viable.</p>
+                                </div>
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-header">
+                                       <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg></div>
+                                        <h3>El valor percibido de tu oferta</h3>
+                                    </div>
+                                    <div class="dimension-bar-container"><div id="ofertaValorBar" class="dimension-bar-fill" style="width: 100%;"></div></div>
+                                    <p id="ofertaValorComment" class="dimension-comment">Tu oferta es clara, directa y muy atractiva. ¡Un trabajo impecable!</p>
+                                </div>
+                                <a href="#final-cta" class="cta-button-card">
+                                    <span class="icon-placeholder">📄</span>
+                                    <span>Recibe el detalle de cada pilar y el paso a paso para mejorar tu narrativa</span>
+                                </a>
+                            </div>
+                        </div>
+            
+                        <!-- 3) Div Siguiente Paso Estratégico -->
+                        <div id="nextStepBlock" class="next-step-card">
+                            <div class="nia-avatar-col">
+                                <img src="img/nia.png" alt="Avatar de NIA" class="nia-avatar" onerror="this.onerror=null;this.src='https://placehold.co/150x150/AF86FF/1A1B26?text=NIA';">
+                            </div>
+                            <div class="next-step-text-col">
+                                <h2>Tu siguiente paso estratégico</h2>
+                                <div class="next-step-content">
+                                    <p id="proximopasoText">Enfócate en crear una "Propuesta Única de Valor" (PUV) tan clara y potente que tus competidores parezcan irrelevantes.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 4) Div CTA Final -->
+                        <div id="final-cta" class="final-cta-section">
+                            <div class="final-cta-text-col">
+                                <h2>¿Quieres el informe detallado y un plan de acción a medida?</h2>
+                                <p>Agenda una sesión gratuita con Carlos y recibe informe más tu plan de acción personalizado, para cerrar tus brechas y transformar tu narrativa en ventas.</p>
+                                <a href="https://calendly.com/tu-link" target="_blank" class="cta-button">
+                                    <i class="fa-regular fa-calendar-days"></i>
+                                    <span>Sesión 1:1 + Plan de acción</span>
+                                </a>
+                                <p class="warning">⚠️ Solo para empresas con ventas activas y compromiso real con su crecimiento.</p>
+                            </div>
+                            <div class="final-cta-image-col">
+                                <img src="img/informe.png" alt="Imagen del informe detallado" onerror="this.onerror=null;this.src='https://placehold.co/600x400/212230/A0A3B1?text=Informe+Detallado';">
+                            </div>
+                        </div>
+                        
+                        <!-- Footer -->
+                        <div class="footer">
+                            <p class="signature">Con cariño,<br><strong>NIA 💜 by Vicerales</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                
+
+        <!-- Footer -->
+        <footer class="text-center py-4 text-gray-500 text-sm">
+            Desarrollado por <a href="https://www.vicerales.com" target="_blank" class="text-purple-400 hover:text-purple-300">Vicerales.com</a>
+        </footer>
+    </div>
+
+<script>
+    // --- CONFIGURACIÓN PREGUNTAS + RESULTADO ----
+    const webhookUrl = 'https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc'; // Tu webhook actual
+    
+    // --- FUNCIONES AUXILIARES (DEFINIDAS PRIMERO) ---
+    
+    // Función para actualizar la barra de progreso visual
+    function updateProgressBar(screenId) {
+        const progressSteps = {
+            'question1': { step: 1, progress: 16 },
+            'question2': { step: 2, progress: 32 },
+            'question3': { step: 3, progress: 48 },
+            'question4': { step: 4, progress: 64 },
+            'question5': { step: 5, progress: 80 },
+            'dataScreen': { step: 6, progress: 100 }
+        };
+        
+        const currentStepInfo = progressSteps[screenId];
+        if (!currentStepInfo) {
+            console.log(`⚠️ No hay información de progreso para: ${screenId}`);
+            return;
+        }
+        
+        console.log(`📊 Actualizando progreso: Paso ${currentStepInfo.step} (${currentStepInfo.progress}%)`);
+        
+        // Actualizar barra de progreso
+        const progressBar = document.getElementById('progressBar');
+        if (progressBar) {
+            progressBar.style.width = `${currentStepInfo.progress}%`;
+            console.log(`✅ Barra actualizada: ${currentStepInfo.progress}%`);
+        }
+        
+        // Actualizar indicador de paso actual
+        const currentStepElement = document.getElementById('currentStep');
+        if (currentStepElement) {
+            currentStepElement.textContent = currentStepInfo.step;
+        }
+        
+        // Actualizar indicadores visuales de pasos
+        for (let i = 1; i <= 6; i++) {
+            const stepElement = document.getElementById(`step${i}`);
+            if (stepElement) {
+                if (i <= currentStepInfo.step) {
+                    stepElement.classList.remove('step-inactive');
+                    stepElement.classList.add('step-active');
+                } else {
+                    stepElement.classList.remove('step-active');
+                    stepElement.classList.add('step-inactive');
+                }
+            }
+        }
+    }
+    
+    // Función auxiliar inteligente que prueba múltiples IDs
+    function updateElementSafely(possibleIds, content) {
+        for (const id of possibleIds) {
+            const element = document.getElementById(id);
+            if (element) {
+                element.textContent = content;
+                console.log(`✅ Actualizado elemento: ${id} = "${content}"`);
+                return true;
+            }
+        }
+        console.warn(`⚠️ No se encontró ningún elemento con IDs: ${possibleIds.join(', ')}`);
+        return false;
+    }
+    
+    // Función auxiliar para actualizar dimensiones
+    function updateDimensionSafely(shortName, fullName, score, comment) {
+        const scoreIds = [`${fullName}Score`, `${shortName}Score`];
+        const commentIds = [`${fullName}Comment`, `${shortName}Comment`];
+        const barIds = [`${fullName}Bar`, `${shortName}Bar`];
+        
+        // Actualizar puntaje
+        const scoreText = `${score || 0}/5`;
+        updateElementSafely(scoreIds, scoreText);
+        
+        // Actualizar comentario (limpio, sin "Análisis:" para tu diseño)
+        const commentText = comment || 'Análisis no disponible';
+        updateElementSafely(commentIds, commentText);
+        
+        // Actualizar barra de progreso visual
+        const percentage = ((score || 0) / 5) * 100;
+        for (const barId of barIds) {
+            const barElement = document.getElementById(barId);
+            if (barElement) {
+                barElement.style.width = `${percentage}%`;
+                console.log(`✅ Barra actualizada: ${barId} = ${percentage}%`);
+                break;
+            }
+        }
+    }
+    // --- FUNCIONES PRINCIPALES ---
+    
+    // Función adaptada a tu estructura HTML específica
+    function mostrarPantalla(screenId) {
+        console.log(`🔄 Cambiando a pantalla: ${screenId}`);
+        
+        // Pantallas principales de nivel superior
+        const mainScreens = ['introScreen', 'questionScreens', 'dataScreen', 'loadingScreen', 'resultsScreen', 'errorScreen'];
+        
+        // Si es una pregunta específica (question1, question2, etc.)
+        if (screenId.startsWith('question') && screenId !== 'questionScreens') {
+            // CLAVE: Mostrar el contenedor de preguntas PRIMERO
+            const questionScreens = document.getElementById('questionScreens');
+            if (questionScreens) {
+                questionScreens.style.display = 'block';
+            }
+            
+            // Ocultar todas las preguntas individuales
+            for (let i = 1; i <= 5; i++) {
+                const questionDiv = document.getElementById(`question${i}`);
+                if (questionDiv) {
+                    questionDiv.style.display = 'none';
+                }
+            }
+            
+            // Mostrar la pregunta específica
+            const targetQuestion = document.getElementById(screenId);
+            if (targetQuestion) {
+                targetQuestion.style.display = 'block';
+                console.log(`✅ Pregunta ${screenId} mostrada`);
+            }
+            
+            // Ocultar otras pantallas principales (excepto questionScreens)
+            mainScreens.forEach(screenName => {
+                if (screenName !== 'questionScreens') {
+                    const screen = document.getElementById(screenName);
+                    if (screen) {
+                        screen.style.display = 'none';
+                    }
+                }
+            });
+            
+        } else {
+            // Para pantallas principales, comportamiento normal
+            mainScreens.forEach(screenName => {
+                const screen = document.getElementById(screenName);
+                if (screen) {
+                    screen.style.display = screenName === screenId ? 'block' : 'none';
+                }
+            });
+        }
+        
+        // Manejar barra de progreso
+        const progressContainer = document.getElementById('progressContainer');
+        if (progressContainer) {
+            if (['question1', 'question2', 'question3', 'question4', 'question5', 'dataScreen'].includes(screenId)) {
+                progressContainer.style.display = 'block';
+                updateProgressBar(screenId);
+            } else {
+                progressContainer.style.display = 'none';
+            }
+        }
+    }
+    
+    // Función para iniciar diagnóstico
+    function startDiagnosis() {
+        console.log('🚀 Iniciando diagnóstico...');
+        mostrarPantalla('question1');
+    }
+    
+  // Función blindada contra conflictos externos para navegar entre preguntas
+    function nextQuestionSegura(currentQuestionNumber) {
+        const timestamp = Date.now();
+        console.log(`🔒 [${timestamp}] VALIDACIÓN SEGURA - Pregunta ${currentQuestionNumber}`);
+        
+        const currentAnswerId = `answer${currentQuestionNumber}`;
+        const currentAnswer = document.getElementById(currentAnswerId);
+        
+        // Logging detallado para debugging
+        console.log(`🔍 [${timestamp}] Elemento: ${currentAnswerId}`, currentAnswer);
+        
+        if (!currentAnswer) {
+            console.error(`❌ [${timestamp}] Elemento ${currentAnswerId} no encontrado`);
+            alert(`Error técnico: No se encuentra la pregunta ${currentQuestionNumber}`);
+            return false;
+        }
+        
+        const valorRaw = currentAnswer.value;
+        const valorLimpio = valorRaw.trim();
+        
+        console.log(`📝 [${timestamp}] Valor RAW: "${valorRaw}"`);
+        console.log(`📝 [${timestamp}] Valor LIMPIO: "${valorLimpio}"`);
+        console.log(`📝 [${timestamp}] Es válido: ${valorLimpio.length > 0}`);
+        
+        if (!valorLimpio || valorLimpio.length === 0) {
+            console.warn(`⚠️ [${timestamp}] Validación fallida para pregunta ${currentQuestionNumber}`);
+            alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
+            return false;
+        }
+        
+        console.log(`✅ [${timestamp}] Validación exitosa para pregunta ${currentQuestionNumber}`);
+        
+        // Prevenir ejecuciones múltiples
+        const nextQuestionNumber = currentQuestionNumber + 1;
+        
+        // Usar setTimeout para evitar conflictos de timing
+        setTimeout(() => {
+            if (nextQuestionNumber <= 5) {
+                mostrarPantalla(`question${nextQuestionNumber}`);
+            } else {
+                mostrarPantalla('dataScreen');
+            }
+            console.log(`🎯 [${timestamp}] Navegación completada a ${nextQuestionNumber <= 5 ? `question${nextQuestionNumber}` : 'dataScreen'}`);
+        }, 50);
+        
+        return true;
+    }
+    
+    // Sobrescribir la función original para evitar conflictos
+    window.nextQuestion = nextQuestionSegura;
+
+    
+    // Función para mostrar recolección de datos
+    function showDataCollection() {
+        const answer5 = document.getElementById('answer5');
+        if (!answer5 || !answer5.value.trim()) {
+            alert('Por favor, completa tu narrativa comercial actual.');
+            return;
+        }
+        mostrarPantalla('dataScreen');
+    }
+    
+    // Función principal para generar diagnóstico
+    async function generateDiagnosis() {
+        console.log('🚀 Iniciando generación de diagnóstico...');
+        
+        // Recolectar respuestas
+        const answers = {};
+        let allAnswersComplete = true;
+        
+        for (let i = 1; i <= 5; i++) {
+            const answer = document.getElementById(`answer${i}`);
+            if (!answer || !answer.value.trim()) {
+                alert(`Por favor, completa la pregunta ${i}.`);
+                allAnswersComplete = false;
+                break;
+            }
+            answers[`answer${i}`] = answer.value.trim();
+        }
+        
+        if (!allAnswersComplete) return;
+        
+        // Recolectar datos personales
+        const personalData = {};
+        const requiredFields = ['firstName', 'lastName', 'email'];
+        const optionalFields = ['whatsapp'];
+        
+        for (const field of requiredFields) {
+            const element = document.getElementById(field);
+            if (!element || !element.value.trim()) {
+                alert(`Por favor, completa el campo: ${field}`);
+                return;
+            }
+            personalData[field] = element.value.trim();
+        }
+        
+        for (const field of optionalFields) {
+            const element = document.getElementById(field);
+            personalData[field] = element ? element.value.trim() : '';
+        }
+        
+        // Mostrar pantalla de carga
+        mostrarPantalla('loadingScreen');
+        
+        try {
+            console.log('📡 Enviando datos a MAKE...');
+            
+            const response = await fetch(webhookUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...answers,
+                    ...personalData
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            console.log('✅ Datos recibidos de MAKE:', data);
+            
+            if (data && data.resultado) {
+                displayResults(data.resultado);
+                mostrarPantalla('resultsScreen');
+            } else {
+                throw new Error('Estructura de datos incorrecta');
+            }
+            
+        } catch (error) {
+            console.error('❌ Error en generateDiagnosis:', error);
+            mostrarPantalla('errorScreen');
+        }
+    }
+    
+    // Función inteligente para mostrar resultados
+    // Función mejorada para mostrar resultados con personalización
+    function displayResults(data) {
+        console.log('🎨 Procesando resultados:', data);
+        
+        try {
+            // Actualizar nombre del usuario en el título
+            const firstName = document.getElementById('firstName')?.value || 'Carlos';
+            const userNameElement = document.getElementById('userFirstName');
+            if (userNameElement) {
+                userNameElement.textContent = firstName;
+            }
+            
+            // Calcular puntaje total
+            const scores = [
+                data.foco_cliente || 0,
+                data.promesa_transformacion || 0,
+                data.autoridad_confianza || 0,
+                data.diferenciacion || 0,
+                data.oferta_valor || 0
+            ];
+            
+            const totalScore = scores.reduce((sum, score) => sum + score, 0);
+            const percentage = Math.round((totalScore / 25) * 100);
+            
+            console.log(`📊 Puntaje calculado: ${totalScore}/25 (${percentage}%)`);
+
+            // En tu función displayResults(), después de calcular totalScore y percentage, agrega:
+            animarRadialProgressBar(totalScore, 25);
+            
+            // También activa los efectos de hover en las tarjetas
+            const metricCards = document.querySelectorAll('.dimension-item');
+            metricCards.forEach(card => {
+                card.addEventListener('mousemove', e => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    card.style.setProperty('--mouse-x', `${x}px`);
+                    card.style.setProperty('--mouse-y', `${y}px`);
+                });
+            });
+
+
+            
+            // Actualizar elementos principales
+            updateElementSafely(['totalScore'], `${totalScore}/25 puntos`);
+            updateElementSafely(['scorePercent'], `${percentage}%`);
+            
+            // Actualizar dimensiones con barras animadas
+            updateDimensionSafely('foco', 'focoCliente', data.foco_cliente, data.comentario_foco_cliente);
+            updateDimensionSafely('promesa', 'promesaTransformacion', data.promesa_transformacion, data.comentario_promesa_transformacion);
+            updateDimensionSafely('autoridad', 'autoridadConfianza', data.autoridad_confianza, data.comentario_autoridad_confianza);
+            updateDimensionSafely('diferenciacion', 'diferenciacion', data.diferenciacion, data.comentario_diferenciacion);
+            updateDimensionSafely('oferta', 'ofertaValor', data.oferta_valor, data.comentario_oferta_valor);
+            
+            // Actualizar textos principales
+            updateElementSafely(['principalesBrechasText'], data.principales_brechas || 'Análisis no disponible');
+            updateElementSafely(['proximopasoText'], data.proximo_paso || 'Recomendación no disponible');
+            
+            console.log('✅ Todos los resultados procesados correctamente');
+            
+            } catch (error) {
+                console.error('❌ Error en displayResults:', error);
+                alert('Error al mostrar resultados. Revisa la consola para detalles.');
+            }
+        }
+
+        // Función para animar el gráfico radial (agregar al final de tu JavaScript)
+        function animarRadialProgressBar(score, maxScore) {
+            const circle = document.getElementById('progress-circle');
+            const scoreValueText = document.getElementById('score-value');
+            
+            if (!circle || !scoreValueText) {
+                console.warn('⚠️ Elementos del gráfico radial no encontrados');
+                return;
+            }
+            
+            const radius = circle.r.baseVal.value;
+            const circumference = 2 * Math.PI * radius;
+            const percentage = Math.max(0, Math.min(100, (score / maxScore) * 100));
+            const offset = circumference - (percentage / 100) * circumference;
+        
+            // Configurar el círculo para iniciar vacío
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference;
+            
+            // Animar después de un pequeño delay
+            setTimeout(() => {
+                circle.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)";
+                circle.style.strokeDashoffset = offset;
+            }, 200);
+            
+            // Actualizar el número central
+            scoreValueText.textContent = score;
+            
+            console.log(`🎯 Gráfico radial animado: ${score}/${maxScore} (${percentage}%)`);
+        }
+
+    
+    // --- FUNCIONES DE TESTING ---
+    
+    // Función para probar navegación completa
+    function testNavigation() {
+        console.log('🧪 Probando navegación paso a paso...');
+        
+        // Llenar respuestas de prueba
+        for (let i = 1; i <= 5; i++) {
+            const answer = document.getElementById(`answer${i}`);
+            if (answer) {
+                answer.value = `Respuesta de prueba ${i}`;
+            }
+        }
+        
+        // Secuencia de navegación con delays
+        setTimeout(() => {
+            console.log('Paso 1: Iniciando');
+            startDiagnosis();
+        }, 500);
+        
+        setTimeout(() => {
+            console.log('Paso 2: Pregunta 1 → 2');
+            nextQuestion(1);
+        }, 1500);
+        
+        setTimeout(() => {
+            console.log('Paso 3: Pregunta 2 → 3');
+            nextQuestion(2);
+        }, 2500);
+        
+        setTimeout(() => {
+            console.log('Paso 4: Pregunta 3 → 4');  
+            nextQuestion(3);
+        }, 3500);
+        
+        setTimeout(() => {
+            console.log('Paso 5: Pregunta 4 → 5');  
+            nextQuestion(4);
+        }, 4500);
+        
+        setTimeout(() => {
+            console.log('Paso 6: Pregunta 5 → Datos');  
+            nextQuestion(5);
+        }, 5500);
+    }
+    
+    // Función para probar resultados
+    function testResults() {
+        console.log('🧪 Ejecutando prueba de resultados...');
+        
+        const testData = {
+            foco_cliente: 3,
+            comentario_foco_cliente: "Tu mensaje identifica el segmento, pero puede profundizar más en el dolor específico.",
+            promesa_transformacion: 4,
+            comentario_promesa_transformacion: "La promesa es clara, pero considera ser más específica en resultados medibles.",
+            autoridad_confianza: 2,
+            comentario_autoridad_confianza: "Necesitas más evidencia social y casos de éxito que refuercen tu credibilidad.",
+            diferenciacion: 3,
+            comentario_diferenciacion: "Tu diferenciación es buena, pero puede ser más única y memorable.",
+            oferta_valor: 4,
+            comentario_oferta_valor: "La propuesta de valor es fuerte, pero optimízala para el ROI percibido.",
+            principales_brechas: "Tu narrativa tiene bases sólidas, pero la autoridad y diferenciación son tus mayores GAPs. Sin ellas, pierdes clientes cada día.",
+            proximo_paso: "Crea 3 micro-historias de éxito. Para un plan a medida, agenda tu sesión 1:1 con Carlos"
+        };
+        
+        (testData);
+        mostrarPantalla('resultsScreen');
+    }
+    
+    // Función para debuggear estado de preguntas
+    function debugQuestions() {
+        console.log('🔍 Estado actual de las preguntas:');
+        
+        const questionScreens = document.getElementById('questionScreens');
+        console.log('questionScreens display:', questionScreens ? questionScreens.style.display : 'NO EXISTE');
+        
+        for (let i = 1; i <= 5; i++) {
+            const question = document.getElementById(`question${i}`);
+            console.log(`question${i} display:`, question ? question.style.display : 'NO EXISTE');
+        }
+    }
+    
+    // Inicialización cuando se carga la página
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('🚀 NIA JavaScript cargado correctamente');
+        mostrarPantalla('introScreen');
+    });
+    
+
+
+//========= SANITIZADOR: ===============
+    // SISTEMA DE VALIDACIÓN INTEGRAL NIA - VERSIÓN DEFINITIVA CORREGIDA
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('✨ Sistema de validación integral NIA activado y corregido');
+    
+    // === CONTROL DE PANTALLAS (Usando tus IDs reales) ===
+    function mostrarPantalla(pantallaId) {
+        const pantallas = ['introScreen', 'questionScreens', 'dataScreen', 'loadingScreen', 'resultsScreen'];
+        
+        // Ocultar todas las pantallas
+        pantallas.forEach(id => {
+            const elemento = document.getElementById(id);
+            if (elemento) elemento.style.display = 'none';
+        });
+        
+        // Mostrar la pantalla solicitada
+        const pantallaObjetivo = document.getElementById(pantallaId);
+        if (pantallaObjetivo) {
+            pantallaObjetivo.style.display = 'block';
+            pantallaObjetivo.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            console.log(`✅ Mostrando pantalla: ${pantallaId}`);
+            return true;
+        }
+        
+        console.error(`❌ Pantalla no encontrada: ${pantallaId}`);
+        return false;
+    }
+    
+    // === FUNCIONES DE SANITIZACIÓN ===
+    function sanitizarTexto(texto) {
+        if (typeof texto !== 'string' || !texto) return '';
+        
+        return texto
+            .replace(/"/g, '')              // Eliminar comillas dobles
+            .replace(/'/g, '')              // Eliminar comillas simples
+            .replace(/`/g, '')              // Eliminar comillas invertidas
+            .replace(/\r\n/g, ' ')          // Convertir saltos Windows a espacio
+            .replace(/\n/g, ' ')            // Convertir saltos Unix a espacio
+            .replace(/\r/g, ' ')            // Convertir saltos Mac a espacio
+            .replace(/\t/g, ' ')            // Convertir tabs a espacio
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Eliminar caracteres de control
+            .replace(/\s+/g, ' ')           // Normalizar espacios múltiples
+            .trim();                        // Limpiar espacios extremos
+    }
+    
+    // === FUNCIONES DE VALIDACIÓN ===
+    function validarTextoLargo(texto) {
+        const textoLimpio = texto.trim();
+        if (!textoLimpio) return { valido: false, mensaje: 'Este campo es obligatorio' };
+        if (textoLimpio.length < 10) return { valido: false, mensaje: 'Necesitas escribir al menos 10 caracteres' };
+        if (/<[^>]*>/g.test(texto)) return { valido: false, mensaje: 'No copies texto con HTML, escribe tu respuesta' };
+        
+        const saltosDeLinea = (texto.match(/\n/g) || []).length;
+        if (saltosDeLinea > 3) return { valido: false, mensaje: 'Evita copiar de web, escribe tu respuesta en texto plano' };
+        
+        return { valido: true, mensaje: 'Perfecto' };
+    }
+    
+    function validarEmail(email) {
+        const emailLimpio = email.trim();
+        if (!emailLimpio) return { valido: false, mensaje: 'El email es obligatorio' };
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(emailLimpio)) return { valido: false, mensaje: 'Ingresa un email válido (ej: carlos@empresa.com)' };
+        
+        return { valido: true, mensaje: 'Email válido' };
+    }
+    
+    function validarTelefono(telefono) {
+        const telefonoLimpio = telefono.trim();
+        if (!telefonoLimpio) return { valido: false, mensaje: 'El WhatsApp es obligatorio' };
+        
+        const telefonoSinFormato = telefonoLimpio.replace(/[\s\-\(\)]/g, '');
+        const telefonoRegex = /^[\+]?[\d]{8,15}$/;
+        
+        if (!telefonoRegex.test(telefonoSinFormato)) return { valido: false, mensaje: 'Formato: +56987654321 o 987654321' };
+        
+        return { valido: true, mensaje: 'WhatsApp válido' };
+    }
+    
+    function validarNombre(nombre) {
+        const nombreLimpio = nombre.trim();
+        if (!nombreLimpio) return { valido: false, mensaje: 'Este campo es obligatorio' };
+        if (nombreLimpio.length < 2) return { valido: false, mensaje: 'Mínimo 2 caracteres' };
+        return { valido: true, mensaje: 'Correcto' };
+    }
+    
+    // === FUNCIONES DE INTERFAZ INLINE ===
+    function mostrarError(campo, mensaje) {
+        limpiarValidacion(campo);
+        campo.classList.add('campo-error');
+        
+        const mensajeError = document.createElement('div');
+        mensajeError.className = 'mensaje-error';
+        mensajeError.textContent = mensaje;
+        campo.parentNode.insertBefore(mensajeError, campo.nextSibling);
+        console.log(`❌ ${campo.id}: ${mensaje}`);
+    }
+    
+    function mostrarExito(campo, mensaje) {
+        limpiarValidacion(campo);
+        campo.classList.add('campo-valido');
+        
+        const mensajeExito = document.createElement('div');
+        mensajeExito.className = 'mensaje-exito';
+        mensajeExito.textContent = mensaje;
+        campo.parentNode.insertBefore(mensajeExito, campo.nextSibling);
+        console.log(`✅ ${campo.id}: ${mensaje}`);
+    }
+    
+    function limpiarValidacion(campo) {
+        campo.classList.remove('campo-error', 'campo-valido');
+        const mensajesExistentes = campo.parentNode.querySelectorAll('.mensaje-error, .mensaje-exito');
+        mensajesExistentes.forEach(mensaje => mensaje.remove());
+    }
+    
+    // === VALIDACIÓN DE CAMPO INDIVIDUAL ===
+    function validarCampo(campo) {
+        // Sanitizar antes de validar
+        campo.value = sanitizarTexto(campo.value || '');
+        
+        const valor = campo.value;
+        const tipoValidacion = determinarTipoValidacion(campo);
+        
+        let resultado;
+        switch (tipoValidacion) {
+            case 'texto': resultado = validarTextoLargo(valor); break;
+            case 'email': resultado = validarEmail(valor); break;
+            case 'telefono': resultado = validarTelefono(valor); break;
+            case 'nombre': resultado = validarNombre(valor); break;
+            default: resultado = { valido: true, mensaje: 'Campo válido' };
+        }
+        
+        if (resultado.valido) {
+            if (valor.length > 0) {
+                mostrarExito(campo, resultado.mensaje);
+            } else {
+                limpiarValidacion(campo);
+            }
+        } else {
+            mostrarError(campo, resultado.mensaje);
+        }
+        
+        return resultado.valido;
+    }
+    
+    function determinarTipoValidacion(campo) {
+        const id = campo.id?.toLowerCase() || '';
+        
+        if (campo.type === 'email' || id.includes('email')) return 'email';
+        if (id.includes('whatsapp')) return 'telefono';
+        if (id.includes('firstname') || id.includes('lastname')) return 'nombre';
+        if (campo.tagName === 'TEXTAREA') return 'texto';
+        
+        return 'nombre';
+    }
+    
+    // === VALIDACIÓN PASO A PASO (Clave para formulario multipaso) ===
+    function validarPreguntaActual(numeroPregunta) {
+        const campo = document.getElementById(`answer${numeroPregunta}`);
+        if (!campo) return true;
+        
+        const esValido = validarCampo(campo);
+        if (!esValido) {
+            campo.focus();
+        }
+        return esValido;
+    }
+    
+    // === VALIDACIÓN COMPLETA DE TODOS LOS CAMPOS ===
+    function validarFormularioCompleto() {
+        console.log('🔍 Validando formulario completo...');
+        
+        let todoValido = true;
+        let primerCampoInvalido = null;
+        
+        // Validar las 5 preguntas (incluso si están ocultas)
+        for (let i = 1; i <= 5; i++) {
+            const campo = document.getElementById(`answer${i}`);
+            if (campo) {
+                const esValido = validarCampo(campo);
+                if (!esValido) {
+                    todoValido = false;
+                    if (!primerCampoInvalido) {
+                        primerCampoInvalido = campo;
+                    }
+                }
+            }
+        }
+        
+        // Validar campos de datos personales
+        const camposPersonales = ['firstName', 'lastName', 'email', 'whatsapp'];
+        camposPersonales.forEach(campoId => {
+            const campo = document.getElementById(campoId);
+            if (campo) {
+                const esValido = validarCampo(campo);
+                if (!esValido) {
+                    todoValido = false;
+                    if (!primerCampoInvalido) {
+                        primerCampoInvalido = campo;
+                    }
+                }
+            }
+        });
+        
+        if (primerCampoInvalido) {
+            // Determinar en qué pantalla está el error y mostrarla
+            const pantallaConError = determinarPantallaDelCampo(primerCampoInvalido);
+            mostrarPantalla(pantallaConError);
+            
+            setTimeout(() => {
+                primerCampoInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                primerCampoInvalido.focus();
+            }, 200);
+        }
+        
+        console.log(`🎯 Validación: ${todoValido ? 'EXITOSA' : 'FALLIDA'}`);
+        return todoValido;
+    }
+    
+    function determinarPantallaDelCampo(campo) {
+        const campoId = campo.id;
+        
+        if (campoId.includes('answer')) {
+            return 'questionScreens';
+        } else if (['firstName', 'lastName', 'email', 'whatsapp'].includes(campoId)) {
+            return 'dataScreen';
+        }
+        
+        return 'dataScreen';
+    }
+    
+    // === ENVÍO DE DATOS ===
+
+        async function enviarDatos() {
+    console.log('🚀 Iniciando proceso de envío corregido...');
+    
+    // VALIDACIÓN ESTRICTA
+    if (!validarFormularioCompleto()) {
+        console.log('🚫 Envío BLOQUEADO debido a errores de validación');
+        return false;
+    }
+    
+    // Mostrar pantalla de carga
+    mostrarPantalla('loadingScreen');
+    
+    // ESTRATEGIA DE RECOLECCIÓN ROBUSTA
+    console.log('📊 INICIANDO RECOLECCIÓN DE DATOS...');
+    const datos = {};
+    
+    // Estrategia 1: Recolección específica por IDs (principal)
+    console.log('🎯 Estrategia 1: Recolección por IDs específicos');
+    
+    // Recopilar respuestas de preguntas
+    for (let i = 1; i <= 5; i++) {
+        const campo = document.getElementById(`answer${i}`);
+        if (campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            if (valor) {
+                datos[`answer${i}`] = sanitizarTexto(valor);
+                console.log(`✅ answer${i} capturado: "${datos[`answer${i}`].substring(0, 30)}..."`);
+            } else {
+                console.log(`⚠️ answer${i} encontrado pero vacío`);
+            }
+        } else {
+            console.log(`❌ answer${i} NO encontrado en DOM`);
+        }
+    }
+    
+    // Recopilar datos personales
+    const camposPersonales = ['firstName', 'lastName', 'email', 'whatsapp'];
+    camposPersonales.forEach(campoId => {
+        const campo = document.getElementById(campoId);
+        if (campo) {
+            const valor = campo.value ? campo.value.trim() : '';
+            if (valor) {
+                datos[campoId] = sanitizarTexto(valor);
+                console.log(`✅ ${campoId} capturado: "${datos[campoId]}"`);
+            } else {
+                console.log(`⚠️ ${campoId} encontrado pero vacío`);
+            }
+        } else {
+            console.log(`❌ ${campoId} NO encontrado en DOM`);
+        }
+    });
+    
+    // Estrategia 2: Fallback - Buscar cualquier campo con datos
+    if (Object.keys(datos).length < 7) { // Esperamos al menos 5 respuestas + 2 datos personales mínimos
+        console.log('🔄 Estrategia 2: Fallback - buscando todos los campos con datos');
+        
+        const todosLosCampos = document.querySelectorAll('input, textarea');
+        todosLosCampos.forEach((campo, index) => {
+            const valor = campo.value ? campo.value.trim() : '';
+            if (valor) {
+                const clave = campo.id || campo.name || `campo_detectado_${index}`;
+                if (!datos[clave]) { // Solo agregar si no lo tenemos ya
+                    datos[clave] = sanitizarTexto(valor);
+                    console.log(`🔄 Fallback capturado - ${clave}: "${datos[clave].substring(0, 30)}..."`);
+                }
+            }
+        });
+    }
+    
+    // Estrategia 3: Verificación de datos críticos
+    console.log('🔍 VERIFICACIÓN FINAL DE DATOS:');
+    console.log('📤 Datos finales para envío:', datos);
+    console.log(`📊 Total de campos capturados: ${Object.keys(datos).length}`);
+    
+    // Validaciones de integridad
+    const respuestasCapturadas = Object.keys(datos).filter(key => key.startsWith('answer')).length;
+    const datosPersonalesCapturados = ['firstName', 'lastName', 'email', 'whatsapp'].filter(key => datos[key]).length;
+    
+    console.log(`📋 Respuestas capturadas: ${respuestasCapturadas}/5`);
+    console.log(`👤 Datos personales capturados: ${datosPersonalesCapturados}/4`);
+    
+    // Validar que tenemos datos suficientes
+    if (Object.keys(datos).length === 0) {
+        console.error('❌ NO SE CAPTURARON DATOS');
+        mostrarPantalla('dataScreen');
+        alert('No se pudieron capturar los datos del formulario. Por favor, recarga la página e inténtalo de nuevo.');
+        return false;
+    }
+    
+    if (respuestasCapturadas < 3) { // Al menos 3 respuestas para un diagnóstico mínimo
+        console.error(`❌ Datos insuficientes: solo ${respuestasCapturadas} respuestas capturadas`);
+        mostrarPantalla('dataScreen');
+        alert('Faltan respuestas por capturar. Por favor, asegúrate de completar todas las preguntas.');
+        return false;
+    }
+    
+    // Envío a MAKE con URL corregida
+    try {
+        console.log('🌐 Enviando petición a MAKE (webhook desarrollo - URL corregida)...');
+        
+        const response = await fetch('https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(datosFormulario)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Llamar a la nueva función
+            procesarResultadosDiagnostico(data.resultado);
+            
+            // Mostrar pantalla de resultados (si tienes esta lógica)
+            // mostrarPantalla('results');
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            // Manejar error
+        });
+        
+        console.log(`📡 Respuesta recibida - Status: ${response.status}`);
+        
+        if (response.status >= 200 && response.status < 300) {
+            console.log('✅ Envío exitoso a MAKE');
+            
+            // Intentar leer la respuesta
+            try {
+                const resultado = await response.json();
+                console.log('📋 Respuesta JSON de MAKE:', resultado);
+            } catch (jsonError) {
+                console.log('📋 Respuesta procesada correctamente (sin JSON válido)');
+            }
+            
+            // Mostrar resultados después de delay
+            setTimeout(() => {
+                mostrarPantalla('resultsScreen');
+            }, 1500);
+            
+            return true;
+            
+        } else {
+            const errorText = await response.text();
+            console.error(`❌ Error ${response.status}: ${errorText}`);
+            throw new Error(`Error HTTP ${response.status}: ${errorText}`);
+        }
+        
+    } catch (error) {
+        console.error('❌ Error en envío:', error);
+        mostrarPantalla('dataScreen');
+        alert('Hubo un problema al enviar tu información. Por favor, inténtalo de nuevo.');
+        return false;
+    }
+}
+
+    
+    // === INTERCEPTACIÓN DE TUS FUNCIONES EXISTENTES ===
+    
+    // Guardar referencias originales
+    const originalStartDiagnosis = window.startDiagnosis;
+    const originalNextQuestion = window.nextQuestion;
+    const originalShowDataCollection = window.showDataCollection;
+    const originalGenerateDiagnosis = window.generateDiagnosis;
+    
+    // Interceptar startDiagnosis
+    window.startDiagnosis = function() {
+        if (originalStartDiagnosis) originalStartDiagnosis();
+        mostrarPantalla('questionScreens');
+    };
+    
+    // Interceptar nextQuestion con validación
+    window.nextQuestion = function(numeroPregunta) {
+        // Validar la pregunta actual antes de avanzar
+        const preguntaActual = numeroPregunta - 1;
+        if (preguntaActual >= 1 && preguntaActual <= 5) {
+            if (!validarPreguntaActual(preguntaActual)) {
+                console.log(`🚫 Pregunta ${preguntaActual} inválida - bloqueando avance`);
+                return false;
+            }
+        }
+        
+        // Si es válido, continuar con la función original
+        if (originalNextQuestion) {
+            originalNextQuestion(numeroPregunta);
+        }
+    };
+    
+    // Interceptar showDataCollection
+    window.showDataCollection = function() {
+        // Validar la última pregunta antes de mostrar datos
+        if (!validarPreguntaActual(5)) {
+            console.log('🚫 Pregunta 5 inválida - bloqueando avance a datos');
+            return false;
+        }
+        
+        if (originalShowDataCollection) originalShowDataCollection();
+        mostrarPantalla('dataScreen');
+    };
+    
+// Interceptar generateDiagnosis - DESACTIVADO para usar función original optimizada
+// window.generateDiagnosis = async function(event) {
+//     if (event) {
+//         event.preventDefault();
+//         event.stopPropagation();
+//     }
+//     
+//     await enviarDatos();
+// };
+    
+    // === CONFIGURACIÓN DE EVENTOS ===
+    
+    // Validación en tiempo real
+    document.addEventListener('blur', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            validarCampo(e.target);
+        }
+    }, true);
+    
+    // Sanitización al pegar
+    document.addEventListener('paste', function(e) {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+            setTimeout(() => {
+                e.target.value = sanitizarTexto(e.target.value || '');
+                validarCampo(e.target);
+            }, 10);
+        }
+    });
+    
+    // Mostrar pantalla inicial
+    mostrarPantalla('introScreen');
+    
+    console.log('✅ Sistema integral configurado completamente');
+});
+
+// === FUNCIONES DE UTILIDAD PARA DEBUGGING ===
+function verificarCampos() {
+    console.log('🔍 VERIFICANDO TODOS LOS CAMPOS:');
+    
+    for (let i = 1; i <= 5; i++) {
+        const campo = document.getElementById(`answer${i}`);
+        if (campo) {
+            const valor = campo.value || '';
+            const longitud = valor.length;
+            console.log(`answer${i}: "${valor.substring(0, 30)}..." (${longitud} chars) ${longitud < 10 ? '❌ MUY CORTO' : '✅ OK'}`);
+        }
+    }
+    
+    ['firstName', 'lastName', 'email', 'whatsapp'].forEach(id => {
+        const campo = document.getElementById(id);
+        if (campo) {
+            console.log(`${id}: "${campo.value}" ${campo.value ? '✅' : '❌'}`);
+        }
+    });
+}
+
+function probarValidacionCompleta() {
+    console.log('🧪 PROBANDO VALIDACIÓN COMPLETA:');
+    const resultado = validarFormularioCompleto();
+    console.log(`Resultado: ${resultado ? '✅ VÁLIDO' : '❌ INVÁLIDO'}`);
+    return resultado;
+}
+
+function limpiarTodo() {
+    console.log('🧹 Limpiando validaciones...');
+    document.querySelectorAll('.campo-error, .campo-valido').forEach(campo => {
+        campo.classList.remove('campo-error', 'campo-valido');
+    });
+    document.querySelectorAll('.mensaje-error, .mensaje-exito').forEach(mensaje => {
+        mensaje.remove();
+    });
+    console.log('✅ Limpieza completa');
+}
+
+// ==== DEBBUG ====    
+// Función de debugging específica para el problema de MAKE
+async function debugearEnvioMAKE() {
+    console.log('🔍 DEBUGGING ESPECÍFICO PARA MAKE');
+    
+    // Recopilar datos exactamente como lo hace tu función principal
+    const datos = {};
+    
+    // Respuestas
+    for (let i = 1; i <= 5; i++) {
+        const campo = document.getElementById(`answer${i}`);
+        if (campo && campo.value) {
+            datos[`answer${i}`] = campo.value.trim();
+        }
+    }
+    
+    // Datos personales
+    ['firstName', 'lastName', 'email', 'whatsapp'].forEach(id => {
+        const campo = document.getElementById(id);
+        if (campo && campo.value) {
+            datos[id] = campo.value.trim();
+        }
+    });
+    
+    console.log('📊 DATOS PARA DEBUGGING:', datos);
+    console.log('📏 Número de campos:', Object.keys(datos).length);
+    
+    // Generar JSON y verificar
+    const jsonString = JSON.stringify(datos, null, 2);
+    console.log('📄 JSON GENERADO:');
+    console.log(jsonString);
+    console.log(`📐 Tamaño: ${jsonString.length} caracteres`);
+    
+    // Verificar caracteres problemáticos
+    const caracteresProblematicos = jsonString.match(/[^\x20-\x7E\u00A0-\u00FF\u0100-\u017F\u0180-\u024F]/g);
+    if (caracteresProblematicos) {
+        console.warn('⚠️ CARACTERES PROBLEMÁTICOS DETECTADOS:', caracteresProblematicos);
+    } else {
+        console.log('✅ No se detectaron caracteres problemáticos');
+    }
+    
+    // Prueba de envío con logging detallado
+    try {
+        console.log('🚀 ENVIANDO A MAKE...');
+        
+        const response = await fetch('https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'User-Agent': 'NIA-Diagnostico/1.0'
+            },
+            body: jsonString
+        });
+        
+        console.log(`📡 STATUS RECIBIDO: ${response.status}`);
+        console.log(`📡 STATUS TEXT: ${response.statusText}`);
+        console.log('📡 HEADERS DE RESPUESTA:');
+        
+        response.headers.forEach((value, key) => {
+            console.log(`   ${key}: ${value}`);
+        });
+        
+        // Leer contenido de respuesta
+        const responseText = await response.text();
+        console.log('📄 CONTENIDO DE RESPUESTA:');
+        console.log(responseText);
+        
+        if (response.status >= 200 && response.status < 300) {
+            console.log('✅ ENVÍO EXITOSO');
+        } else {
+            console.error(`❌ ERROR ${response.status}: ${responseText}`);
+        }
+        
+    } catch (error) {
+        console.error('❌ ERROR DE RED:', error);
+        }
+    }
+
+// ===NUEVO DEBUGGEAR
+    function diagnosticarCapturaDatos() {
+    console.log('🔍 DIAGNÓSTICO COMPLETO DE CAPTURA DE DATOS');
+    
+    // Verificar campos de preguntas
+    console.log('📋 CAMPOS DE PREGUNTAS:');
+    for (let i = 1; i <= 5; i++) {
+        const campo = document.getElementById(`answer${i}`);
+        console.log(`answer${i}:`, {
+            existe: !!campo,
+            valor: campo ? `"${campo.value.substring(0, 30)}..."` : 'N/A',
+            longitud: campo ? campo.value.length : 0,
+            visible: campo ? campo.offsetParent !== null : false,
+            enDOM: !!campo
+        });
+    }
+    
+    // Verificar campos personales
+    console.log('👤 CAMPOS PERSONALES:');
+    ['firstName', 'lastName', 'email', 'whatsapp'].forEach(id => {
+        const campo = document.getElementById(id);
+        console.log(`${id}:`, {
+            existe: !!campo,
+            valor: campo ? `"${campo.value}"` : 'N/A',
+            longitud: campo ? campo.value.length : 0,
+            visible: campo ? campo.offsetParent !== null : false
+        });
+    });
+    
+    // Buscar TODOS los campos con datos
+    console.log('🔍 TODOS LOS CAMPOS CON DATOS:');
+    const todosLosCampos = document.querySelectorAll('input, textarea');
+    let camposConDatos = 0;
+    todosLosCampos.forEach((campo, index) => {
+        if (campo.value && campo.value.trim()) {
+            camposConDatos++;
+            console.log(`Campo ${index}:`, {
+                id: campo.id || 'sin-id',
+                name: campo.name || 'sin-name',
+                valor: `"${campo.value.substring(0, 40)}..."`,
+                tipo: campo.tagName,
+                visible: campo.offsetParent !== null
+            });
+        }
+    });
+    
+    console.log(`📊 RESUMEN: ${camposConDatos} campos con datos encontrados`);
+    }
+    
+    //PROBARDOR
+    //========¿?¿?¿?¿?¿?¿?
+    function probarDisplayResultados() {
+    // Simular datos de MAKE
+    const resultadoSimulado = {
+        foco_cliente: 3,
+        promesa_transformacion: 2,
+        autoridad_confianza: 4,
+        diferenciacion: 1,
+        oferta_valor: 5,
+        recomendacion: "¡Excelente! Tu mayor oportunidad está en la diferenciación. Te recomiendo definir claramente qué te hace único en el mercado y comunicarlo con fuerza. 🚀"
+    };
+    
+    // Simular userData
+    userData = { firstName: 'Carlos' };
+    
+    // Mostrar resultados
+    document.getElementById('loadingScreen').style.display = 'none';
+    (resultadoSimulado);
+    
+    console.log('✅ Prueba de display completada');
+    }
+
+    // SOLO PARA TESTING - Comentar en producción
+    function testearResultados() {
+        const datosEjemplo = {
+            foco_cliente: 3,
+            comentario_foco_cliente: "Tu mensaje identifica el segmento, pero puede profundizar más en el dolor específico.",
+            promesa_transformacion: 4,
+            comentario_promesa_transformacion: "La promesa es clara, pero considera ser más específico en resultados medibles.",
+            autoridad_confianza: 2,
+            comentario_autoridad_confianza: "Necesitas más evidencia social y casos de éxito que refuercen tu credibilidad.",
+            diferenciacion: 3,
+            comentario_diferenciacion: "Tu diferenciación es buena, pero puede ser más única y memorable.",
+            oferta_valor: 4,
+            comentario_oferta_valor: "La propuesta de valor es fuerte, pero optimízala para el ROI percibido.",
+            principales_brechas: "Tu narrativa tiene bases sólidas 💪, pero la autoridad y diferenciación son tus mayores GAPs. Sin ellas, pierdes clientes cada día.",
+            proximo_paso: "Crea 3 micro-historias de éxito. Para un plan a medida, agenda tu sesión 1:1 con Carlos 🚀"
+        };
+        
+        procesarResultadosDiagnostico(datosEjemplo);
+    }
+
+//Script Conflictivo
+    function encontrarScriptConflictivo() {
+    console.log('🔍 BUSCANDO SCRIPTS CONFLICTIVOS...');
+    
+    // Verificar si hay múltiples definiciones de nextQuestion
+    console.log('nextQuestion definido:', typeof window.nextQuestion);
+    console.log('nextQuestion código:', window.nextQuestion.toString().substring(0, 200) + '...');
+    
+    // Buscar todos los scripts en la página
+    const scripts = document.querySelectorAll('script');
+    console.log(`📜 Total scripts encontrados: ${scripts.length}`);
+    
+    scripts.forEach((script, index) => {
+        if (script.src) {
+            console.log(`${index + 1}. Script externo: ${script.src}`);
+        } else if (script.textContent.includes('nextQuestion') || script.textContent.includes('answer1')) {
+            console.log(`${index + 1}. Script interno con nextQuestion/answer1:`, script.textContent.substring(0, 100) + '...');
+        }
+    });
+    
+    // Verificar event listeners en botones
+    const buttons = document.querySelectorAll('button');
+    buttons.forEach((button, index) => {
+        if (button.onclick) {
+            console.log(`🔘 Botón ${index + 1} onclick:`, button.onclick.toString());
+        }
+    });
+}
+
+
+    // Función para configurar navegación segura
+    function configurarNavegacionSegura() {
+        console.log('🔧 Configurando navegación segura...');
+        
+        // Remover todos los onclick existentes y agregar event listeners
+        for (let i = 1; i <= 5; i++) {
+            const questionDiv = document.getElementById(`question${i}`);
+            if (questionDiv) {
+                const button = questionDiv.querySelector('button[onclick*="nextQuestion"]');
+                if (button) {
+                    // Remover onclick existente
+                    button.removeAttribute('onclick');
+                    
+                    // Agregar event listener seguro
+                    button.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        nextQuestionSegura(i);
+                    });
+                    
+                    console.log(`✅ Configurado botón seguro para pregunta ${i}`);
+                }
+            }
+        }
+    }
+    
+    // Ejecutar cuando se carga la página
+    document.addEventListener('DOMContentLoaded', configurarNavegacionSegura);
+
+    
+</script>
+
+            <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 hidden">
+                <div class="glass-effect p-6 rounded-2xl max-w-md text-center">
+                    <img src="img/nia.png" 
+                        alt="NIA Avatar" class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-green-400">
+                    <h2 class="text-xl font-bold text-white mb-2">Ups... algo no está bien</h2>
+                    <p id="errorModalMessage" class="text-gray-300 mb-4"></p>
+                    <button onclick="closeErrorModal()" class="btn-primary px-6 py-2">
+                        Entendido
+                    </button>
+                </div>
+            </div>
+
+</body>
+</html>
