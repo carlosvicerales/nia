@@ -2387,6 +2387,67 @@ async function debugearEnvioMAKE() {
     });
 }
 
+    
+// ========= DEBUG DIAGNOSTICO =======
+function diagnosticoCompleto() {
+    console.log('🔍 DIAGNÓSTICO COMPLETO DE VISUALIZACIÓN:');
+    
+    // Verificar contenedor principal
+    const questionScreens = document.getElementById('questionScreens');
+    console.log('📋 CONTENEDOR PRINCIPAL:');
+    console.log('questionScreens existe:', !!questionScreens);
+    if (questionScreens) {
+        console.log('questionScreens display:', questionScreens.style.display);
+        console.log('questionScreens children:', questionScreens.children.length);
+        console.log('questionScreens visible:', questionScreens.offsetParent !== null);
+    }
+    
+    // Verificar cada pregunta individual
+    console.log('📋 PREGUNTAS INDIVIDUALES:');
+    for (let i = 1; i <= 5; i++) {
+        const question = document.getElementById(`question${i}Screen`);
+        console.log(`question${i}Screen:`, {
+            existe: !!question,
+            display: question ? question.style.display : 'N/A',
+            visible: question ? question.offsetParent !== null : false,
+            altura: question ? question.offsetHeight : 0,
+            ancho: question ? question.offsetWidth : 0,
+            contenidoLength: question ? question.innerHTML.length : 0,
+            contenidoPreview: question ? question.innerHTML.substring(0, 100) + '...' : 'N/A'
+        });
+        
+        // Verificar estilos computados para la pregunta 2
+        if (i === 2 && question) {
+            const styles = window.getComputedStyle(question);
+            console.log('🎨 ESTILOS COMPUTADOS question2Screen:', {
+                display: styles.display,
+                visibility: styles.visibility,
+                opacity: styles.opacity,
+                height: styles.height,
+                width: styles.width,
+                position: styles.position,
+                zIndex: styles.zIndex,
+                overflow: styles.overflow
+            });
+        }
+    }
+    
+    // Verificar si hay contenido dentro de question2Screen
+    const q2 = document.getElementById('question2Screen');
+    if (q2) {
+        console.log('📋 CONTENIDO DE QUESTION2SCREEN:');
+        console.log('HTML completo:', q2.innerHTML);
+        console.log('Elementos hijos:', q2.children.length);
+        for (let child of q2.children) {
+            console.log('Hijo:', child.tagName, child.className, child.id);
+        }
+    }
+}
+
+diagnosticoCompleto();
+
+
+
 
     // Función para configurar navegación segura
     function configurarNavegacionSegura() {
