@@ -1188,12 +1188,12 @@ textarea {
     
     // Función para actualizar la barra de progreso visual
     function updateProgressBar(screenId) {
-        const progressSteps = {
-            'question1': { step: 1, progress: 16 },
-            'question2': { step: 2, progress: 32 },
-            'question3': { step: 3, progress: 48 },
-            'question4': { step: 4, progress: 64 },
-            'question5': { step: 5, progress: 80 },
+       const progressSteps = {
+            'question1Screen': { step: 1, progress: 16 },
+            'question2Screen': { step: 2, progress: 32 },
+            'question3Screen': { step: 3, progress: 48 },
+            'question4Screen': { step: 4, progress: 64 },
+            'question5Screen': { step: 5, progress: 80 },
             'dataScreen': { step: 6, progress: 100 }
         };
         
@@ -1291,7 +1291,7 @@ textarea {
             
             // Ocultar todas las preguntas individuales
             for (let i = 1; i <= 5; i++) {
-                const questionDiv = document.getElementById(`question${i}`);
+                const questionDiv = document.getElementById(`question${i}Screen`);
                 if (questionDiv) {
                     questionDiv.style.display = 'none';
                 }
@@ -1327,7 +1327,7 @@ textarea {
         // Manejar barra de progreso
         const progressContainer = document.getElementById('progressContainer');
         if (progressContainer) {
-            if (['question1', 'question2', 'question3', 'question4', 'question5', 'dataScreen'].includes(screenId)) {
+            if (['question1Screen', 'question2Screen', 'question3Screen', 'question4Screen', 'question5Screen', 'dataScreen'].includes(screenId)) {
                 progressContainer.style.display = 'block';
                 updateProgressBar(screenId);
             } else {
@@ -1339,7 +1339,7 @@ textarea {
     // Función para iniciar diagnóstico
     function startDiagnosis() {
         console.log('🚀 Iniciando diagnóstico...');
-        mostrarPantalla('question1');
+        mostrarPantalla('question1Screen');
     }
     
   // Función blindada contra conflictos externos para navegar entre preguntas
@@ -1380,7 +1380,7 @@ textarea {
         // Usar setTimeout para evitar conflictos de timing
         setTimeout(() => {
             if (nextQuestionNumber <= 5) {
-                mostrarPantalla(`question${nextQuestionNumber}`);
+                mostrarPantalla(`question${nextQuestionNumber}Screen`);
             } else {
                 mostrarPantalla('dataScreen');
             }
@@ -2382,7 +2382,7 @@ async function debugearEnvioMAKE() {
         
         // Remover todos los onclick existentes y agregar event listeners
         for (let i = 1; i <= 5; i++) {
-            const questionDiv = document.getElementById(`question${i}`);
+            const questionDiv = document.getElementById(`question${i}Screen`);
             if (questionDiv) {
                 const button = questionDiv.querySelector('button[onclick*="nextQuestion"]');
                 if (button) {
