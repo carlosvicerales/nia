@@ -678,6 +678,32 @@ textarea {
 .floating-animation { animation: float 3s ease-in-out infinite; }
 .fade-in { animation: fadeIn 0.5s ease-in; }
 
+
+/* Transición suave para los mensajes dinámicos */
+#niaProcessStep {
+    transition: opacity 0.4s ease-in-out;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+/* Mejora la animación del avatar existente */
+.pulse-animation {
+    animation: niaPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes niaPulse {
+    0%, 100% { 
+        transform: scale(1);
+        box-shadow: 0 0 15px rgba(79, 220, 154, 0.3);
+    }
+    50% { 
+        transform: scale(1.08);
+        box-shadow: 0 0 25px rgba(79, 220, 154, 0.5);
+    }
+}
+        
 /* =============================================
    MEDIA QUERIES UNIFICADOS - SIN SOLAPAMIENTOS
    ============================================= */
@@ -1096,6 +1122,10 @@ textarea {
                         </div>
                         <h2 class="text-2xl font-bold mb-4">🧠 Analizando tu narrativa...</h2>
                         <p class="text-gray-400 mb-6">NIA está procesando tus respuestas para crear tu diagnóstico personalizado</p>
+                        
+                        <!-- NUEVA LÍNEA: Aquí aparecerán los mensajes dinámicos -->
+                        <p id="niaProcessStep" class="text-sm text-green-400 font-medium mb-4 min-h-[1.5rem]"></p>
+                        
                         <div class="loading-spinner mx-auto mb-4"></div>
                         <p class="text-sm text-gray-500">Esto tomará unos segundos</p>
                     </div>
@@ -1430,7 +1460,6 @@ textarea {
     }
 
 
-
     
     // Función para iniciar diagnóstico
     function startDiagnosis() {
@@ -1540,7 +1569,9 @@ textarea {
         }
         
         // Mostrar pantalla de carga
+       // Mostrar pantalla de carga con animación NIA
         mostrarPantalla('loadingScreen');
+        iniciarAnimacionNIA(); // ← NUEVA LÍNEA
         
         try {
             console.log('📡 Enviando datos a MAKE...');
@@ -1564,14 +1595,17 @@ textarea {
             console.log('✅ Datos recibidos de MAKE:', data);
             
             if (data && data.resultado) {
+                detenerAnimacionNIA(); // ← NUEVA LÍNEA
                 displayResults(data.resultado);
                 mostrarPantalla('resultsScreen');
             } else {
+                detenerAnimacionNIA(); // ← NUEVA LÍNEA
                 throw new Error('Estructura de datos incorrecta');
             }
             
         } catch (error) {
             console.error('❌ Error en generateDiagnosis:', error);
+            detenerAnimacionNIA(); // ← NUEVA LÍNEA
             mostrarPantalla('errorScreen');
         }
     }
@@ -1674,6 +1708,78 @@ textarea {
             console.log(`🎯 Gráfico radial animado: ${score}/${maxScore} (${percentage}%)`);
         }
 
+  
+    //===== Animaciones NIA pantalla de carga ======
+    // Configuración de mensajes alineados con los 5 pilares de NIA
+    const niaPillarMessages = [
+        { icon: "🎯", text: "Evaluando el foco en el Cliente y su dolor..." },
+        { icon: "✨", text: "Analizando la promesa de Transformación..." },
+        { icon: "🏆", text: "Midiendo Autoridad y Confianza..." },
+        { icon: "💎", text: "Identificando puntos de Diferenciación..." },
+        { icon: "💰", text: "Desglosando la Oferta de Valor..." },
+        { icon: "📊", text: "Compilando diagnóstico personalizado..." },
+        { icon: "🚀", text: "Generando recomendaciones estratégicas..." }
+    ];
+    
+    let currentMessageIndex = 0;
+    let messageRotationInterval = null;
+
+    /**
+     * Inicia la animación de mensajes dinámicos de NIA
+     */
+    function iniciarAnimacionNIA() {
+        const stepElement = document.getElementById('niaProcessStep');
+        
+        // Verificar que el elemento existe
+        if (!stepElement) {
+            console.warn('Elemento niaProcessStep no encontrado');
+            return;
+        }
+        
+        // Función para actualizar el mensaje con transición suave
+        function actualizarMensaje() {
+            const currentMessage = niaPillarMessages[currentMessageIndex];
+            
+            // Fade out
+            stepElement.style.opacity = '0';
+            
+            // Cambiar contenido después del fade out
+            setTimeout(() => {
+                stepElement.textContent = `${currentMessage.icon} ${currentMessage.text}`;
+                stepElement.style.opacity = '1';
+                
+                // Avanzar al siguiente mensaje (con ciclo)
+                currentMessageIndex = (currentMessageIndex + 1) % niaPillarMessages.length;
+            }, 200);
+        }
+        
+        // Mostrar primer mensaje inmediatamente
+        actualizarMensaje();
+        
+        // Configurar rotación automática cada 2.8 segundos
+        messageRotationInterval = setInterval(actualizarMensaje, 2800);
+    }
+
+    /**
+     * Detiene la animación y limpia recursos
+     */
+    function detenerAnimacionNIA() {
+        if (messageRotationInterval) {
+            clearInterval(messageRotationInterval);
+            messageRotationInterval = null;
+        }
+        
+        const stepElement = document.getElementById('niaProcessStep');
+        if (stepElement) {
+            stepElement.textContent = '';
+            stepElement.style.opacity = '1';
+        }
+        
+        // Resetear índice para próxima vez
+        currentMessageIndex = 0;
+    }
+    
+    
     
     // --- FUNCIONES DE TESTING ---
     
