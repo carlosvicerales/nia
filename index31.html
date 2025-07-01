@@ -2072,13 +2072,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     // === INTERCEPTACIÓN DE TUS FUNCIONES EXISTENTES ===
-   // Interceptar startDiagnosis
-    window.startDiagnosis = function() {
-        if (originalStartDiagnosis) originalStartDiagnosis();
-        // Usar la función original, no redefinir
-    };
-
-    /* 
     // Guardar referencias originales
     const originalStartDiagnosis = window.startDiagnosis;
     const originalNextQuestion = window.nextQuestion;
@@ -2088,9 +2081,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Interceptar startDiagnosis
     window.startDiagnosis = function() {
         if (originalStartDiagnosis) originalStartDiagnosis();
-        mostrarPantalla('questionScreens');
+        // Usar la función original, no redefinir
     };
-    */
     
     // Interceptar nextQuestion con validación
     window.nextQuestion = function(numeroPregunta) {
