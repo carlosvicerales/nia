@@ -36,7 +36,7 @@ html, body {
     overflow-x: hidden;
     box-sizing: border-box;
     scroll-behavior: smooth;
-    scroll-padding-top: 80px; /* CLAVE: Espacio automático para navbar fija */
+    scroll-padding-top: 80px;
 }
 
 body {
@@ -50,36 +50,33 @@ body {
    ESTRUCTURA PRINCIPAL - ALINEACIÓN SUPERIOR GARANTIZADA
    ============================================= */
 
-/* Estructura principal sin centrado vertical forzado */
 .min-h-screen {
     display: flex;
     flex-direction: column;
     width: 100%;
-    padding-top: 80px; /* Aumentado de 70px a 80px */
+    padding-top: 80px;
     margin: 0;
 }
 
-/* CLAVE: Alineación superior en TODAS las pantallas */
 .flex-1.flex.items-center.justify-center {
-    align-items: flex-start !important; /* Solución definitiva problema 4 */
+    align-items: flex-start !important;
     justify-content: center;
     width: 100%;
     padding: 20px 10px;
     min-height: auto;
 }
 
-/* Eliminar restricciones que causan problemas */
 .w-full.max-w-2xl {
     margin-top: 0;
     padding-top: 0;
 }
 
 #resultsScreen .w-full.max-w-2xl {
-    max-width: none !important; /* MANTENER: Solo para resultados */
+    max-width: none !important;
 }
 
 /* =============================================
-   NAVBAR FIJA SIN PADDING LATERAL - PROBLEMA 5
+   NAVBAR FIJA CON CLASES ESPECÍFICAS
    ============================================= */
 
 #progressContainer {
@@ -99,32 +96,39 @@ body {
     margin: 0 auto;
     padding: 16px 20px;
     display: flex;
-    flex-direction: column; /* CLAVE: Layout vertical */
-    gap: 12px; /* Espacio entre fila superior y barra */
+    flex-direction: column;
+    gap: 12px;
     width: 100%;
     box-sizing: border-box;
 }
 
-/* NUEVA CLASE: Fila superior con distribución horizontal */
 .navbar-content-row {
     display: flex;
-    justify-content: space-between; /* Números izquierda, texto derecha */
+    justify-content: space-between;
     align-items: center;
     width: 100%;
 }
 
-/* Texto descriptivo - optimizado */
-.text-sm.text-gray-400 {
+.flex.space-x-4 {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+/* NUEVA CLASE ESPECÍFICA: Solo para el texto de la navbar */
+.navbar-step-info {
     color: var(--color-text-light-secondary);
     font-size: 14px;
     text-align: right;
     flex-shrink: 0;
+    font-weight: 500;
 }
+
 /* =============================================
    CONTENEDORES - ANCHO DIFERENCIADO PROGRESIVO
    ============================================= */
 
-/* PREGUNTAS: Ancho estándar */
 .container {
     max-width: 900px;
     margin: 0 auto;
@@ -135,6 +139,31 @@ body {
     max-width: 1400px;
     padding: 0 20px;
     width: 100%;
+}
+
+/* =============================================
+   GLASS EFFECT - PADDING INTELIGENTE PARA PREGUNTAS
+   ============================================= */
+
+.glass-effect {
+    /* Padding base para móvil */
+    padding: 20px 15px;
+    
+    /* Efectos visuales modernos (opcionales) */
+    background: rgba(26, 27, 38, 0.8);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(175, 134, 255, 0.1);
+    border-radius: 16px;
+    
+    /* Transición suave */
+    transition: all 0.3s ease;
+}
+
+.glass-effect:hover {
+    background: rgba(26, 27, 38, 0.9);
+    border-color: rgba(175, 134, 255, 0.2);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 32px rgba(175, 134, 255, 0.1);
 }
 
 /* =============================================
@@ -277,14 +306,13 @@ textarea {
     color: var(--color-text-light-primary);
 }
 
-/* Barra de progreso - sin cambios, solo limpieza */
 .progress-bar {
     height: 4px;
     background: var(--color-surface-dark);
     border-radius: 2px;
     overflow: hidden;
     width: 100%;
-    margin: 0; /* Sin margin, el gap del padre controla el espacio */
+    margin: 0;
 }
 
 .progress-fill {
@@ -292,7 +320,6 @@ textarea {
     background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%);
     transition: width 0.3s ease;
 }
-
 
 .loading-spinner {
     border: 3px solid var(--color-surface-dark);
@@ -305,7 +332,6 @@ textarea {
 
 /* PÁGINA DE RESULTADOS - TODOS LOS ESTILOS PRESERVADOS */
 
-/* Tarjeta superior con gráfico radial */
 .score-header-card {
     display: flex;
     background: var(--color-surface-dark);
@@ -655,81 +681,14 @@ textarea {
 /* =============================================
    MEDIA QUERIES UNIFICADOS - SIN SOLAPAMIENTOS
    ============================================= */
-/* Desktop (1024px+) - Control del contenedor principal */
-@media (min-width: 1024px) {
-    /* CLAVE: Controlar el contenedor padre para contenido general */
-    .w-full.max-w-2xl {
-        max-width: 1000px !important; /* Tu ancho deseado */
-        margin: 0 auto;
-    }
-    
-    /* El container general toma el 100% de su padre (1000px) */
-    .container {
-        max-width: 100%;
-        padding: 0 30px;
-    }
-    
-    /* Resultados mantienen su expansión */
-    #resultsScreen .container {
-        max-width: 1100px;
-        padding: 0 30px;
-    }
-    
-    /* ELEMENTOS EN 2 COLUMNAS - REAFIRMACIÓN EXPLÍCITA */
-    .score-header-card,
-    .next-step-card,
-    .final-cta-section {
-        display: flex;
-        flex-direction: row !important; /* Forzar fila en desktop */
-        align-items: center;
-        text-align: left;
-        gap: 32px;
-        padding: 32px;
-    }
-    
-    .final-cta-section {
-        flex-direction: row !important; /* Imagen a la derecha */
-    }
-    
-    .final-cta-text-col {
-        padding-left: 16px;
-    }
-    
-    /* Proporciones de columnas */
-    .score-graphic-col { flex: 1; }
-    .score-title-col { flex: 2; }
-    .nia-avatar-col { flex: 1; }
-    .next-step-text-col { flex: 2; }
-    .final-cta-text-col { flex: 2; }
-    .final-cta-image-col { flex: 1; }
-
-    #progressContainer .max-w-4xl {
-        justify-content: center !important;
-    }
-    
-    /* Contenedor de números - optimizado */
-    .flex.space-x-4 {
-        display: flex;
-        gap: 16px;
-        align-items: center;
-        flex-shrink: 0;
-    }
-}
-
-/* =============================================
-   MEDIA QUERIES LIMPIOS - SIN DUPLICACIONES
-   ============================================= */
 
 /* Desktop (1024px+) */
 @media (min-width: 1024px) {
-    /* NAVBAR: Sincronizada con contenido principal */
     #progressContainer .max-w-4xl {
         max-width: 1000px;
         padding: 16px 30px;
-        /* ELIMINAR: justify-content: center !important; */
     }
     
-    /* CONTENIDO PRINCIPAL */
     .w-full.max-w-2xl {
         max-width: 1000px !important;
         margin: 0 auto;
@@ -743,6 +702,11 @@ textarea {
     #resultsScreen .container {
         max-width: 1100px;
         padding: 0 30px;
+    }
+
+    /* GLASS EFFECT: Padding lateral de 20px en desktop */
+    .glass-effect {
+        padding: 32px 20px;
     }
     
     /* ELEMENTOS EN 2 COLUMNAS */
@@ -793,6 +757,10 @@ textarea {
         max-width: 1300px;
         padding: 0 40px;
     }
+
+    .glass-effect {
+        padding: 32px 30px;
+    }
 }
 
 /* Desktop Grande (1400px+) */
@@ -813,6 +781,10 @@ textarea {
     #resultsScreen .container {
         max-width: 1500px;
         padding: 0 50px;
+    }
+
+    .glass-effect {
+        padding: 32px 40px;
     }
 }
 
@@ -835,6 +807,10 @@ textarea {
         max-width: 1600px;
         padding: 0 60px;
     }
+
+    .glass-effect {
+        padding: 32px 50px;
+    }
 }
 
 /* Tablet (769px - 1023px) */
@@ -856,87 +832,7 @@ textarea {
     
     #resultsScreen .container {
         max-width: 950px;
-        padding: 0 25px;
-    }
-    
-    /* CAMBIO A COLUMNA ÚNICA */
-    .score-header-card,
-    .next-step-card,
-    .final-cta-section {
-        flex-direction: column !important;
-        text-align: center;
-    }
-    
-    .final-cta-section {
-        flex-direction: column-reverse !important;
-    }
-    
-    .final-cta-text-col {
-        padding-left: 0;
-    }
-}
-
-/* Móvil (768px y menos) */
-@media (max-width: 768px) {
-    #progressContainer .max-w-4xl {
-        max-width: 100%;
-        padding: 12px 15px;
-    }
-    
-    .flex-1.flex.items-center.justify-center {
-        align-items: flex-start !important;
-        padding: 30px 10px 20px;
-        min-height: auto;
-    }
-    
-    .w-full.max-w-2xl {
-        max-width: 100% !important;
-        margin: 0 auto;
-    }
-    
-    .container {
-        padding: 0 15px;
-        max-width: 100%;
-    }
-    
-    #resultsScreen .container {
-        padding: 15px;
-        max-width: 100%;
-        width: 100%;
-    }
-    
-    /* COLUMNA ÚNICA EN MÓVIL */
-    .score-header-card,
-    .evaluation-details-card,
-    .next-step-card,
-    .final-cta-section {
-        padding: 20px 15px;
-        margin: 15px 0;
-        flex-direction: column !important;
-        text-align: center;
-    }
-    
-    .final-cta-section {
-        flex-direction: column-reverse !important;
-    }
-    
-    .final-cta-text-col {
-        padding-left: 0;
-    }
-    
-    textarea {
-        min-height: 100px;
-    }
-    
-    .dimension-metric-card:hover {
-        transform: none;
-    }
-    
-    .dimension-metric-card:before {
-        display: none;
-    }
-}
-
+        padding: 0 25
 
     </style>
 </head>
@@ -945,7 +841,6 @@ textarea {
         <!-- Progress Bar -->
         <div id="progressContainer">
            <div class="max-w-4xl">
-                <!-- AGREGAR SOLO ESTE DIV CONTENEDOR -->
                 <div class="navbar-content-row">
                     <!-- Números a la izquierda -->
                     <div class="flex space-x-4">
@@ -959,14 +854,13 @@ textarea {
                         </div>
                     </div>
                     
-                    <!-- Texto a la derecha -->
-                    <div class="text-sm text-gray-400">
+                    <!-- Texto con clase específica (CAMBIO CLAVE) -->
+                    <div class="navbar-step-info">
                         Paso 3 de 6
                     </div>
                 </div>
-                <!-- FIN DEL DIV CONTENEDOR -->
                 
-                <!-- Barra de progreso debajo (sin cambios) -->
+                <!-- Barra de progreso (sin cambios) -->
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: 50%;"></div>
                 </div>
