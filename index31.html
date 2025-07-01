@@ -893,13 +893,7 @@ textarea {
                             Responde sólo 5 preguntas clave, y sabrás de forma personalizada si tu narrativa actual 
                             <span class="font-bold">refleja el valor</span> que entregas, y si estás ayudando a 
                             <span class="font-bold">atraer y convertir a los clientes correctos</span>.
-                        </p>
-
-                   <!---     
-                        <p class="text-lg text-gray-300 mb-8">
-                            ¿List@ para empezar?
-                        </p>
-                    --->    
+                        </p> 
                         
                         <button onclick="startDiagnosis()" class="btn-primary text-lg">
                             <i class="fas fa-rocket mr-2"></i>
@@ -1286,40 +1280,47 @@ textarea {
         }
     }
     // --- FUNCIONES PRINCIPALES ---
-    
     // Función adaptada a tu estructura HTML específica
+    // Reemplaza SOLO tu función mostrarPantalla con esta versión corregida
     function mostrarPantalla(screenId) {
         console.log(`🔄 Cambiando a pantalla: ${screenId}`);
         
         // Pantallas principales de nivel superior
-        const mainScreens = ['introScreen', 'questionScreens', 'dataScreen', 'loadingScreen', 'resultsScreen', 'errorScreen'];
+        const mainScreens = ['introScreen', 'question1Screen', 'dataScreen', 'loadingScreen', 'resultsScreen', 'errorScreen'];
         
-        // Si es una pregunta específica (question1, question2, etc.)
-        if (screenId.startsWith('question') && screenId !== 'questionScreens') {
-            // CLAVE: Mostrar el contenedor de preguntas PRIMERO
-            const questionScreens = document.getElementById('questionScreens');
-            if (questionScreens) {
-                questionScreens.style.display = 'block';
+        // Si es una pregunta específica (question2Screen, question3Screen, etc.)
+        if (screenId.startsWith('question') && screenId !== 'question1Screen') {
+            // CLAVE: Mostrar el contenedor principal de preguntas (question1Screen)
+            const questionContainer = document.getElementById('question1Screen');
+            if (questionContainer) {
+                questionContainer.style.display = 'block';
+                console.log(`✅ Contenedor question1Screen mostrado`);
             }
             
-            // Ocultar todas las preguntas individuales
-            for (let i = 1; i <= 5; i++) {
+            // Ocultar todas las preguntas individuales dentro del contenedor
+            for (let i = 2; i <= 5; i++) {
                 const questionDiv = document.getElementById(`question${i}Screen`);
                 if (questionDiv) {
                     questionDiv.style.display = 'none';
                 }
             }
             
-            // Mostrar la pregunta específica
+            // Ocultar también la pregunta 1 individual (el div interno)
+            const question1Div = document.getElementById('question1');
+            if (question1Div) {
+                question1Div.style.display = 'none';
+            }
+            
+            // Mostrar la pregunta específica solicitada
             const targetQuestion = document.getElementById(screenId);
             if (targetQuestion) {
                 targetQuestion.style.display = 'block';
                 console.log(`✅ Pregunta ${screenId} mostrada`);
             }
             
-            // Ocultar otras pantallas principales (excepto questionScreens)
+            // Ocultar otras pantallas principales (excepto question1Screen)
             mainScreens.forEach(screenName => {
-                if (screenName !== 'questionScreens') {
+                if (screenName !== 'question1Screen') {
                     const screen = document.getElementById(screenName);
                     if (screen) {
                         screen.style.display = 'none';
@@ -1327,14 +1328,40 @@ textarea {
                 }
             });
             
+        } else if (screenId === 'question1Screen') {
+            // Mostrar question1Screen y solo la primera pregunta
+            mainScreens.forEach(screenName => {
+                const screen = document.getElementById(screenName);
+                if (screen) {
+                    screen.style.display = screenName === 'question1Screen' ? 'block' : 'none';
+                }
+            });
+            
+            // Dentro de question1Screen, mostrar solo la pregunta 1
+            const question1Div = document.getElementById('question1');
+            if (question1Div) {
+                question1Div.style.display = 'block';
+            }
+            
+            // Ocultar las demás preguntas
+            for (let i = 2; i <= 5; i++) {
+                const questionDiv = document.getElementById(`question${i}Screen`);
+                if (questionDiv) {
+                    questionDiv.style.display = 'none';
+                }
+            }
+            
+            console.log(`✅ question1Screen mostrado con pregunta 1`);
+            
         } else {
-            // Para pantallas principales, comportamiento normal
+            // Para otras pantallas principales (intro, data, loading, results)
             mainScreens.forEach(screenName => {
                 const screen = document.getElementById(screenName);
                 if (screen) {
                     screen.style.display = screenName === screenId ? 'block' : 'none';
                 }
             });
+            console.log(`✅ Pantalla ${screenId} mostrada`);
         }
         
         // Manejar barra de progreso
@@ -1348,6 +1375,9 @@ textarea {
             }
         }
     }
+
+
+
     
     // Función para iniciar diagnóstico
     function startDiagnosis() {
