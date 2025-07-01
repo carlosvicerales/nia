@@ -95,16 +95,31 @@ body {
 }
 
 #progressContainer .max-w-4xl {
-    max-width: 1000px; /* Sincronizado con contenido principal */
+    max-width: 1000px;
     margin: 0 auto;
     padding: 16px 20px;
     display: flex;
-    justify-content: space-between; /* CLAVE: Números izquierda, texto derecha */
-    align-items: center;
+    flex-direction: column; /* CLAVE: Layout vertical */
+    gap: 12px; /* Espacio entre fila superior y barra */
     width: 100%;
     box-sizing: border-box;
 }
-        
+
+/* NUEVA CLASE: Fila superior con distribución horizontal */
+.navbar-content-row {
+    display: flex;
+    justify-content: space-between; /* Números izquierda, texto derecha */
+    align-items: center;
+    width: 100%;
+}
+
+/* Texto descriptivo - optimizado */
+.text-sm.text-gray-400 {
+    color: var(--color-text-light-secondary);
+    font-size: 14px;
+    text-align: right;
+    flex-shrink: 0;
+}
 /* =============================================
    CONTENEDORES - ANCHO DIFERENCIADO PROGRESIVO
    ============================================= */
@@ -262,14 +277,14 @@ textarea {
     color: var(--color-text-light-primary);
 }
 
-/* Asegurar que la barra de progreso sea visible */
+/* Barra de progreso - sin cambios, solo limpieza */
 .progress-bar {
     height: 4px;
     background: var(--color-surface-dark);
     border-radius: 2px;
     overflow: hidden;
     width: 100%;
-    margin-top: 12px;
+    margin: 0; /* Sin margin, el gap del padre controla el espacio */
 }
 
 .progress-fill {
@@ -277,6 +292,7 @@ textarea {
     background: linear-gradient(90deg, var(--color-secondary) 0%, var(--color-primary) 100%);
     transition: width 0.3s ease;
 }
+
 
 .loading-spinner {
     border: 3px solid var(--color-surface-dark);
@@ -691,7 +707,7 @@ textarea {
         justify-content: center !important;
     }
     
-    /* Contenedor de números - alineado a la izquierda */
+    /* Contenedor de números - optimizado */
     .flex.space-x-4 {
         display: flex;
         gap: 16px;
@@ -700,13 +716,17 @@ textarea {
     }
 }
 
+/* =============================================
+   MEDIA QUERIES LIMPIOS - SIN DUPLICACIONES
+   ============================================= */
 
 /* Desktop (1024px+) */
 @media (min-width: 1024px) {
     /* NAVBAR: Sincronizada con contenido principal */
     #progressContainer .max-w-4xl {
         max-width: 1000px;
-        padding: 16px 30px; /* Consistente con contenido */
+        padding: 16px 30px;
+        /* ELIMINAR: justify-content: center !important; */
     }
     
     /* CONTENIDO PRINCIPAL */
@@ -725,7 +745,7 @@ textarea {
         padding: 0 30px;
     }
     
-    /* ELEMENTOS EN 2 COLUMNAS - REAFIRMACIÓN EXPLÍCITA */
+    /* ELEMENTOS EN 2 COLUMNAS */
     .score-header-card,
     .next-step-card,
     .final-cta-section {
@@ -861,7 +881,6 @@ textarea {
     #progressContainer .max-w-4xl {
         max-width: 100%;
         padding: 12px 15px;
-        /* Mantener justify-content: space-between para móvil */
     }
     
     .flex-1.flex.items-center.justify-center {
@@ -919,51 +938,35 @@ textarea {
 }
 
 
-/* TEMPORAL - PARA DEBUGGING */
-[class*="max-w-"] {
-    border: 2px solid red !important;
-    position: relative;
-}
-
-[class*="max-w-"]:before {
-    content: attr(class);
-    position: absolute;
-    top: -20px;
-    left: 0;
-    background: red;
-    color: white;
-    font-size: 10px;
-    padding: 2px;
-    z-index: 9999;
-}
-
-
-
     </style>
 </head>
 <body class="text-white">
     <div class="min-h-screen flex flex-col">
         <!-- Progress Bar -->
         <div id="progressContainer">
-            <div class="max-w-4xl">
-                <!-- Números a la izquierda -->
-                <div class="flex space-x-4">
-                    <div class="step-indicator step-completed">1</div>
-                    <div class="step-indicator step-completed">2</div>
-                    <div class="step-indicator step-active">3</div>
-                    <div class="step-indicator step-inactive">4</div>
-                    <div class="step-indicator step-inactive">5</div>
-                    <div class="step-indicator step-completed">
-                        <i class="fa-solid fa-list-check"></i>
+           <div class="max-w-4xl">
+                <!-- AGREGAR SOLO ESTE DIV CONTENEDOR -->
+                <div class="navbar-content-row">
+                    <!-- Números a la izquierda -->
+                    <div class="flex space-x-4">
+                        <div class="step-indicator step-completed">1</div>
+                        <div class="step-indicator step-completed">2</div>
+                        <div class="step-indicator step-active">3</div>
+                        <div class="step-indicator step-inactive">4</div>
+                        <div class="step-indicator step-inactive">5</div>
+                        <div class="step-indicator step-completed">
+                            <i class="fa-solid fa-list-check"></i>
+                        </div>
+                    </div>
+                    
+                    <!-- Texto a la derecha -->
+                    <div class="text-sm text-gray-400">
+                        Paso 3 de 6
                     </div>
                 </div>
+                <!-- FIN DEL DIV CONTENEDOR -->
                 
-                <!-- Texto a la derecha -->
-                <div class="text-sm text-gray-400">
-                    Paso 3 de 6
-                </div>
-                
-                <!-- Barra de progreso debajo -->
+                <!-- Barra de progreso debajo (sin cambios) -->
                 <div class="progress-bar">
                     <div class="progress-fill" style="width: 50%;"></div>
                 </div>
