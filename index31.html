@@ -844,25 +844,25 @@ textarea {
                 <div class="navbar-content-row">
                     <!-- Números a la izquierda -->
                     <div class="flex space-x-4">
-                        <div class="step-indicator step-completed">1</div>
-                        <div class="step-indicator step-completed">2</div>
-                        <div class="step-indicator step-active">3</div>
-                        <div class="step-indicator step-inactive">4</div>
-                        <div class="step-indicator step-inactive">5</div>
-                        <div class="step-indicator step-completed">
+                        <div class="step-indicator step-completed" id="step1">1</div>
+                        <div class="step-indicator step-completed" id="step2">2</div>
+                        <div class="step-indicator step-active" id="step3">3</div>
+                        <div class="step-indicator step-inactive" id="step4">4</div>
+                        <div class="step-indicator step-inactive" id="step5">5</div>
+                        <div class="step-indicator step-completed" id="stepResults">
                             <i class="fa-solid fa-list-check"></i>
                         </div>
                     </div>
                     
                     <!-- Texto con clase específica (CAMBIO CLAVE) -->
-                    <div class="navbar-step-info">
+                    <div class="navbar-step-info" id="stepText">
                         Paso 3 de 6
                     </div>
                 </div>
                 
                 <!-- Barra de progreso (sin cambios) -->
                 <div class="progress-bar">
-                    <div class="progress-fill" style="width: 50%;"></div>
+                    <div class="progress-fill" id="progressFill" style="width: 50%;"></div>
                 </div>
             </div>
         </div>
@@ -909,7 +909,7 @@ textarea {
                 </div>
 
                 <!-- Question Screens -->
-                <div id="questionScreens" style="display: none;">
+                <div id="question1Screen" style="display: none;">
                     <!-- Question 1 -->
                     <div id="question1" class="question-screen fade-in">
                         <div class="glass-effect rounded-3xl p-8">
@@ -929,7 +929,7 @@ textarea {
                     </div>
 
                     <!-- Question 2 -->
-                    <div id="question2" class="question-screen" style="display: none;">
+                    <div id="question2Screen" class="question-screen" style="display: none;">
                         <div class="glass-effect rounded-3xl p-8">
                             <div class="text-center mb-8">
                                 <img src="img/nia.png" 
@@ -947,7 +947,7 @@ textarea {
                     </div>
 
                     <!-- Question 3 -->
-                    <div id="question3" class="question-screen" style="display: none;">
+                    <div id="question3Screen" class="question-screen" style="display: none;">
                         <div class="glass-effect rounded-3xl p-8">
                             <div class="text-center mb-8">
                                 <img src="img/nia.png" 
@@ -965,7 +965,7 @@ textarea {
                     </div>
 
                     <!-- Question 4 -->
-                    <div id="question4" class="question-screen" style="display: none;">
+                    <div id="question4Screen" class="question-screen" style="display: none;">
                         <div class="glass-effect rounded-3xl p-8">
                             <div class="text-center mb-8">
                                 <img src="img/nia.png" 
@@ -983,7 +983,7 @@ textarea {
                     </div>
 
                     <!-- Question 5 -->
-                    <div id="question5" class="question-screen" style="display: none;">
+                    <div id="question5Screen" class="question-screen" style="display: none;">
                         <div class="glass-effect rounded-3xl p-8">
                             <div class="text-center mb-8">
                                 <img src="img/nia.png" 
