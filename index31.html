@@ -1187,51 +1187,64 @@ textarea {
     // --- FUNCIONES AUXILIARES (DEFINIDAS PRIMERO) ---
     
     // Función para actualizar la barra de progreso visual
-    function updateProgressBar(screenId) {
-       const progressSteps = {
-            'question1Screen': { step: 1, progress: 16 },
-            'question2Screen': { step: 2, progress: 32 },
-            'question3Screen': { step: 3, progress: 48 },
-            'question4Screen': { step: 4, progress: 64 },
-            'question5Screen': { step: 5, progress: 80 },
-            'dataScreen': { step: 6, progress: 100 }
-        };
-        
-        const currentStepInfo = progressSteps[screenId];
-        if (!currentStepInfo) {
-            console.log(`⚠️ No hay información de progreso para: ${screenId}`);
-            return;
-        }
-        
-        console.log(`📊 Actualizando progreso: Paso ${currentStepInfo.step} (${currentStepInfo.progress}%)`);
-        
-        // Actualizar barra de progreso
-        const progressBar = document.getElementById('progressBar');
-        if (progressBar) {
-            progressBar.style.width = `${currentStepInfo.progress}%`;
-            console.log(`✅ Barra actualizada: ${currentStepInfo.progress}%`);
-        }
-        
-        // Actualizar indicador de paso actual
-        const currentStepElement = document.getElementById('currentStep');
-        if (currentStepElement) {
-            currentStepElement.textContent = currentStepInfo.step;
-        }
-        
-        // Actualizar indicadores visuales de pasos
-        for (let i = 1; i <= 6; i++) {
-            const stepElement = document.getElementById(`step${i}`);
-            if (stepElement) {
-                if (i <= currentStepInfo.step) {
-                    stepElement.classList.remove('step-inactive');
-                    stepElement.classList.add('step-active');
-                } else {
-                    stepElement.classList.remove('step-active');
-                    stepElement.classList.add('step-inactive');
-                }
+   function updateProgressBar(screenId) {
+    const progressSteps = {
+        'question1Screen': { step: 1, progress: 16 },
+        'question2Screen': { step: 2, progress: 32 },
+        'question3Screen': { step: 3, progress: 48 },
+        'question4Screen': { step: 4, progress: 64 },
+        'question5Screen': { step: 5, progress: 80 },
+        'dataScreen': { step: 6, progress: 100 }
+    };
+    
+    const currentStepInfo = progressSteps[screenId];
+    if (!currentStepInfo) {
+        console.log(`⚠️ No hay información de progreso para: ${screenId}`);
+        return;
+    }
+    
+    console.log(`📊 Actualizando progreso: Paso ${currentStepInfo.step} (${currentStepInfo.progress}%)`);
+    
+    // Actualizar barra de progreso (ID corregido)
+    const progressBar = document.getElementById('progressFill');
+    if (progressBar) {
+        progressBar.style.width = `${currentStepInfo.progress}%`;
+        console.log(`✅ Barra actualizada: ${currentStepInfo.progress}%`);
+    }
+    
+    // Actualizar texto del paso (ID corregido)
+    const stepText = document.getElementById('stepText');
+    if (stepText) {
+        stepText.textContent = `Paso ${currentStepInfo.step} de 6`;
+    }
+    
+    // Actualizar indicadores visuales de pasos
+    for (let i = 1; i <= 5; i++) {
+        const stepElement = document.getElementById(`step${i}`);
+        if (stepElement) {
+            stepElement.classList.remove('step-inactive', 'step-active', 'step-completed');
+            if (i < currentStepInfo.step) {
+                stepElement.classList.add('step-completed');
+            } else if (i === currentStepInfo.step) {
+                stepElement.classList.add('step-active');
+            } else {
+                stepElement.classList.add('step-inactive');
             }
         }
     }
+    
+    // Actualizar indicador de resultados
+    const stepResults = document.getElementById('stepResults');
+    if (stepResults) {
+        stepResults.classList.remove('step-inactive', 'step-active', 'step-completed');
+        if (currentStepInfo.step === 6) {
+            stepResults.classList.add('step-active');
+        } else {
+            stepResults.classList.add('step-inactive');
+        }
+    }
+}
+
     
     // Función auxiliar inteligente que prueba múltiples IDs
     function updateElementSafely(possibleIds, content) {
@@ -1674,7 +1687,7 @@ textarea {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('✨ Sistema de validación integral NIA activado y corregido');
     
-    // === CONTROL DE PANTALLAS (Usando tus IDs reales) ===
+/*    // === CONTROL DE PANTALLAS (Usando tus IDs reales) ===
     function mostrarPantalla(pantallaId) {
         const pantallas = ['introScreen', 'questionScreens', 'dataScreen', 'loadingScreen', 'resultsScreen'];
         
@@ -1696,7 +1709,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error(`❌ Pantalla no encontrada: ${pantallaId}`);
         return false;
     }
-    
+    */
     // === FUNCIONES DE SANITIZACIÓN ===
     function sanitizarTexto(texto) {
         if (typeof texto !== 'string' || !texto) return '';
@@ -2059,7 +2072,13 @@ document.addEventListener('DOMContentLoaded', function() {
 
     
     // === INTERCEPTACIÓN DE TUS FUNCIONES EXISTENTES ===
-    
+   // Interceptar startDiagnosis
+    window.startDiagnosis = function() {
+        if (originalStartDiagnosis) originalStartDiagnosis();
+        // Usar la función original, no redefinir
+    };
+
+    /* 
     // Guardar referencias originales
     const originalStartDiagnosis = window.startDiagnosis;
     const originalNextQuestion = window.nextQuestion;
@@ -2071,6 +2090,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (originalStartDiagnosis) originalStartDiagnosis();
         mostrarPantalla('questionScreens');
     };
+    */
     
     // Interceptar nextQuestion con validación
     window.nextQuestion = function(numeroPregunta) {
