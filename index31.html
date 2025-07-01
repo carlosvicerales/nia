@@ -679,41 +679,34 @@ textarea {
 .fade-in { animation: fadeIn 0.5s ease-in; }
 
 /* =============================================
-   MEDIA QUERIES UNIFICADOS - CORREGIDOS Y COMPLETOS
+   MEDIA QUERIES UNIFICADOS - SIN SOLAPAMIENTOS
    ============================================= */
-
-/* Desktop (1024px+) */
+/* Desktop (1024px+) - Control del contenedor principal */
 @media (min-width: 1024px) {
-    #progressContainer .max-w-4xl {
-        max-width: 1000px;
-        padding: 16px 30px;
-    }
-    
+    /* CLAVE: Controlar el contenedor padre para contenido general */
     .w-full.max-w-2xl {
-        max-width: 1000px !important;
+        max-width: 1000px !important; /* Tu ancho deseado */
         margin: 0 auto;
     }
     
+    /* El container general toma el 100% de su padre (1000px) */
     .container {
         max-width: 100%;
         padding: 0 30px;
     }
     
+    /* Resultados mantienen su expansión */
     #resultsScreen .container {
         max-width: 1100px;
         padding: 0 30px;
     }
-
-    .glass-effect {
-        padding: 32px 20px;
-    }
     
-    /* ELEMENTOS EN 2 COLUMNAS */
+    /* ELEMENTOS EN 2 COLUMNAS - REAFIRMACIÓN EXPLÍCITA */
     .score-header-card,
     .next-step-card,
     .final-cta-section {
         display: flex;
-        flex-direction: row !important;
+        flex-direction: row !important; /* Forzar fila en desktop */
         align-items: center;
         text-align: left;
         gap: 32px;
@@ -721,7 +714,7 @@ textarea {
     }
     
     .final-cta-section {
-        flex-direction: row !important;
+        flex-direction: row !important; /* Imagen a la derecha */
     }
     
     .final-cta-text-col {
@@ -735,17 +728,24 @@ textarea {
     .next-step-text-col { flex: 2; }
     .final-cta-text-col { flex: 2; }
     .final-cta-image-col { flex: 1; }
+
+    #progressContainer .max-w-4xl {
+        justify-content: center !important;
+    }
+    
+    /* Si tienes múltiples elementos en la navbar, centrar específicamente los números */
+    .flex.space-x-4 {
+        justify-content: center;
+        width: 100%;
+    }
 }
+
+
 
 /* Desktop Mediano (1200px+) */
 @media (min-width: 1200px) {
-    #progressContainer .max-w-4xl {
-        max-width: 1000px;
-        padding: 16px 40px;
-    }
-    
     .w-full.max-w-2xl {
-        max-width: 1000px !important;
+        max-width: 1000px !important; /* Mantener 1000px */
     }
     
     .container {
@@ -756,21 +756,12 @@ textarea {
         max-width: 1300px;
         padding: 0 40px;
     }
-
-    .glass-effect {
-        padding: 32px 30px;
-    }
 }
 
 /* Desktop Grande (1400px+) */
 @media (min-width: 1400px) {
-    #progressContainer .max-w-4xl {
-        max-width: 1000px;
-        padding: 16px 50px;
-    }
-    
     .w-full.max-w-2xl {
-        max-width: 1000px !important;
+        max-width: 1000px !important; /* Mantener 1000px */
     }
     
     .container {
@@ -781,21 +772,12 @@ textarea {
         max-width: 1500px;
         padding: 0 50px;
     }
-
-    .glass-effect {
-        padding: 32px 40px;
-    }
 }
 
 /* Desktop Extra Grande (1600px+) */
 @media (min-width: 1600px) {
-    #progressContainer .max-w-4xl {
-        max-width: 1000px;
-        padding: 16px 60px;
-    }
-    
     .w-full.max-w-2xl {
-        max-width: 1000px !important;
+        max-width: 1000px !important; /* Mantener 1000px */
     }
     
     .container {
@@ -806,19 +788,10 @@ textarea {
         max-width: 1600px;
         padding: 0 60px;
     }
-
-    .glass-effect {
-        padding: 32px 50px;
-    }
 }
 
-/* Tablet (769px - 1023px) - ¡CORREGIDO! */
+/* Tablet (769px - 1023px) */
 @media (min-width: 769px) and (max-width: 1023px) {
-    #progressContainer .max-w-4xl {
-        max-width: 900px;
-        padding: 16px 25px;
-    }
-    
     .w-full.max-w-2xl {
         max-width: 900px !important;
         margin: 0 auto;
@@ -831,11 +804,7 @@ textarea {
     
     #resultsScreen .container {
         max-width: 950px;
-        padding: 0 25px; /* ✅ CORREGIDO: Agregado 'px;' */
-    }
-
-    .glass-effect {
-        padding: 25px 20px;
+        padding: 0 25px;
     }
     
     /* CAMBIO A COLUMNA ÚNICA */
@@ -844,8 +813,6 @@ textarea {
     .final-cta-section {
         flex-direction: column !important;
         text-align: center;
-        gap: 20px;
-        padding: 25px;
     }
     
     .final-cta-section {
@@ -855,33 +822,21 @@ textarea {
     .final-cta-text-col {
         padding-left: 0;
     }
-} /* ✅ CORREGIDO: Agregado corchete de cierre */
+}
 
-/* MÓVIL (768px y menos) - ¡RESTAURADO COMPLETAMENTE! */
+/* Móvil (768px y menos) */
 @media (max-width: 768px) {
-    /* NAVBAR MÓVIL */
-    #progressContainer .max-w-4xl {
-        max-width: 100%;
-        padding: 12px 15px;
-        gap: 8px;
-    }
     
-    /* ESPACIADO MÓVIL CRÍTICO */
-    .min-h-screen {
-        padding-top: 70px;
-    }
     
     .flex-1.flex.items-center.justify-center {
         align-items: flex-start !important;
-        padding: 15px 10px;
+        padding: 10px;
         min-height: auto;
     }
     
-    /* CONTENEDORES MÓVIL */
     .w-full.max-w-2xl {
         max-width: 100% !important;
-        margin: 0;
-        padding: 0 10px;
+        margin: 0 auto;
     }
     
     .container {
@@ -894,75 +849,16 @@ textarea {
         max-width: 100%;
         width: 100%;
     }
-
-    /* GLASS EFFECT MÓVIL */
-    .glass-effect {
-        padding: 20px 15px !important;
-        margin: 10px 0;
-        border-radius: 12px;
-    }
     
-    /* INDICADORES DE PASO MÓVIL */
-    .step-indicator {
-        width: 25px;
-        height: 25px;
-        font-size: 12px;
-    }
-    
-    .flex.space-x-4 {
-        gap: 8px;
-    }
-    
-    .navbar-step-info {
-        font-size: 12px;
-    }
-    
-    /* FORMULARIOS MÓVIL */
-    textarea {
-        min-height: 100px;
-        font-size: 16px; /* Evita zoom en iOS */
-    }
-    
-    input[type="text"],
-    input[type="email"],
-    input[type="tel"] {
-        font-size: 16px; /* Evita zoom en iOS */
-        padding: 12px;
-    }
-    
-    /* BOTONES MÓVIL */
-    .btn-primary {
-        padding: 14px 24px;
-        font-size: 16px;
-        width: 100%;
-        text-align: center;
-    }
-    
-    /* TÍTULOS MÓVIL */
-    .main-title {
-        font-size: 1.5em;
-        margin-bottom: 20px;
-    }
-    
-    h2 {
-        font-size: 1.3em !important;
-        line-height: 1.3;
-    }
-    
-    h3 {
-        font-size: 1.1em !important;
-    }
-    
-    /* ELEMENTOS EN COLUMNA ÚNICA MÓVIL */
+    /* COLUMNA ÚNICA EN MÓVIL */
     .score-header-card,
     .evaluation-details-card,
     .next-step-card,
     .final-cta-section {
-        flex-direction: column !important;
-        text-align: center;
-        gap: 15px;
         padding: 20px 15px;
         margin: 15px 0;
+        flex-direction: column !important;
+        text-align: center;
     }
     
     .final-cta-section {
@@ -973,105 +869,23 @@ textarea {
         padding-left: 0;
     }
     
-    /* GRID RESPONSIVO MÓVIL */
-    .dimensions-grid {
-        grid-template-columns: 1fr;
-        gap: 15px;
+    #progressContainer .max-w-4xl {
+        padding: 12px 15px;
+        justify-content: flex-start; /* Alineación izquierda en móvil */
     }
     
-    /* GRÁFICO RADIAL MÓVIL */
-    .radial-progress-container {
-        width: 120px;
-        height: 120px;
-    }
-    
-    .radial-score {
-        font-size: 36px;
-    }
-    
-    .radial-score-label {
-        font-size: 14px;
-    }
-    
-    /* NIA AVATAR MÓVIL */
-    .nia-avatar {
-        width: 100px;
-        height: 100px;
-    }
-    
-    /* EFECTOS HOVER DESHABILITADOS EN MÓVIL */
-    .glass-effect:hover {
-        transform: none;
-        box-shadow: none;
+    textarea {
+        min-height: 100px;
     }
     
     .dimension-metric-card:hover {
         transform: none;
-        border-color: transparent;
     }
     
     .dimension-metric-card:before {
         display: none;
     }
-    
-    .btn-primary:hover,
-    .btn-secondary:hover {
-        transform: none;
-    }
-    
-    /* ESPACIADO ESPECÍFICO MÓVIL */
-    .text-center.mb-8 {
-        margin-bottom: 1.5rem !important;
-    }
-    
-    .mt-6 {
-        margin-top: 1rem !important;
-    }
-    
-    /* FOOTER MÓVIL */
-    .footer {
-        margin-top: 30px;
-        padding: 0 15px 20px;
-        font-size: 14px;
-    }
 }
-
-/* MÓVIL PEQUEÑO (480px y menos) */
-@media (max-width: 480px) {
-    .min-h-screen {
-        padding-top: 60px;
-    }
-    
-    .glass-effect {
-        padding: 15px 12px !important;
-        margin: 8px 0;
-    }
-    
-    .step-indicator {
-        width: 22px;
-        height: 22px;
-        font-size: 11px;
-    }
-    
-    .flex.space-x-4 {
-        gap: 6px;
-    }
-    
-    .btn-primary {
-        padding: 12px 20px;
-        font-size: 14px;
-    }
-    
-    h2 {
-        font-size: 1.2em !important;
-    }
-    
-    .navbar-step-info {
-        font-size: 11px;
-    }
-}
-
-
 
     </style>
 </head>
