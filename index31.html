@@ -510,6 +510,85 @@ textarea {
     line-height: 1.6;
 }
 
+/* =============================================
+   INDICADORES DE PUNTAJE ÚNICOS Y OPTIMIZADOS
+   ============================================= */
+
+/* Contenedor del badge de puntaje */
+.dimension-score-badge {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    z-index: 10;
+}
+
+/* Indicador de puntaje base */
+.dimension-score-indicator {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 45px;
+    height: 32px;
+    border-radius: 16px;
+    font-weight: 700;
+    font-size: 13px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Números dentro del indicador */
+.score-number {
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+.score-total {
+    font-size: 11px;
+    opacity: 0.85;
+    margin-left: 1px;
+    font-weight: 600;
+}
+
+/* Colores dinámicos según puntaje */
+.score-excellent { /* 4-5 puntos */
+    background: linear-gradient(135deg, var(--color-secondary), #22c55e);
+    color: var(--color-bg-dark);
+    box-shadow: 0 2px 8px rgba(79, 220, 154, 0.4);
+}
+
+.score-good { /* 3 puntos */
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    color: var(--color-bg-dark);
+    box-shadow: 0 2px 8px rgba(251, 191, 36, 0.4);
+}
+
+.score-needs-improvement { /* 1-2 puntos */
+    background: linear-gradient(135deg, #ef4444, #dc2626);
+    color: white;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.4);
+}
+
+/* Ajustar padding de la tarjeta para dar espacio al badge */
+.dimension-metric-card {
+    position: relative;
+    padding: 20px 60px 20px 20px; /* Espacio extra a la derecha para desktop */
+}
+
+/* Animación sutil al hacer hover */
+.dimension-score-indicator:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+}
+
+/* ELIMINAR el puntaje duplicado */
+.dimension-score {
+    display: none !important; /* Ocultar completamente el puntaje duplicado */
+}
+
+
 .cta-button-card {
     display: flex;
     align-items: center;
@@ -764,6 +843,36 @@ textarea {
         justify-content: center;
         width: 100%;
     }
+    
+/* INDICADORES DESKTOP Nuevo dimension score*/
+    .dimension-score-badge {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        z-index: 10;
+    }
+    
+    .dimension-metric-card {
+        padding: 20px 60px 20px 20px; /* Espacio para badge */
+    }
+    
+    .dimension-score-indicator {
+        min-width: 45px;
+        height: 32px;
+        font-size: 13px;
+    }
+    
+    .dimension-icon {
+        display: flex; /* Mostrar ícono en desktop */
+    }
+    
+    .dimension-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+    
 }
 
 
@@ -848,6 +957,38 @@ textarea {
     .final-cta-text-col {
         padding-left: 0;
     }
+    
+/* INDICADORES TABLET */
+    .dimension-score-badge {
+        position: static;
+        display: flex;
+        justify-content: center;
+        margin: 8px 0 12px 0;
+    }
+    
+    .dimension-metric-card {
+        padding: 20px;
+        text-align: center;
+    }
+    
+    .dimension-header {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+    }
+    
+    .dimension-score-indicator {
+        min-width: 50px;
+        height: 34px;
+        font-size: 14px;
+    }
+    
+    .dimension-icon {
+        display: flex; /* Mostrar ícono en tablet */
+    }
+    
 }
 
 /* Móvil (768px y menos) */
@@ -910,6 +1051,53 @@ textarea {
     
     .dimension-metric-card:before {
         display: none;
+    }
+
+     /* INDICADORES MÓVIL */
+    .dimension-score-badge {
+        position: static;
+        margin: 0;
+        flex-shrink: 0;
+    }
+    
+    .dimension-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+    
+    .dimension-metric-card {
+        padding: 15px;
+    }
+    
+    .dimension-score-indicator {
+        min-width: 35px;
+        height: 26px;
+        font-size: 11px;
+        border-radius: 13px;
+    }
+    
+    .score-number {
+        font-size: 14px;
+    }
+    
+    .score-total {
+        font-size: 9px;
+    }
+    
+    /* OCULTAR ícono en móvil (reemplazado por badge) */
+    .dimension-icon {
+        display: none;
+    }
+    
+    /* Título ocupa todo el espacio disponible */
+    .dimension-header h3 {
+        font-size: 16px;
+        line-height: 1.3;
+        margin: 0;
+        flex: 1;
+        text-align: left;
     }
 }
 
@@ -1166,46 +1354,131 @@ textarea {
                         <div class="evaluation-details-card">
                             <h2>Detalle de tu evaluación</h2>
                             <div class="dimensions-grid">
+                                <!-- Foco en el cliente y su dolor -->
                                 <div class="dimension-metric-card">
+                                    <div class="dimension-score-badge">
+                                        <div class="dimension-score-indicator score-excellent" id="focoClienteIndicator">
+                                            <span class="score-number">4</span>
+                                            <span class="score-total">/5</span>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="dimension-header">
-                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" /></svg></div>
+                                        <div class="dimension-icon">
+                                            <i class="fa-solid fa-users"></i>
+                                        </div>
                                         <h3>Foco en el cliente y su dolor</h3>
                                     </div>
-                                    <div class="dimension-bar-container"><div id="focoClienteBar" class="dimension-bar-fill" style="width: 100%;"></div></div>
-                                    <p id="focoClienteComment" class="dimension-comment">¡Excelente! Demuestras un profundo entendimiento de las necesidades y problemas de tus clientes.</p>
+                                    
+                                    <div class="dimension-bar-container">
+                                        <div class="dimension-bar-fill" id="focoClienteBar" style="width: 80%;"></div>
+                                    </div>
+                                    
+                                    <p class="dimension-comment" id="focoClienteComment">
+                                        ¡Excelente! Demuestras un profundo entendimiento de las necesidades y problemas de tus clientes.
+                                    </p>
                                 </div>
-                                 <div class="dimension-metric-card">
+                            
+                                <!-- Transformación y resultado -->
+                                <div class="dimension-metric-card">
+                                    <div class="dimension-score-badge">
+                                        <div class="dimension-score-indicator score-good" id="promesaTransformacionIndicator">
+                                            <span class="score-number">3</span>
+                                            <span class="score-total">/5</span>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="dimension-header">
-                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z" /></svg></div>
+                                        <div class="dimension-icon">
+                                            <i class="fa-solid fa-wand-magic-sparkles"></i>
+                                        </div>
                                         <h3>Transformación y resultado</h3>
                                     </div>
-                                    <div class="dimension-bar-container"><div id="promesaTransformacionBar" class="dimension-bar-fill" style="width: 80%;"></div></div>
-                                    <p id="promesaTransformacionComment" class="dimension-comment">Tu promesa es clara, pero podrías cuantificar más el resultado final para hacerla irresistible.</p>
+                                    
+                                    <div class="dimension-bar-container">
+                                        <div class="dimension-bar-fill" id="promesaTransformacionBar" style="width: 60%;"></div>
+                                    </div>
+                                    
+                                    <p class="dimension-comment" id="promesaTransformacionComment">
+                                        Tu promesa es clara, pero podrías cuantificar más el resultado final para hacerla irresistible.
+                                    </p>
                                 </div>
+                            
+                                <!-- Autoridad y confianza -->
                                 <div class="dimension-metric-card">
+                                    <div class="dimension-score-badge">
+                                        <div class="dimension-score-indicator score-needs-improvement" id="autoridadConfianzaIndicator">
+                                            <span class="score-number">2</span>
+                                            <span class="score-total">/5</span>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="dimension-header">
-                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75m-3-7.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.749c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.286Z" /></svg></div>
+                                        <div class="dimension-icon">
+                                            <i class="fa-solid fa-chess-rook"></i>
+                                        </div>
                                         <h3>Autoridad y confianza</h3>
                                     </div>
-                                    <div class="dimension-bar-container"><div id="autoridadConfianzaBar" class="dimension-bar-fill" style="width: 80%;"></div></div>
-                                    <p id="autoridadConfianzaComment" class="dimension-comment">Proyectas confianza. Añadir testimonios en video o estudios de caso podría elevarla al máximo nivel.</p>
+                                    
+                                    <div class="dimension-bar-container">
+                                        <div class="dimension-bar-fill" id="autoridadConfianzaBar" style="width: 40%;"></div>
+                                    </div>
+                                    
+                                    <p class="dimension-comment" id="autoridadConfianzaComment">
+                                        Proyectas confianza. Añadir testimonios en video o estudios de caso podría elevarla al máximo nivel.
+                                    </p>
                                 </div>
+                            
+                                <!-- Diferenciación de tu oferta -->
                                 <div class="dimension-metric-card">
+                                    <div class="dimension-score-badge">
+                                        <div class="dimension-score-indicator score-good" id="diferenciacionIndicator">
+                                            <span class="score-number">3</span>
+                                            <span class="score-total">/5</span>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="dimension-header">
-                                        <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 18v-5.25m0 0a6.01 6.01 0 0 0 1.5-.189m-1.5.189a6.01 6.01 0 0 1-1.5-.189m3.75 7.478a12.06 12.06 0 0 1-4.5 0m3.75 2.311a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0c-1.255 0-2.443.29-3.5.832a7.5 7.5 0 0 1-7.5 0" /></svg></div>
+                                        <div class="dimension-icon">
+                                            <i class="fa-solid fa-star"></i>
+                                        </div>
                                         <h3>Diferenciación de tu oferta</h3>
                                     </div>
-                                    <div class="dimension-bar-container"><div id="diferenciacionBar" class="dimension-bar-fill" style="width: 60%;"></div></div>
-                                    <p id="diferenciacionComment" class="dimension-comment">Tu propuesta es única, pero podrías destacar más claramente por qué eres la única opción viable.</p>
+                                    
+                                    <div class="dimension-bar-container">
+                                        <div class="dimension-bar-fill" id="diferenciacionBar" style="width: 60%;"></div>
+                                    </div>
+                                    
+                                    <p class="dimension-comment" id="diferenciacionComment">
+                                        Tu propuesta es única, pero podrías destacar más claramente por qué eres la única opción viable.
+                                    </p>
                                 </div>
+                            
+                                <!-- El valor percibido de tu oferta -->
                                 <div class="dimension-metric-card">
+                                    <div class="dimension-score-badge">
+                                        <div class="dimension-score-indicator score-excellent" id="ofertaValorIndicator">
+                                            <span class="score-number">5</span>
+                                            <span class="score-total">/5</span>
+                                        </div>
+                                    </div>
+                                    
                                     <div class="dimension-header">
-                                       <div class="dimension-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg></div>
+                                        <div class="dimension-icon">
+                                            <i class="fa-solid fa-gift"></i>
+                                        </div>
                                         <h3>El valor percibido de tu oferta</h3>
                                     </div>
-                                    <div class="dimension-bar-container"><div id="ofertaValorBar" class="dimension-bar-fill" style="width: 100%;"></div></div>
-                                    <p id="ofertaValorComment" class="dimension-comment">Tu oferta es clara, directa y muy atractiva. ¡Un trabajo impecable!</p>
+                                    
+                                    <div class="dimension-bar-container">
+                                        <div class="dimension-bar-fill" id="ofertaValorBar" style="width: 100%;"></div>
+                                    </div>
+                                    
+                                    <p class="dimension-comment" id="ofertaValorComment">
+                                        Tu oferta es clara, directa y muy atractiva. ¡Un trabajo impecable!
+                                    </p>
                                 </div>
+
                                 <a href="#final-cta" class="cta-button-card">
                                     <span class="icon-placeholder">📄</span>
                                     <span>Recibe el detalle de cada pilar y el paso a paso para mejorar tu narrativa</span>
@@ -1779,7 +2052,56 @@ textarea {
         currentMessageIndex = 0;
     }
     
+    // === Numeritos reporte ----
+    // Función para determinar la clase de color según el puntaje
+    function getScoreClass(score) {
+        if (score >= 4) return 'score-excellent';
+        if (score >= 3) return 'score-good';
+        return 'score-needs-improvement';
+    }
     
+    // Función optimizada sin duplicación de puntajes
+    function updateDimensionSafely(shortName, fullName, score, comment) {
+        const commentIds = [`${fullName}Comment`, `${shortName}Comment`];
+        const barIds = [`${fullName}Bar`, `${shortName}Bar`];
+        const indicatorIds = [`${fullName}Indicator`, `${shortName}Indicator`];
+        
+        // Actualizar comentario
+        const commentText = comment || 'Análisis no disponible';
+        updateElementSafely(commentIds, commentText);
+        
+        // Actualizar barra de progreso visual
+        const percentage = ((score || 0) / 5) * 100;
+        for (const barId of barIds) {
+            const barElement = document.getElementById(barId);
+            if (barElement) {
+                barElement.style.width = `${percentage}%`;
+                console.log(`✅ Barra actualizada: ${barId} = ${percentage}%`);
+                break;
+            }
+        }
+        
+        // Actualizar indicador de puntaje (ÚNICA fuente de verdad)
+        for (const indicatorId of indicatorIds) {
+            const indicatorElement = document.getElementById(indicatorId);
+            if (indicatorElement) {
+                // Actualizar número
+                const scoreNumber = indicatorElement.querySelector('.score-number');
+                if (scoreNumber) {
+                    scoreNumber.textContent = score || '0';
+                }
+                
+                // Actualizar clase de color
+                indicatorElement.classList.remove('score-excellent', 'score-good', 'score-needs-improvement');
+                indicatorElement.classList.add(getScoreClass(score || 0));
+                
+                console.log(`✅ Indicador actualizado: ${indicatorId} = ${score}/5 (${getScoreClass(score || 0)})`);
+                break;
+            }
+        }
+    }
+
+
     
     // --- FUNCIONES DE TESTING ---
     
