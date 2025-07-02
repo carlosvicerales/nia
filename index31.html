@@ -1603,150 +1603,253 @@ textarea {
         </footer>
     </div>
 
+
 <script>
     // --- CONFIGURACIÓN PREGUNTAS + RESULTADO ----
-    const webhookUrl = 'https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc'; // Tu webhook actual
+    const webhookUrl = 'https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc';
 
-    // === FUNCIONES PARA MODAL DE ERROR PERSONALIZADO ===
-    function showErrorModal(message) {
-        const modal = document.getElementById('errorModal');
-        const msgElement = document.getElementById('errorModalMessage');
-        if (msgElement) {
-            msgElement.textContent = message;
-        }
-        if (modal) {
-            modal.classList.remove('hidden');
-        }
-        console.error(`🚨 Error Modal: ${message}`);
-    }
-    
-    function closeErrorModal() {
-        const modal = document.getElementById('errorModal');
-        if (modal) {
-            modal.classList.add('hidden');
-        }
+    // === SISTEMA DE VALIDACIÓN VISUAL GLOBAL NIA ===
+    function sanitizarTextoGlobal(texto) {
+        if (typeof texto !== 'string' || !texto) return '';
+        
+        return texto
+            .replace(/"/g, '')
+            .replace(/'/g, '')
+            .replace(/`/g, '')
+            .replace(/\r\n/g, ' ')
+            .replace(/\n/g, ' ')
+            .replace(/\r/g, ' ')
+            .replace(/\t/g, ' ')
+            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '')
+            .replace(/\s+/g, ' ')
+            .trim();
     }
 
-    
-    // --- FUNCIONES AUXILIARES (DEFINIDAS PRIMERO) ---
-    // Función para actualizar la barra de progreso visual
-   function updateProgressBar(screenId) {
-    const progressSteps = {
-        'question1Screen': { step: 1, progress: 16 },
-        'question2Screen': { step: 2, progress: 32 },
-        'question3Screen': { step: 3, progress: 48 },
-        'question4Screen': { step: 4, progress: 64 },
-        'question5Screen': { step: 5, progress: 80 },
-        'dataScreen': { step: 6, progress: 100 }
-    };
-    
-    const currentStepInfo = progressSteps[screenId];
-    if (!currentStepInfo) {
-        console.log(`⚠️ No hay información de progreso para: ${screenId}`);
-        return;
+    function mostrarErrorVisual(campo, mensaje, tipo = 'error') {
+        const color = tipo === 'warning' ? '#f59e0b' : '#ef4444';
+        const bgColor = tipo === 'warning' ? 'rgba(245, 158, 11, 0.1)' : 'rgba(239, 68, 68, 0.1)';
+        
+        limpiarValidacionVisual(campo);
+        
+        campo.style.border = `2px solid ${color}`;
+        campo.style.boxShadow = `0 0 0 3px ${bgColor}`;
+        campo.style.borderRadius = '8px';
+        
+        const mensajeDiv = document.createElement('div');
+        mensajeDiv.className = 'mensaje-validacion-nia';
+        mensajeDiv.style.cssText = `
+            color: ${color};
+            font-size: 14px;
+            margin-top: 8px;
+            padding: 8px 12px;
+            background: ${bgColor};
+            border-radius: 8px;
+            border-left: 3px solid ${color};
+            animation: fadeInNia 0.3s ease-in;
+            font-weight: 500;
+        `;
+        mensajeDiv.textContent = mensaje;
+        
+        campo.parentNode.insertBefore(mensajeDiv, campo.nextSibling);
+        console.log(`❌ Validación NIA: ${campo.id} - ${mensaje}`);
     }
-    
-    console.log(`📊 Actualizando progreso: Paso ${currentStepInfo.step} (${currentStepInfo.progress}%)`);
-    
-    // Actualizar barra de progreso (ID corregido)
-    const progressBar = document.getElementById('progressFill');
-    if (progressBar) {
-        progressBar.style.width = `${currentStepInfo.progress}%`;
-        console.log(`✅ Barra actualizada: ${currentStepInfo.progress}%`);
+
+    function mostrarExitoVisual(campo) {
+        limpiarValidacionVisual(campo);
+        
+        campo.style.border = '2px solid #10b981';
+        campo.style.boxShadow = '0 0 0 3px rgba(16, 185, 129, 0.1)';
+        campo.style.borderRadius = '8px';
+        
+        const mensajeDiv = document.createElement('div');
+        mensajeDiv.className = 'mensaje-validacion-nia';
+        mensajeDiv.style.cssText = `
+            color: #10b981;
+            font-size: 12px;
+            margin-top: 4px;
+            opacity: 0.8;
+            animation: fadeInNia 0.3s ease-in;
+        `;
+        mensajeDiv.textContent = '✓ Perfecto';
+        
+        campo.parentNode.insertBefore(mensajeDiv, campo.nextSibling);
+        console.log(`✅ Validación NIA exitosa: ${campo.id}`);
     }
-    
-    // Actualizar texto del paso (ID corregido)
-    const stepText = document.getElementById('stepText');
-    if (stepText) {
-        stepText.textContent = `Paso ${currentStepInfo.step} de 6`;
+
+    function limpiarValidacionVisual(campo) {
+        campo.style.border = '';
+        campo.style.boxShadow = '';
+        campo.style.borderRadius = '';
+        
+        const mensajes = campo.parentNode.querySelectorAll('.mensaje-validacion-nia');
+        mensajes.forEach(mensaje => mensaje.remove());
     }
-    
-    // Actualizar indicadores visuales de pasos
-    for (let i = 1; i <= 5; i++) {
-        const stepElement = document.getElementById(`step${i}`);
-        if (stepElement) {
-            stepElement.classList.remove('step-inactive', 'step-active', 'step-completed');
-            if (i < currentStepInfo.step) {
-                stepElement.classList.add('step-completed');
-            } else if (i === currentStepInfo.step) {
-                stepElement.classList.add('step-active');
+
+    function validarCampoGlobal(campo) {
+        if (!campo) return false;
+        
+        campo.value = sanitizarTextoGlobal(campo.value || '');
+        const valor = campo.value.trim();
+        const id = campo.id?.toLowerCase() || '';
+        
+        if (id.startsWith('answer')) {
+            if (!valor) {
+                mostrarErrorVisual(campo, 'Este campo es obligatorio. Por favor, escribe tu respuesta.');
+                return false;
+            }
+            if (valor.length < 10) {
+                mostrarErrorVisual(campo, 'Necesitas escribir al menos 10 caracteres para continuar.', 'warning');
+                return false;
+            }
+            if (/<[^>]*>/g.test(valor)) {
+                mostrarErrorVisual(campo, 'No copies texto con HTML, escribe tu respuesta original.');
+                return false;
+            }
+        }
+        
+        if (id.includes('email')) {
+            if (!valor) {
+                mostrarErrorVisual(campo, 'El email es obligatorio.');
+                return false;
+            }
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(valor)) {
+                mostrarErrorVisual(campo, 'Ingresa un email válido (ej: carlos@empresa.com).');
+                return false;
+            }
+        }
+        
+        if (id.includes('whatsapp')) {
+            if (!valor) {
+                mostrarErrorVisual(campo, 'El WhatsApp es obligatorio.');
+                return false;
+            }
+            const telefonoLimpio = valor.replace(/[\s\-\(\)]/g, '');
+            const telefonoRegex = /^[\+]?[\d]{8,15}$/;
+            if (!telefonoRegex.test(telefonoLimpio)) {
+                mostrarErrorVisual(campo, 'Formato: +56987654321 o 987654321.');
+                return false;
+            }
+        }
+        
+        if (id.includes('firstname') || id.includes('lastname')) {
+            if (!valor) {
+                mostrarErrorVisual(campo, 'Este campo es obligatorio.');
+                return false;
+            }
+            if (valor.length < 2) {
+                mostrarErrorVisual(campo, 'Mínimo 2 caracteres.');
+                return false;
+            }
+        }
+        
+        mostrarExitoVisual(campo);
+        return true;
+    }
+
+    // --- FUNCIONES AUXILIARES ---
+    function updateProgressBar(screenId) {
+        const progressSteps = {
+            'question1Screen': { step: 1, progress: 16 },
+            'question2Screen': { step: 2, progress: 32 },
+            'question3Screen': { step: 3, progress: 48 },
+            'question4Screen': { step: 4, progress: 64 },
+            'question5Screen': { step: 5, progress: 80 },
+            'dataScreen': { step: 6, progress: 100 }
+        };
+        
+        const currentStepInfo = progressSteps[screenId];
+        if (!currentStepInfo) return;
+        
+        const progressBar = document.getElementById('progressFill');
+        if (progressBar) {
+            progressBar.style.width = `${currentStepInfo.progress}%`;
+        }
+        
+        const stepText = document.getElementById('stepText');
+        if (stepText) {
+            stepText.textContent = `Paso ${currentStepInfo.step} de 6`;
+        }
+        
+        for (let i = 1; i <= 5; i++) {
+            const stepElement = document.getElementById(`step${i}`);
+            if (stepElement) {
+                stepElement.classList.remove('step-inactive', 'step-active', 'step-completed');
+                if (i < currentStepInfo.step) {
+                    stepElement.classList.add('step-completed');
+                } else if (i === currentStepInfo.step) {
+                    stepElement.classList.add('step-active');
+                } else {
+                    stepElement.classList.add('step-inactive');
+                }
+            }
+        }
+        
+        const stepResults = document.getElementById('stepResults');
+        if (stepResults) {
+            stepResults.classList.remove('step-inactive', 'step-active', 'step-completed');
+            if (currentStepInfo.step === 6) {
+                stepResults.classList.add('step-active');
             } else {
-                stepElement.classList.add('step-inactive');
+                stepResults.classList.add('step-inactive');
             }
         }
     }
-    
-    // Actualizar indicador de resultados
-    const stepResults = document.getElementById('stepResults');
-    if (stepResults) {
-        stepResults.classList.remove('step-inactive', 'step-active', 'step-completed');
-        if (currentStepInfo.step === 6) {
-            stepResults.classList.add('step-active');
-        } else {
-            stepResults.classList.add('step-inactive');
-        }
-    }
-}
 
-    
-    // Función auxiliar inteligente que prueba múltiples IDs
     function updateElementSafely(possibleIds, content) {
         for (const id of possibleIds) {
             const element = document.getElementById(id);
             if (element) {
                 element.textContent = content;
-                console.log(`✅ Actualizado elemento: ${id} = "${content}"`);
                 return true;
             }
         }
-        console.warn(`⚠️ No se encontró ningún elemento con IDs: ${possibleIds.join(', ')}`);
         return false;
     }
     
-    // Función auxiliar para actualizar dimensiones
     function updateDimensionSafely(shortName, fullName, score, comment) {
-        const scoreIds = [`${fullName}Score`, `${shortName}Score`];
         const commentIds = [`${fullName}Comment`, `${shortName}Comment`];
         const barIds = [`${fullName}Bar`, `${shortName}Bar`];
+        const indicatorIds = [`${fullName}Indicator`, `${shortName}Indicator`];
         
-        // Actualizar puntaje
-        const scoreText = `${score || 0}/5`;
-        updateElementSafely(scoreIds, scoreText);
-        
-        // Actualizar comentario (limpio, sin "Análisis:" para tu diseño)
         const commentText = comment || 'Análisis no disponible';
         updateElementSafely(commentIds, commentText);
         
-        // Actualizar barra de progreso visual
         const percentage = ((score || 0) / 5) * 100;
         for (const barId of barIds) {
             const barElement = document.getElementById(barId);
             if (barElement) {
                 barElement.style.width = `${percentage}%`;
-                console.log(`✅ Barra actualizada: ${barId} = ${percentage}%`);
+                break;
+            }
+        }
+        
+        for (const indicatorId of indicatorIds) {
+            const indicatorElement = document.getElementById(indicatorId);
+            if (indicatorElement) {
+                const scoreNumber = indicatorElement.querySelector('.score-number');
+                if (scoreNumber) {
+                    scoreNumber.textContent = score || '0';
+                }
+                
+                const scoreClass = score >= 4 ? 'score-excellent' : score >= 3 ? 'score-good' : 'score-needs-improvement';
+                indicatorElement.classList.remove('score-excellent', 'score-good', 'score-needs-improvement');
+                indicatorElement.classList.add(scoreClass);
                 break;
             }
         }
     }
+
     // --- FUNCIONES PRINCIPALES ---
-    // Función adaptada a tu estructura HTML específica
-    // Reemplaza SOLO tu función mostrarPantalla con esta versión corregida
     function mostrarPantalla(screenId) {
-        console.log(`🔄 Cambiando a pantalla: ${screenId}`);
-        
-        // Pantallas principales de nivel superior
         const mainScreens = ['introScreen', 'question1Screen', 'dataScreen', 'loadingScreen', 'resultsScreen', 'errorScreen'];
         
-        // Si es una pregunta específica (question2Screen, question3Screen, etc.)
         if (screenId.startsWith('question') && screenId !== 'question1Screen') {
-            // CLAVE: Mostrar el contenedor principal de preguntas (question1Screen)
             const questionContainer = document.getElementById('question1Screen');
             if (questionContainer) {
                 questionContainer.style.display = 'block';
-                console.log(`✅ Contenedor question1Screen mostrado`);
             }
             
-            // Ocultar todas las preguntas individuales dentro del contenedor
             for (let i = 2; i <= 5; i++) {
                 const questionDiv = document.getElementById(`question${i}Screen`);
                 if (questionDiv) {
@@ -1754,20 +1857,16 @@ textarea {
                 }
             }
             
-            // Ocultar también la pregunta 1 individual (el div interno)
             const question1Div = document.getElementById('question1');
             if (question1Div) {
                 question1Div.style.display = 'none';
             }
             
-            // Mostrar la pregunta específica solicitada
             const targetQuestion = document.getElementById(screenId);
             if (targetQuestion) {
                 targetQuestion.style.display = 'block';
-                console.log(`✅ Pregunta ${screenId} mostrada`);
             }
             
-            // Ocultar otras pantallas principales (excepto question1Screen)
             mainScreens.forEach(screenName => {
                 if (screenName !== 'question1Screen') {
                     const screen = document.getElementById(screenName);
@@ -1778,7 +1877,6 @@ textarea {
             });
             
         } else if (screenId === 'question1Screen') {
-            // Mostrar question1Screen y solo la primera pregunta
             mainScreens.forEach(screenName => {
                 const screen = document.getElementById(screenName);
                 if (screen) {
@@ -1786,13 +1884,11 @@ textarea {
                 }
             });
             
-            // Dentro de question1Screen, mostrar solo la pregunta 1
             const question1Div = document.getElementById('question1');
             if (question1Div) {
                 question1Div.style.display = 'block';
             }
             
-            // Ocultar las demás preguntas
             for (let i = 2; i <= 5; i++) {
                 const questionDiv = document.getElementById(`question${i}Screen`);
                 if (questionDiv) {
@@ -1800,20 +1896,15 @@ textarea {
                 }
             }
             
-            console.log(`✅ question1Screen mostrado con pregunta 1`);
-            
         } else {
-            // Para otras pantallas principales (intro, data, loading, results)
             mainScreens.forEach(screenName => {
                 const screen = document.getElementById(screenName);
                 if (screen) {
                     screen.style.display = screenName === screenId ? 'block' : 'none';
                 }
             });
-            console.log(`✅ Pantalla ${screenId} mostrada`);
         }
         
-        // Manejar barra de progreso
         const progressContainer = document.getElementById('progressContainer');
         if (progressContainer) {
             if (['question1Screen', 'question2Screen', 'question3Screen', 'question4Screen', 'question5Screen', 'dataScreen'].includes(screenId)) {
@@ -1825,38 +1916,25 @@ textarea {
         }
     }
 
-
-    
-    // Función para iniciar diagnóstico
     function startDiagnosis() {
-        console.log('🚀 Iniciando diagnóstico...');
         mostrarPantalla('question1Screen');
     }
     
-    // Función blindada contra conflictos externos para navegar entre preguntas
     function nextQuestionSegura(currentQuestionNumber) {
-        const timestamp = Date.now();
-        console.log(`🔒 [${timestamp}] VALIDACIÓN SEGURA - Pregunta ${currentQuestionNumber}`);
-        
         const currentAnswerId = `answer${currentQuestionNumber}`;
         const currentAnswer = document.getElementById(currentAnswerId);
         
         if (!currentAnswer) {
-            console.error(`❌ [${timestamp}] Elemento ${currentAnswerId} no encontrado`);
-            showErrorModal(`Error técnico: No se encuentra la pregunta ${currentQuestionNumber}. Por favor, recarga la página.`);
+            alert('Error técnico: Por favor, recarga la página e inténtalo de nuevo.');
             return false;
         }
         
-        // Usar la función de validación integral existente
-        const isValid = validarCampo(currentAnswer);
+        const isValid = validarCampoGlobal(currentAnswer);
         
         if (!isValid) {
-            console.warn(`⚠️ [${timestamp}] Validación fallida para pregunta ${currentQuestionNumber}. Feedback visual mostrado.`);
             currentAnswer.focus();
             return false;
         }
-        
-        console.log(`✅ [${timestamp}] Validación exitosa para pregunta ${currentQuestionNumber}`);
         
         const nextQuestionNumber = currentQuestionNumber + 1;
         
@@ -1866,51 +1944,37 @@ textarea {
             } else {
                 mostrarPantalla('dataScreen');
             }
-            console.log(`🎯 [${timestamp}] Navegación completada`);
         }, 50);
         
         return true;
     }
-
     
-    // Sobrescribir la función original para evitar conflictos
     window.nextQuestion = nextQuestionSegura;
 
-    
-    // Función para mostrar recolección de datos
     function showDataCollection() {
         const answer5 = document.getElementById('answer5');
         if (!answer5) {
-            console.error('Elemento answer5 no encontrado.');
-            showErrorModal('Error interno: No se encuentra el campo de la última pregunta. Por favor, recarga la página.');
+            alert('Error interno: Por favor, recarga la página.');
             return;
         }
         
-        // Usar la función de validación integral
-        const isValid = validarCampo(answer5);
+        const isValid = validarCampoGlobal(answer5);
         
         if (!isValid) {
-            console.warn('🚫 La última pregunta no es válida. Bloqueando avance a datos.');
             answer5.focus();
             return;
         }
         
         mostrarPantalla('dataScreen');
     }
-
     
-    // Función principal para generar diagnóstico
     async function generateDiagnosis() {
-        console.log('🚀 Iniciando generación de diagnóstico...');
-        
-        // Recolectar respuestas
         const answers = {};
         let allAnswersComplete = true;
         
         for (let i = 1; i <= 5; i++) {
             const answer = document.getElementById(`answer${i}`);
-            if (!answer || !answer.value.trim()) {
-                showErrorModal(`Por favor, completa la pregunta ${i}.`);
+            if (!answer || !validarCampoGlobal(answer)) {
                 allAnswersComplete = false;
                 break;
             }
@@ -1919,15 +1983,13 @@ textarea {
         
         if (!allAnswersComplete) return;
         
-        // Recolectar datos personales
         const personalData = {};
         const requiredFields = ['firstName', 'lastName', 'email'];
         const optionalFields = ['whatsapp'];
         
         for (const field of requiredFields) {
             const element = document.getElementById(field);
-            if (!element || !element.value.trim()) {
-                showErrorModal(`Por favor, completa el campo: ${field}.`);
+            if (!element || !validarCampoGlobal(element)) {
                 return;
             }
             personalData[field] = element.value.trim();
@@ -1938,14 +2000,10 @@ textarea {
             personalData[field] = element ? element.value.trim() : '';
         }
         
-        // Mostrar pantalla de carga
-       // Mostrar pantalla de carga con animación NIA
         mostrarPantalla('loadingScreen');
-        iniciarAnimacionNIA(); // ← NUEVA LÍNEA
+        iniciarAnimacionNIA();
         
         try {
-            console.log('📡 Enviando datos a MAKE...');
-            
             const response = await fetch(webhookUrl, {
                 method: 'POST',
                 headers: {
@@ -1962,38 +2020,31 @@ textarea {
             }
             
             const data = await response.json();
-            console.log('✅ Datos recibidos de MAKE:', data);
             
             if (data && data.resultado) {
-                detenerAnimacionNIA(); // ← NUEVA LÍNEA
+                detenerAnimacionNIA();
                 displayResults(data.resultado);
                 mostrarPantalla('resultsScreen');
             } else {
-                detenerAnimacionNIA(); // ← NUEVA LÍNEA
+                detenerAnimacionNIA();
                 throw new Error('Estructura de datos incorrecta');
             }
             
         } catch (error) {
             console.error('❌ Error en generateDiagnosis:', error);
-            detenerAnimacionNIA(); // ← NUEVA LÍNEA
+            detenerAnimacionNIA();
             mostrarPantalla('errorScreen');
         }
     }
     
-    // Función inteligente para mostrar resultados
-    // Función mejorada para mostrar resultados con personalización
     function displayResults(data) {
-        console.log('🎨 Procesando resultados:', data);
-        
         try {
-            // Actualizar nombre del usuario en el título
             const firstName = document.getElementById('firstName')?.value || 'Carlos';
             const userNameElement = document.getElementById('userFirstName');
             if (userNameElement) {
                 userNameElement.textContent = firstName;
             }
             
-            // Calcular puntaje total
             const scores = [
                 data.foco_cliente || 0,
                 data.promesa_transformacion || 0,
@@ -2004,13 +2055,9 @@ textarea {
             
             const totalScore = scores.reduce((sum, score) => sum + score, 0);
             const percentage = Math.round((totalScore / 25) * 100);
-            
-            console.log(`📊 Puntaje calculado: ${totalScore}/25 (${percentage}%)`);
 
-            // En tu función displayResults(), después de calcular totalScore y percentage, agrega:
             animarRadialProgressBar(totalScore, 25);
             
-            // También activa los efectos de hover en las tarjetas
             const metricCards = document.querySelectorAll('.dimension-item');
             metricCards.forEach(card => {
                 card.addEventListener('mousemove', e => {
@@ -2021,66 +2068,48 @@ textarea {
                     card.style.setProperty('--mouse-y', `${y}px`);
                 });
             });
-
-
             
-            // Actualizar elementos principales
             updateElementSafely(['totalScore'], `${totalScore}/25 puntos`);
             updateElementSafely(['scorePercent'], `${percentage}%`);
             
-            // Actualizar dimensiones con barras animadas
             updateDimensionSafely('foco', 'focoCliente', data.foco_cliente, data.comentario_foco_cliente);
             updateDimensionSafely('promesa', 'promesaTransformacion', data.promesa_transformacion, data.comentario_promesa_transformacion);
             updateDimensionSafely('autoridad', 'autoridadConfianza', data.autoridad_confianza, data.comentario_autoridad_confianza);
             updateDimensionSafely('diferenciacion', 'diferenciacion', data.diferenciacion, data.comentario_diferenciacion);
             updateDimensionSafely('oferta', 'ofertaValor', data.oferta_valor, data.comentario_oferta_valor);
             
-            // Actualizar textos principales
             updateElementSafely(['principalesBrechasText'], data.principales_brechas || 'Análisis no disponible');
             updateElementSafely(['proximopasoText'], data.proximo_paso || 'Recomendación no disponible');
             
-            console.log('✅ Todos los resultados procesados correctamente');
-            
-            } catch (error) {
-                console.error('❌ Error en displayResults:', error);
-                alert('Error al mostrar resultados. Revisa la consola para detalles.');
-            }
+        } catch (error) {
+            console.error('❌ Error en displayResults:', error);
+            alert('Error al mostrar resultados. Revisa la consola para detalles.');
         }
+    }
 
-        // Función para animar el gráfico radial (agregar al final de tu JavaScript)
-        function animarRadialProgressBar(score, maxScore) {
-            const circle = document.getElementById('progress-circle');
-            const scoreValueText = document.getElementById('score-value');
-            
-            if (!circle || !scoreValueText) {
-                console.warn('⚠️ Elementos del gráfico radial no encontrados');
-                return;
-            }
-            
-            const radius = circle.r.baseVal.value;
-            const circumference = 2 * Math.PI * radius;
-            const percentage = Math.max(0, Math.min(100, (score / maxScore) * 100));
-            const offset = circumference - (percentage / 100) * circumference;
+    function animarRadialProgressBar(score, maxScore) {
+        const circle = document.getElementById('progress-circle');
+        const scoreValueText = document.getElementById('score-value');
         
-            // Configurar el círculo para iniciar vacío
-            circle.style.strokeDasharray = `${circumference} ${circumference}`;
-            circle.style.strokeDashoffset = circumference;
-            
-            // Animar después de un pequeño delay
-            setTimeout(() => {
-                circle.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)";
-                circle.style.strokeDashoffset = offset;
-            }, 200);
-            
-            // Actualizar el número central
-            scoreValueText.textContent = score;
-            
-            console.log(`🎯 Gráfico radial animado: ${score}/${maxScore} (${percentage}%)`);
-        }
+        if (!circle || !scoreValueText) return;
+        
+        const radius = circle.r.baseVal.value;
+        const circumference = 2 * Math.PI * radius;
+        const percentage = Math.max(0, Math.min(100, (score / maxScore) * 100));
+        const offset = circumference - (percentage / 100) * circumference;
+    
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+        
+        setTimeout(() => {
+            circle.style.transition = "stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1)";
+            circle.style.strokeDashoffset = offset;
+        }, 200);
+        
+        scoreValueText.textContent = score;
+    }
 
-  
-    //===== Animaciones NIA pantalla de carga ======
-    // Configuración de mensajes alineados con los 5 pilares de NIA
+    // === Animaciones NIA pantalla de carga ===
     const niaPillarMessages = [
         { icon: "🎯", text: "Evaluando el foco en el Cliente y su dolor..." },
         { icon: "✨", text: "Analizando la promesa de Transformación..." },
@@ -2094,45 +2123,25 @@ textarea {
     let currentMessageIndex = 0;
     let messageRotationInterval = null;
 
-    /**
-     * Inicia la animación de mensajes dinámicos de NIA
-     */
     function iniciarAnimacionNIA() {
         const stepElement = document.getElementById('niaProcessStep');
+        if (!stepElement) return;
         
-        // Verificar que el elemento existe
-        if (!stepElement) {
-            console.warn('Elemento niaProcessStep no encontrado');
-            return;
-        }
-        
-        // Función para actualizar el mensaje con transición suave
         function actualizarMensaje() {
             const currentMessage = niaPillarMessages[currentMessageIndex];
-            
-            // Fade out
             stepElement.style.opacity = '0';
             
-            // Cambiar contenido después del fade out
             setTimeout(() => {
                 stepElement.textContent = `${currentMessage.icon} ${currentMessage.text}`;
                 stepElement.style.opacity = '1';
-                
-                // Avanzar al siguiente mensaje (con ciclo)
                 currentMessageIndex = (currentMessageIndex + 1) % niaPillarMessages.length;
             }, 200);
         }
         
-        // Mostrar primer mensaje inmediatamente
         actualizarMensaje();
-        
-        // Configurar rotación automática cada 2.8 segundos
         messageRotationInterval = setInterval(actualizarMensaje, 2800);
     }
 
-    /**
-     * Detiene la animación y limpia recursos
-     */
     function detenerAnimacionNIA() {
         if (messageRotationInterval) {
             clearInterval(messageRotationInterval);
@@ -2145,921 +2154,30 @@ textarea {
             stepElement.style.opacity = '1';
         }
         
-        // Resetear índice para próxima vez
         currentMessageIndex = 0;
     }
-    
-    // === Numeritos reporte ----
-    // Función para determinar la clase de color según el puntaje
-    function getScoreClass(score) {
-        if (score >= 4) return 'score-excellent';
-        if (score >= 3) return 'score-good';
-        return 'score-needs-improvement';
-    }
-    
-    // Función optimizada sin duplicación de puntajes
-    function updateDimensionSafely(shortName, fullName, score, comment) {
-        const commentIds = [`${fullName}Comment`, `${shortName}Comment`];
-        const barIds = [`${fullName}Bar`, `${shortName}Bar`];
-        const indicatorIds = [`${fullName}Indicator`, `${shortName}Indicator`];
-        
-        // Actualizar comentario
-        const commentText = comment || 'Análisis no disponible';
-        updateElementSafely(commentIds, commentText);
-        
-        // Actualizar barra de progreso visual
-        const percentage = ((score || 0) / 5) * 100;
-        for (const barId of barIds) {
-            const barElement = document.getElementById(barId);
-            if (barElement) {
-                barElement.style.width = `${percentage}%`;
-                console.log(`✅ Barra actualizada: ${barId} = ${percentage}%`);
-                break;
-            }
-        }
-        
-        // Actualizar indicador de puntaje (ÚNICA fuente de verdad)
-        for (const indicatorId of indicatorIds) {
-            const indicatorElement = document.getElementById(indicatorId);
-            if (indicatorElement) {
-                // Actualizar número
-                const scoreNumber = indicatorElement.querySelector('.score-number');
-                if (scoreNumber) {
-                    scoreNumber.textContent = score || '0';
+
+    // === Limpieza automática ===
+    document.addEventListener('input', function(e) {
+        if ((e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') && 
+            (e.target.id.startsWith('answer') || e.target.id.includes('firstName') || 
+             e.target.id.includes('lastName') || e.target.id.includes('email') || 
+             e.target.id.includes('whatsapp'))) {
+            
+            setTimeout(() => {
+                const valor = e.target.value.trim();
+                if (valor.length > 0) {
+                    limpiarValidacionVisual(e.target);
                 }
-                
-                // Actualizar clase de color
-                indicatorElement.classList.remove('score-excellent', 'score-good', 'score-needs-improvement');
-                indicatorElement.classList.add(getScoreClass(score || 0));
-                
-                console.log(`✅ Indicador actualizado: ${indicatorId} = ${score}/5 (${getScoreClass(score || 0)})`);
-                break;
-            }
+            }, 100);
         }
-    }
+    });
 
-
-    
-    // --- FUNCIONES DE TESTING ---
-    
-    // Función para probar navegación completa
-    function testNavigation() {
-        console.log('🧪 Probando navegación paso a paso...');
-        
-        // Llenar respuestas de prueba
-        for (let i = 1; i <= 5; i++) {
-            const answer = document.getElementById(`answer${i}`);
-            if (answer) {
-                answer.value = `Respuesta de prueba ${i}`;
-            }
-        }
-        
-        // Secuencia de navegación con delays
-        setTimeout(() => {
-            console.log('Paso 1: Iniciando');
-            startDiagnosis();
-        }, 500);
-        
-        setTimeout(() => {
-            console.log('Paso 2: Pregunta 1 → 2');
-            nextQuestion(1);
-        }, 1500);
-        
-        setTimeout(() => {
-            console.log('Paso 3: Pregunta 2 → 3');
-            nextQuestion(2);
-        }, 2500);
-        
-        setTimeout(() => {
-            console.log('Paso 4: Pregunta 3 → 4');  
-            nextQuestion(3);
-        }, 3500);
-        
-        setTimeout(() => {
-            console.log('Paso 5: Pregunta 4 → 5');  
-            nextQuestion(4);
-        }, 4500);
-        
-        setTimeout(() => {
-            console.log('Paso 6: Pregunta 5 → Datos');  
-            nextQuestion(5);
-        }, 5500);
-    }
-    
-    // Función para probar resultados
-    function testResults() {
-        console.log('🧪 Ejecutando prueba de resultados...');
-        
-        const testData = {
-            foco_cliente: 3,
-            comentario_foco_cliente: "Tu mensaje identifica el segmento, pero puede profundizar más en el dolor específico.",
-            promesa_transformacion: 4,
-            comentario_promesa_transformacion: "La promesa es clara, pero considera ser más específica en resultados medibles.",
-            autoridad_confianza: 2,
-            comentario_autoridad_confianza: "Necesitas más evidencia social y casos de éxito que refuercen tu credibilidad.",
-            diferenciacion: 3,
-            comentario_diferenciacion: "Tu diferenciación es buena, pero puede ser más única y memorable.",
-            oferta_valor: 4,
-            comentario_oferta_valor: "La propuesta de valor es fuerte, pero optimízala para el ROI percibido.",
-            principales_brechas: "Tu narrativa tiene bases sólidas, pero la autoridad y diferenciación son tus mayores GAPs. Sin ellas, pierdes clientes cada día.",
-            proximo_paso: "Crea 3 micro-historias de éxito. Para un plan a medida, agenda tu sesión 1:1 con Carlos"
-        };
-        
-        (testData);
-        mostrarPantalla('resultsScreen');
-    }
-    
-    // Función para debuggear estado de preguntas
-    function debugQuestions() {
-        console.log('🔍 Estado actual de las preguntas:');
-        
-        const questionScreens = document.getElementById('questionScreens');
-        console.log('questionScreens display:', questionScreens ? questionScreens.style.display : 'NO EXISTE');
-        
-        for (let i = 1; i <= 5; i++) {
-            const question = document.getElementById(`question${i}`);
-            console.log(`question${i} display:`, question ? question.style.display : 'NO EXISTE');
-        }
-    }
-    
-    // Inicialización cuando se carga la página
+    // === Inicialización ===
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('🚀 NIA JavaScript cargado correctamente');
         mostrarPantalla('introScreen');
     });
-    
-
-
-//========= SANITIZADOR: ===============
-    // SISTEMA DE VALIDACIÓN INTEGRAL NIA - VERSIÓN DEFINITIVA CORREGIDA
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('✨ Sistema de validación integral NIA activado y corregido');
-    
-/*    // === CONTROL DE PANTALLAS (Usando tus IDs reales) ===
-    function mostrarPantalla(pantallaId) {
-        const pantallas = ['introScreen', 'questionScreens', 'dataScreen', 'loadingScreen', 'resultsScreen'];
-        
-        // Ocultar todas las pantallas
-        pantallas.forEach(id => {
-            const elemento = document.getElementById(id);
-            if (elemento) elemento.style.display = 'none';
-        });
-        
-        // Mostrar la pantalla solicitada
-        const pantallaObjetivo = document.getElementById(pantallaId);
-        if (pantallaObjetivo) {
-            pantallaObjetivo.style.display = 'block';
-            pantallaObjetivo.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            console.log(`✅ Mostrando pantalla: ${pantallaId}`);
-            return true;
-        }
-        
-        console.error(`❌ Pantalla no encontrada: ${pantallaId}`);
-        return false;
-    }
-    */
-    // === FUNCIONES DE SANITIZACIÓN ===
-    function sanitizarTexto(texto) {
-        if (typeof texto !== 'string' || !texto) return '';
-        
-        return texto
-            .replace(/"/g, '')              // Eliminar comillas dobles
-            .replace(/'/g, '')              // Eliminar comillas simples
-            .replace(/`/g, '')              // Eliminar comillas invertidas
-            .replace(/\r\n/g, ' ')          // Convertir saltos Windows a espacio
-            .replace(/\n/g, ' ')            // Convertir saltos Unix a espacio
-            .replace(/\r/g, ' ')            // Convertir saltos Mac a espacio
-            .replace(/\t/g, ' ')            // Convertir tabs a espacio
-            .replace(/[\u0000-\u001F\u007F-\u009F]/g, '') // Eliminar caracteres de control
-            .replace(/\s+/g, ' ')           // Normalizar espacios múltiples
-            .trim();                        // Limpiar espacios extremos
-    }
-    
-    // === FUNCIONES DE VALIDACIÓN ===
-    function validarTextoLargo(texto) {
-        const textoLimpio = texto.trim();
-        if (!textoLimpio) return { valido: false, mensaje: 'Este campo es obligatorio' };
-        if (textoLimpio.length < 10) return { valido: false, mensaje: 'Necesitas escribir al menos 10 caracteres' };
-        if (/<[^>]*>/g.test(texto)) return { valido: false, mensaje: 'No copies texto con HTML, escribe tu respuesta' };
-        
-        const saltosDeLinea = (texto.match(/\n/g) || []).length;
-        if (saltosDeLinea > 3) return { valido: false, mensaje: 'Evita copiar de web, escribe tu respuesta en texto plano' };
-        
-        return { valido: true, mensaje: 'Perfecto' };
-    }
-    
-    function validarEmail(email) {
-        const emailLimpio = email.trim();
-        if (!emailLimpio) return { valido: false, mensaje: 'El email es obligatorio' };
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(emailLimpio)) return { valido: false, mensaje: 'Ingresa un email válido (ej: carlos@empresa.com)' };
-        
-        return { valido: true, mensaje: 'Email válido' };
-    }
-    
-    function validarTelefono(telefono) {
-        const telefonoLimpio = telefono.trim();
-        if (!telefonoLimpio) return { valido: false, mensaje: 'El WhatsApp es obligatorio' };
-        
-        const telefonoSinFormato = telefonoLimpio.replace(/[\s\-\(\)]/g, '');
-        const telefonoRegex = /^[\+]?[\d]{8,15}$/;
-        
-        if (!telefonoRegex.test(telefonoSinFormato)) return { valido: false, mensaje: 'Formato: +56987654321 o 987654321' };
-        
-        return { valido: true, mensaje: 'WhatsApp válido' };
-    }
-    
-    function validarNombre(nombre) {
-        const nombreLimpio = nombre.trim();
-        if (!nombreLimpio) return { valido: false, mensaje: 'Este campo es obligatorio' };
-        if (nombreLimpio.length < 2) return { valido: false, mensaje: 'Mínimo 2 caracteres' };
-        return { valido: true, mensaje: 'Correcto' };
-    }
-    
-    // === FUNCIONES DE INTERFAZ INLINE ===
-    function mostrarError(campo, mensaje) {
-        limpiarValidacion(campo);
-        campo.classList.add('campo-error');
-        
-        const mensajeError = document.createElement('div');
-        mensajeError.className = 'mensaje-error';
-        mensajeError.textContent = mensaje;
-        campo.parentNode.insertBefore(mensajeError, campo.nextSibling);
-        console.log(`❌ ${campo.id}: ${mensaje}`);
-    }
-    
-    function mostrarExito(campo, mensaje) {
-        limpiarValidacion(campo);
-        campo.classList.add('campo-valido');
-        
-        const mensajeExito = document.createElement('div');
-        mensajeExito.className = 'mensaje-exito';
-        mensajeExito.textContent = mensaje;
-        campo.parentNode.insertBefore(mensajeExito, campo.nextSibling);
-        console.log(`✅ ${campo.id}: ${mensaje}`);
-    }
-    
-    function limpiarValidacion(campo) {
-        campo.classList.remove('campo-error', 'campo-valido');
-        const mensajesExistentes = campo.parentNode.querySelectorAll('.mensaje-error, .mensaje-exito');
-        mensajesExistentes.forEach(mensaje => mensaje.remove());
-    }
-    
-    // === VALIDACIÓN DE CAMPO INDIVIDUAL ===
-    function validarCampo(campo) {
-        // Sanitizar antes de validar
-        campo.value = sanitizarTexto(campo.value || '');
-        
-        const valor = campo.value;
-        const tipoValidacion = determinarTipoValidacion(campo);
-        
-        let resultado;
-        switch (tipoValidacion) {
-            case 'texto': resultado = validarTextoLargo(valor); break;
-            case 'email': resultado = validarEmail(valor); break;
-            case 'telefono': resultado = validarTelefono(valor); break;
-            case 'nombre': resultado = validarNombre(valor); break;
-            default: resultado = { valido: true, mensaje: 'Campo válido' };
-        }
-        
-        if (resultado.valido) {
-            if (valor.length > 0) {
-                mostrarExito(campo, resultado.mensaje);
-            } else {
-                limpiarValidacion(campo);
-            }
-        } else {
-            mostrarError(campo, resultado.mensaje);
-        }
-        
-        return resultado.valido;
-    }
-    
-    function determinarTipoValidacion(campo) {
-        const id = campo.id?.toLowerCase() || '';
-        
-        if (campo.type === 'email' || id.includes('email')) return 'email';
-        if (id.includes('whatsapp')) return 'telefono';
-        if (id.includes('firstname') || id.includes('lastname')) return 'nombre';
-        if (campo.tagName === 'TEXTAREA') return 'texto';
-        
-        return 'nombre';
-    }
-    
-    // === VALIDACIÓN PASO A PASO (Clave para formulario multipaso) ===
-    function validarPreguntaActual(numeroPregunta) {
-        const campo = document.getElementById(`answer${numeroPregunta}`);
-        if (!campo) return true;
-        
-        const esValido = validarCampo(campo);
-        if (!esValido) {
-            campo.focus();
-        }
-        return esValido;
-    }
-    
-    // === VALIDACIÓN COMPLETA DE TODOS LOS CAMPOS ===
-    function validarFormularioCompleto() {
-        console.log('🔍 Validando formulario completo...');
-        
-        let todoValido = true;
-        let primerCampoInvalido = null;
-        
-        // Validar las 5 preguntas (incluso si están ocultas)
-        for (let i = 1; i <= 5; i++) {
-            const campo = document.getElementById(`answer${i}`);
-            if (campo) {
-                const esValido = validarCampo(campo);
-                if (!esValido) {
-                    todoValido = false;
-                    if (!primerCampoInvalido) {
-                        primerCampoInvalido = campo;
-                    }
-                }
-            }
-        }
-        
-        // Validar campos de datos personales
-        const camposPersonales = ['firstName', 'lastName', 'email', 'whatsapp'];
-        camposPersonales.forEach(campoId => {
-            const campo = document.getElementById(campoId);
-            if (campo) {
-                const esValido = validarCampo(campo);
-                if (!esValido) {
-                    todoValido = false;
-                    if (!primerCampoInvalido) {
-                        primerCampoInvalido = campo;
-                    }
-                }
-            }
-        });
-        
-        if (primerCampoInvalido) {
-            // Determinar en qué pantalla está el error y mostrarla
-            const pantallaConError = determinarPantallaDelCampo(primerCampoInvalido);
-            mostrarPantalla(pantallaConError);
-            
-            setTimeout(() => {
-                primerCampoInvalido.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                primerCampoInvalido.focus();
-            }, 200);
-        }
-        
-        console.log(`🎯 Validación: ${todoValido ? 'EXITOSA' : 'FALLIDA'}`);
-        return todoValido;
-    }
-    
-    function determinarPantallaDelCampo(campo) {
-        const campoId = campo.id;
-        
-        if (campoId.includes('answer')) {
-            return 'questionScreens';
-        } else if (['firstName', 'lastName', 'email', 'whatsapp'].includes(campoId)) {
-            return 'dataScreen';
-        }
-        
-        return 'dataScreen';
-    }
-    
-    // === ENVÍO DE DATOS ===
-
-        async function enviarDatos() {
-    console.log('🚀 Iniciando proceso de envío corregido...');
-    
-    // VALIDACIÓN ESTRICTA
-    if (!validarFormularioCompleto()) {
-        console.log('🚫 Envío BLOQUEADO debido a errores de validación');
-        return false;
-    }
-    
-    // Mostrar pantalla de carga
-    mostrarPantalla('loadingScreen');
-    
-    // ESTRATEGIA DE RECOLECCIÓN ROBUSTA
-    console.log('📊 INICIANDO RECOLECCIÓN DE DATOS...');
-    const datos = {};
-    
-    // Estrategia 1: Recolección específica por IDs (principal)
-    console.log('🎯 Estrategia 1: Recolección por IDs específicos');
-    
-    // Recopilar respuestas de preguntas
-    for (let i = 1; i <= 5; i++) {
-        const campo = document.getElementById(`answer${i}`);
-        if (campo) {
-            const valor = campo.value ? campo.value.trim() : '';
-            if (valor) {
-                datos[`answer${i}`] = sanitizarTexto(valor);
-                console.log(`✅ answer${i} capturado: "${datos[`answer${i}`].substring(0, 30)}..."`);
-            } else {
-                console.log(`⚠️ answer${i} encontrado pero vacío`);
-            }
-        } else {
-            console.log(`❌ answer${i} NO encontrado en DOM`);
-        }
-    }
-    
-    // Recopilar datos personales
-    const camposPersonales = ['firstName', 'lastName', 'email', 'whatsapp'];
-    camposPersonales.forEach(campoId => {
-        const campo = document.getElementById(campoId);
-        if (campo) {
-            const valor = campo.value ? campo.value.trim() : '';
-            if (valor) {
-                datos[campoId] = sanitizarTexto(valor);
-                console.log(`✅ ${campoId} capturado: "${datos[campoId]}"`);
-            } else {
-                console.log(`⚠️ ${campoId} encontrado pero vacío`);
-            }
-        } else {
-            console.log(`❌ ${campoId} NO encontrado en DOM`);
-        }
-    });
-    
-    // Estrategia 2: Fallback - Buscar cualquier campo con datos
-    if (Object.keys(datos).length < 7) { // Esperamos al menos 5 respuestas + 2 datos personales mínimos
-        console.log('🔄 Estrategia 2: Fallback - buscando todos los campos con datos');
-        
-        const todosLosCampos = document.querySelectorAll('input, textarea');
-        todosLosCampos.forEach((campo, index) => {
-            const valor = campo.value ? campo.value.trim() : '';
-            if (valor) {
-                const clave = campo.id || campo.name || `campo_detectado_${index}`;
-                if (!datos[clave]) { // Solo agregar si no lo tenemos ya
-                    datos[clave] = sanitizarTexto(valor);
-                    console.log(`🔄 Fallback capturado - ${clave}: "${datos[clave].substring(0, 30)}..."`);
-                }
-            }
-        });
-    }
-    
-    // Estrategia 3: Verificación de datos críticos
-    console.log('🔍 VERIFICACIÓN FINAL DE DATOS:');
-    console.log('📤 Datos finales para envío:', datos);
-    console.log(`📊 Total de campos capturados: ${Object.keys(datos).length}`);
-    
-    // Validaciones de integridad
-    const respuestasCapturadas = Object.keys(datos).filter(key => key.startsWith('answer')).length;
-    const datosPersonalesCapturados = ['firstName', 'lastName', 'email', 'whatsapp'].filter(key => datos[key]).length;
-    
-    console.log(`📋 Respuestas capturadas: ${respuestasCapturadas}/5`);
-    console.log(`👤 Datos personales capturados: ${datosPersonalesCapturados}/4`);
-    
-    // Validar que tenemos datos suficientes
-    if (Object.keys(datos).length === 0) {
-        console.error('❌ NO SE CAPTURARON DATOS');
-        mostrarPantalla('dataScreen');
-        alert('No se pudieron capturar los datos del formulario. Por favor, recarga la página e inténtalo de nuevo.');
-        return false;
-    }
-    
-    if (respuestasCapturadas < 3) { // Al menos 3 respuestas para un diagnóstico mínimo
-        console.error(`❌ Datos insuficientes: solo ${respuestasCapturadas} respuestas capturadas`);
-        mostrarPantalla('dataScreen');
-        alert('Faltan respuestas por capturar. Por favor, asegúrate de completar todas las preguntas.');
-        return false;
-    }
-    
-    // Envío a MAKE con URL corregida
-    try {
-        console.log('🌐 Enviando petición a MAKE (webhook desarrollo - URL corregida)...');
-        
-        const response = await fetch('https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(datosFormulario)
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Llamar a la nueva función
-            procesarResultadosDiagnostico(data.resultado);
-            
-            // Mostrar pantalla de resultados (si tienes esta lógica)
-            // mostrarPantalla('results');
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            // Manejar error
-        });
-        
-        console.log(`📡 Respuesta recibida - Status: ${response.status}`);
-        
-        if (response.status >= 200 && response.status < 300) {
-            console.log('✅ Envío exitoso a MAKE');
-            
-            // Intentar leer la respuesta
-            try {
-                const resultado = await response.json();
-                console.log('📋 Respuesta JSON de MAKE:', resultado);
-            } catch (jsonError) {
-                console.log('📋 Respuesta procesada correctamente (sin JSON válido)');
-            }
-            
-            // Mostrar resultados después de delay
-            setTimeout(() => {
-                mostrarPantalla('resultsScreen');
-            }, 1500);
-            
-            return true;
-            
-        } else {
-            const errorText = await response.text();
-            console.error(`❌ Error ${response.status}: ${errorText}`);
-            throw new Error(`Error HTTP ${response.status}: ${errorText}`);
-        }
-        
-    } catch (error) {
-        console.error('❌ Error en envío:', error);
-        mostrarPantalla('dataScreen');
-        alert('Hubo un problema al enviar tu información. Por favor, inténtalo de nuevo.');
-        return false;
-    }
-}
-
-    
-    // === INTERCEPTACIÓN DE TUS FUNCIONES EXISTENTES ===
-    // Guardar referencias originales
-    const originalStartDiagnosis = window.startDiagnosis;
-    const originalNextQuestion = window.nextQuestion;
-    const originalShowDataCollection = window.showDataCollection;
-    const originalGenerateDiagnosis = window.generateDiagnosis;
-    
-    // Interceptar startDiagnosis
-    window.startDiagnosis = function() {
-        if (originalStartDiagnosis) originalStartDiagnosis();
-        // Usar la función original, no redefinir
-    };
-    
-    // === CONFIGURACIÓN DE EVENTOS ===
-    
-    // Validación en tiempo real
-    document.addEventListener('blur', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            validarCampo(e.target);
-        }
-    }, true);
-    
-    // Sanitización al pegar
-    document.addEventListener('paste', function(e) {
-        if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-            setTimeout(() => {
-                e.target.value = sanitizarTexto(e.target.value || '');
-                validarCampo(e.target);
-            }, 10);
-        }
-    });
-    
-    // Mostrar pantalla inicial
-    mostrarPantalla('introScreen');
-    
-    console.log('✅ Sistema integral configurado completamente');
-});
-
-// === FUNCIONES DE UTILIDAD PARA DEBUGGING ===
-function verificarCampos() {
-    console.log('🔍 VERIFICANDO TODOS LOS CAMPOS:');
-    
-    for (let i = 1; i <= 5; i++) {
-        const campo = document.getElementById(`answer${i}`);
-        if (campo) {
-            const valor = campo.value || '';
-            const longitud = valor.length;
-            console.log(`answer${i}: "${valor.substring(0, 30)}..." (${longitud} chars) ${longitud < 10 ? '❌ MUY CORTO' : '✅ OK'}`);
-        }
-    }
-    
-    ['firstName', 'lastName', 'email', 'whatsapp'].forEach(id => {
-        const campo = document.getElementById(id);
-        if (campo) {
-            console.log(`${id}: "${campo.value}" ${campo.value ? '✅' : '❌'}`);
-        }
-    });
-}
-
-function probarValidacionCompleta() {
-    console.log('🧪 PROBANDO VALIDACIÓN COMPLETA:');
-    const resultado = validarFormularioCompleto();
-    console.log(`Resultado: ${resultado ? '✅ VÁLIDO' : '❌ INVÁLIDO'}`);
-    return resultado;
-}
-
-function limpiarTodo() {
-    console.log('🧹 Limpiando validaciones...');
-    document.querySelectorAll('.campo-error, .campo-valido').forEach(campo => {
-        campo.classList.remove('campo-error', 'campo-valido');
-    });
-    document.querySelectorAll('.mensaje-error, .mensaje-exito').forEach(mensaje => {
-        mensaje.remove();
-    });
-    console.log('✅ Limpieza completa');
-}
-
-// ==== DEBBUG ====    
-// Función de debugging específica para el problema de MAKE
-async function debugearEnvioMAKE() {
-    console.log('🔍 DEBUGGING ESPECÍFICO PARA MAKE');
-    
-    // Recopilar datos exactamente como lo hace tu función principal
-    const datos = {};
-    
-    // Respuestas
-    for (let i = 1; i <= 5; i++) {
-        const campo = document.getElementById(`answer${i}`);
-        if (campo && campo.value) {
-            datos[`answer${i}`] = campo.value.trim();
-        }
-    }
-    
-    // Datos personales
-    ['firstName', 'lastName', 'email', 'whatsapp'].forEach(id => {
-        const campo = document.getElementById(id);
-        if (campo && campo.value) {
-            datos[id] = campo.value.trim();
-        }
-    });
-    
-    console.log('📊 DATOS PARA DEBUGGING:', datos);
-    console.log('📏 Número de campos:', Object.keys(datos).length);
-    
-    // Generar JSON y verificar
-    const jsonString = JSON.stringify(datos, null, 2);
-    console.log('📄 JSON GENERADO:');
-    console.log(jsonString);
-    console.log(`📐 Tamaño: ${jsonString.length} caracteres`);
-    
-    // Verificar caracteres problemáticos
-    const caracteresProblematicos = jsonString.match(/[^\x20-\x7E\u00A0-\u00FF\u0100-\u017F\u0180-\u024F]/g);
-    if (caracteresProblematicos) {
-        console.warn('⚠️ CARACTERES PROBLEMÁTICOS DETECTADOS:', caracteresProblematicos);
-    } else {
-        console.log('✅ No se detectaron caracteres problemáticos');
-    }
-    
-    // Prueba de envío con logging detallado
-    try {
-        console.log('🚀 ENVIANDO A MAKE...');
-        
-        const response = await fetch('https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json',
-                'User-Agent': 'NIA-Diagnostico/1.0'
-            },
-            body: jsonString
-        });
-        
-        console.log(`📡 STATUS RECIBIDO: ${response.status}`);
-        console.log(`📡 STATUS TEXT: ${response.statusText}`);
-        console.log('📡 HEADERS DE RESPUESTA:');
-        
-        response.headers.forEach((value, key) => {
-            console.log(`   ${key}: ${value}`);
-        });
-        
-        // Leer contenido de respuesta
-        const responseText = await response.text();
-        console.log('📄 CONTENIDO DE RESPUESTA:');
-        console.log(responseText);
-        
-        if (response.status >= 200 && response.status < 300) {
-            console.log('✅ ENVÍO EXITOSO');
-        } else {
-            console.error(`❌ ERROR ${response.status}: ${responseText}`);
-        }
-        
-    } catch (error) {
-        console.error('❌ ERROR DE RED:', error);
-        }
-    }
-
-// ===NUEVO DEBUGGEAR
-    function diagnosticarCapturaDatos() {
-    console.log('🔍 DIAGNÓSTICO COMPLETO DE CAPTURA DE DATOS');
-    
-    // Verificar campos de preguntas
-    console.log('📋 CAMPOS DE PREGUNTAS:');
-    for (let i = 1; i <= 5; i++) {
-        const campo = document.getElementById(`answer${i}`);
-        console.log(`answer${i}:`, {
-            existe: !!campo,
-            valor: campo ? `"${campo.value.substring(0, 30)}..."` : 'N/A',
-            longitud: campo ? campo.value.length : 0,
-            visible: campo ? campo.offsetParent !== null : false,
-            enDOM: !!campo
-        });
-    }
-    
-    // Verificar campos personales
-    console.log('👤 CAMPOS PERSONALES:');
-    ['firstName', 'lastName', 'email', 'whatsapp'].forEach(id => {
-        const campo = document.getElementById(id);
-        console.log(`${id}:`, {
-            existe: !!campo,
-            valor: campo ? `"${campo.value}"` : 'N/A',
-            longitud: campo ? campo.value.length : 0,
-            visible: campo ? campo.offsetParent !== null : false
-        });
-    });
-    
-    // Buscar TODOS los campos con datos
-    console.log('🔍 TODOS LOS CAMPOS CON DATOS:');
-    const todosLosCampos = document.querySelectorAll('input, textarea');
-    let camposConDatos = 0;
-    todosLosCampos.forEach((campo, index) => {
-        if (campo.value && campo.value.trim()) {
-            camposConDatos++;
-            console.log(`Campo ${index}:`, {
-                id: campo.id || 'sin-id',
-                name: campo.name || 'sin-name',
-                valor: `"${campo.value.substring(0, 40)}..."`,
-                tipo: campo.tagName,
-                visible: campo.offsetParent !== null
-            });
-        }
-    });
-    
-    console.log(`📊 RESUMEN: ${camposConDatos} campos con datos encontrados`);
-    }
-    
-    //PROBARDOR
-    //========¿?¿?¿?¿?¿?¿?
-    function probarDisplayResultados() {
-    // Simular datos de MAKE
-    const resultadoSimulado = {
-        foco_cliente: 3,
-        promesa_transformacion: 2,
-        autoridad_confianza: 4,
-        diferenciacion: 1,
-        oferta_valor: 5,
-        recomendacion: "¡Excelente! Tu mayor oportunidad está en la diferenciación. Te recomiendo definir claramente qué te hace único en el mercado y comunicarlo con fuerza. 🚀"
-    };
-    
-    // Simular userData
-    userData = { firstName: 'Carlos' };
-    
-    // Mostrar resultados
-    document.getElementById('loadingScreen').style.display = 'none';
-    (resultadoSimulado);
-    
-    console.log('✅ Prueba de display completada');
-    }
-
-    // SOLO PARA TESTING - Comentar en producción
-    function testearResultados() {
-        const datosEjemplo = {
-            foco_cliente: 3,
-            comentario_foco_cliente: "Tu mensaje identifica el segmento, pero puede profundizar más en el dolor específico.",
-            promesa_transformacion: 4,
-            comentario_promesa_transformacion: "La promesa es clara, pero considera ser más específico en resultados medibles.",
-            autoridad_confianza: 2,
-            comentario_autoridad_confianza: "Necesitas más evidencia social y casos de éxito que refuercen tu credibilidad.",
-            diferenciacion: 3,
-            comentario_diferenciacion: "Tu diferenciación es buena, pero puede ser más única y memorable.",
-            oferta_valor: 4,
-            comentario_oferta_valor: "La propuesta de valor es fuerte, pero optimízala para el ROI percibido.",
-            principales_brechas: "Tu narrativa tiene bases sólidas 💪, pero la autoridad y diferenciación son tus mayores GAPs. Sin ellas, pierdes clientes cada día.",
-            proximo_paso: "Crea 3 micro-historias de éxito. Para un plan a medida, agenda tu sesión 1:1 con Carlos 🚀"
-        };
-        
-        procesarResultadosDiagnostico(datosEjemplo);
-    }
-
-//Script Conflictivo
-    function encontrarScriptConflictivo() {
-    console.log('🔍 BUSCANDO SCRIPTS CONFLICTIVOS...');
-    
-    // Verificar si hay múltiples definiciones de nextQuestion
-    console.log('nextQuestion definido:', typeof window.nextQuestion);
-    console.log('nextQuestion código:', window.nextQuestion.toString().substring(0, 200) + '...');
-    
-    // Buscar todos los scripts en la página
-    const scripts = document.querySelectorAll('script');
-    console.log(`📜 Total scripts encontrados: ${scripts.length}`);
-    
-    scripts.forEach((script, index) => {
-        if (script.src) {
-            console.log(`${index + 1}. Script externo: ${script.src}`);
-        } else if (script.textContent.includes('nextQuestion') || script.textContent.includes('answer1')) {
-            console.log(`${index + 1}. Script interno con nextQuestion/answer1:`, script.textContent.substring(0, 100) + '...');
-        }
-    });
-    
-    // Verificar event listeners en botones
-    const buttons = document.querySelectorAll('button');
-    buttons.forEach((button, index) => {
-        if (button.onclick) {
-            console.log(`🔘 Botón ${index + 1} onclick:`, button.onclick.toString());
-        }
-    });
-}
-
-    
-// ========= DEBUG DIAGNOSTICO =======
-function diagnosticoCompleto() {
-    console.log('🔍 DIAGNÓSTICO COMPLETO DE VISUALIZACIÓN:');
-    
-    // Verificar contenedor principal
-    const questionScreens = document.getElementById('questionScreens');
-    console.log('📋 CONTENEDOR PRINCIPAL:');
-    console.log('questionScreens existe:', !!questionScreens);
-    if (questionScreens) {
-        console.log('questionScreens display:', questionScreens.style.display);
-        console.log('questionScreens children:', questionScreens.children.length);
-        console.log('questionScreens visible:', questionScreens.offsetParent !== null);
-    }
-    
-    // Verificar cada pregunta individual
-    console.log('📋 PREGUNTAS INDIVIDUALES:');
-    for (let i = 1; i <= 5; i++) {
-        const question = document.getElementById(`question${i}Screen`);
-        console.log(`question${i}Screen:`, {
-            existe: !!question,
-            display: question ? question.style.display : 'N/A',
-            visible: question ? question.offsetParent !== null : false,
-            altura: question ? question.offsetHeight : 0,
-            ancho: question ? question.offsetWidth : 0,
-            contenidoLength: question ? question.innerHTML.length : 0,
-            contenidoPreview: question ? question.innerHTML.substring(0, 100) + '...' : 'N/A'
-        });
-        
-        // Verificar estilos computados para la pregunta 2
-        if (i === 2 && question) {
-            const styles = window.getComputedStyle(question);
-            console.log('🎨 ESTILOS COMPUTADOS question2Screen:', {
-                display: styles.display,
-                visibility: styles.visibility,
-                opacity: styles.opacity,
-                height: styles.height,
-                width: styles.width,
-                position: styles.position,
-                zIndex: styles.zIndex,
-                overflow: styles.overflow
-            });
-        }
-    }
-    
-    // Verificar si hay contenido dentro de question2Screen
-    const q2 = document.getElementById('question2Screen');
-    if (q2) {
-        console.log('📋 CONTENIDO DE QUESTION2SCREEN:');
-        console.log('HTML completo:', q2.innerHTML);
-        console.log('Elementos hijos:', q2.children.length);
-        for (let child of q2.children) {
-            console.log('Hijo:', child.tagName, child.className, child.id);
-        }
-    }
-}
-
-diagnosticoCompleto();
-
-
-
-
-    // Función para configurar navegación segura
-    function configurarNavegacionSegura() {
-        console.log('🔧 Configurando navegación segura...');
-        
-        // Remover todos los onclick existentes y agregar event listeners
-        for (let i = 1; i <= 5; i++) {
-            const questionDiv = document.getElementById(`question${i}Screen`);
-            if (questionDiv) {
-                const button = questionDiv.querySelector('button[onclick*="nextQuestion"]');
-                if (button) {
-                    // Remover onclick existente
-                    button.removeAttribute('onclick');
-                    
-                    // Agregar event listener seguro
-                    button.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        nextQuestionSegura(i);
-                    });
-                    
-                    console.log(`✅ Configurado botón seguro para pregunta ${i}`);
-                }
-            }
-        }
-    }
-    
-    // Ejecutar cuando se carga la página
-    document.addEventListener('DOMContentLoaded', configurarNavegacionSegura);
-
 </script>
-
-            <div id="errorModal" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-60 z-50 hidden">
-                <div class="glass-effect p-6 rounded-2xl max-w-md text-center">
-                    <img src="img/nia.png" 
-                        alt="NIA Avatar" class="w-20 h-20 mx-auto mb-4 rounded-full border-2 border-green-400">
-                    <h2 class="text-xl font-bold text-white mb-2">Ups... algo no está bien</h2>
-                    <p id="errorModalMessage" class="text-gray-300 mb-4"></p>
-                    <button onclick="closeErrorModal()" class="btn-primary px-6 py-2">
-                        Entendido
-                    </button>
-                </div>
-            </div>
 
 </body>
 </html>
