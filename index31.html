@@ -785,10 +785,11 @@ textarea {
         box-shadow: 0 0 25px rgba(79, 220, 154, 0.5);
     }
 }
-        
+
 /* =============================================
-   MEDIA QUERIES UNIFICADOS - SIN SOLAPAMIENTOS
+   MEDIA QUERIES UNIFICADOS - CORREGIDOS
    ============================================= */
+
 /* Desktop (1024px+) - Control del contenedor principal */
 @media (min-width: 1024px) {
     /* CLAVE: Controlar el contenedor padre para contenido general */
@@ -847,11 +848,12 @@ textarea {
         width: 100%;
     }
     
-/* INDICADORES DESKTOP Nuevo dimension score*/
+    /* INDICADORES DESKTOP - ALINEACIÓN PERFECTA */
     .dimension-score-badge {
         position: absolute;
-        top: 15px;
-        right: 15px;
+        top: 50%;
+        right: 18px;
+        transform: translateY(-50%); /* Centrado vertical matemáticamente perfecto */
         z-index: 10;
     }
     
@@ -863,22 +865,33 @@ textarea {
         min-width: 45px;
         height: 32px;
         font-size: 13px;
-    }
-    
-    .dimension-icon {
-        display: flex; /* Mostrar ícono en desktop */
+        border-radius: 16px;
     }
     
     .dimension-header {
         display: flex;
-        align-items: center;
+        align-items: center; /* Alineación horizontal perfecta */
         gap: 12px;
         margin-bottom: 16px;
+        position: relative; /* Para posicionamiento del badge */
     }
     
+    .dimension-header h3 {
+        line-height: 1.3;
+        margin: 0;
+        font-weight: 600;
+        flex: 1;
+    }
+    
+    .dimension-icon {
+        display: flex; /* Mostrar ícono en desktop */
+        align-items: center;
+    }
+    
+    .dimension-comment {
+        text-align: left;
+    }
 }
-
-
 
 /* Desktop Mediano (1200px+) */
 @media (min-width: 1200px) {
@@ -961,43 +974,54 @@ textarea {
         padding-left: 0;
     }
     
-/* INDICADORES TABLET */
+    /* INDICADORES TABLET - COMPORTAMIENTO COMO DESKTOP */
     .dimension-score-badge {
-        position: static;
-        display: flex;
-        justify-content: center;
-        margin: 8px 0 12px 0;
+        position: absolute;
+        top: 50%;
+        right: 18px;
+        transform: translateY(-50%);
+        z-index: 10;
     }
     
     .dimension-metric-card {
-        padding: 20px;
-        text-align: center;
+        padding: 20px 60px 20px 20px; /* Espacio para badge */
     }
     
     .dimension-header {
         display: flex;
-        flex-direction: column;
         align-items: center;
-        gap: 8px;
-        margin-bottom: 8px;
+        gap: 10px;
+        margin-bottom: 16px;
+        position: relative;
+        text-align: left;
     }
     
     .dimension-score-indicator {
-        min-width: 50px;
-        height: 34px;
-        font-size: 14px;
+        min-width: 45px;
+        height: 32px;
+        font-size: 13px;
+        border-radius: 16px;
+    }
+    
+    .dimension-header h3 {
+        font-size: 16px;
+        margin: 0;
+        font-weight: 600;
+        flex: 1;
     }
     
     .dimension-icon {
-        display: flex; /* Mostrar ícono en tablet */
+        display: flex; /* Mantener ícono visible en tablet */
+        align-items: center;
     }
     
+    .dimension-comment {
+        text-align: left;
+    }
 }
 
 /* Móvil (768px y menos) */
 @media (max-width: 768px) {
-    
-    
     .flex-1.flex.items-center.justify-center {
         align-items: flex-start !important;
         padding: 10px;
@@ -1056,7 +1080,7 @@ textarea {
         display: none;
     }
 
-     /* INDICADORES MÓVIL */
+    /* INDICADORES MÓVIL - TÍTULO Y BADGE EN LÍNEA HORIZONTAL */
     .dimension-score-badge {
         position: static;
         margin: 0;
@@ -1066,8 +1090,10 @@ textarea {
     .dimension-header {
         display: flex;
         align-items: center;
-        gap: 12px;
+        justify-content: space-between; /* Título izquierda, badge derecha */
+        gap: 8px;
         margin-bottom: 12px;
+        width: 100%;
     }
     
     .dimension-metric-card {
@@ -1075,18 +1101,20 @@ textarea {
     }
     
     .dimension-score-indicator {
-        min-width: 35px;
-        height: 26px;
-        font-size: 11px;
-        border-radius: 13px;
+        min-width: 32px;
+        height: 24px;
+        font-size: 10px;
+        border-radius: 12px;
+        flex-shrink: 0;
     }
     
     .score-number {
-        font-size: 14px;
+        font-size: 13px;
+        font-weight: 800;
     }
     
     .score-total {
-        font-size: 9px;
+        font-size: 8px;
     }
     
     /* OCULTAR ícono en móvil (reemplazado por badge) */
@@ -1094,15 +1122,51 @@ textarea {
         display: none;
     }
     
-    /* Título ocupa todo el espacio disponible */
+    /* Título optimizado para línea horizontal */
     .dimension-header h3 {
-        font-size: 16px;
-        line-height: 1.3;
+        font-size: 15px; /* Ajustado para que quepa en línea */
+        line-height: 1.2;
         margin: 0;
         flex: 1;
         text-align: left;
+        font-weight: 600;
+    }
+    
+    /* Comentario alineado a la izquierda */
+    .dimension-comment {
+        text-align: left !important;
+        font-size: 13px;
+        line-height: 1.4;
+        margin-top: 8px;
     }
 }
+
+/* Móvil Pequeño (480px y menos) */
+@media (max-width: 480px) {
+    .dimension-header h3 {
+        font-size: 14px; /* Más compacto para pantallas pequeñas */
+        line-height: 1.15;
+    }
+    
+    .dimension-score-indicator {
+        min-width: 30px;
+        height: 22px;
+        font-size: 9px;
+    }
+    
+    .score-number {
+        font-size: 12px;
+    }
+    
+    .score-total {
+        font-size: 7px;
+    }
+    
+    .dimension-comment {
+        font-size: 12px;
+    }
+}
+
 
     </style>
 </head>
