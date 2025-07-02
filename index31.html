@@ -1606,9 +1606,29 @@ textarea {
 <script>
     // --- CONFIGURACIÓN PREGUNTAS + RESULTADO ----
     const webhookUrl = 'https://hook.us1.make.com/7ie5wtd8j1jl6igebhgl3si4g8unanuc'; // Tu webhook actual
+
+    // === FUNCIONES PARA MODAL DE ERROR PERSONALIZADO ===
+    function showErrorModal(message) {
+        const modal = document.getElementById('errorModal');
+        const msgElement = document.getElementById('errorModalMessage');
+        if (msgElement) {
+            msgElement.textContent = message;
+        }
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+        console.error(`🚨 Error Modal: ${message}`);
+    }
+    
+    function closeErrorModal() {
+        const modal = document.getElementById('errorModal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
     
     // --- FUNCIONES AUXILIARES (DEFINIDAS PRIMERO) ---
-    
     // Función para actualizar la barra de progreso visual
    function updateProgressBar(screenId) {
     const progressSteps = {
@@ -1813,7 +1833,7 @@ textarea {
         mostrarPantalla('question1Screen');
     }
     
-  // Función blindada contra conflictos externos para navegar entre preguntas
+    // Función blindada contra conflictos externos para navegar entre preguntas
     function nextQuestionSegura(currentQuestionNumber) {
         const timestamp = Date.now();
         console.log(`🔒 [${timestamp}] VALIDACIÓN SEGURA - Pregunta ${currentQuestionNumber}`);
@@ -1821,45 +1841,37 @@ textarea {
         const currentAnswerId = `answer${currentQuestionNumber}`;
         const currentAnswer = document.getElementById(currentAnswerId);
         
-        // Logging detallado para debugging
-        console.log(`🔍 [${timestamp}] Elemento: ${currentAnswerId}`, currentAnswer);
-        
         if (!currentAnswer) {
             console.error(`❌ [${timestamp}] Elemento ${currentAnswerId} no encontrado`);
-            alert(`Error técnico: No se encuentra la pregunta ${currentQuestionNumber}`);
+            showErrorModal(`Error técnico: No se encuentra la pregunta ${currentQuestionNumber}. Por favor, recarga la página.`);
             return false;
         }
         
-        const valorRaw = currentAnswer.value;
-        const valorLimpio = valorRaw.trim();
+        // Usar la función de validación integral existente
+        const isValid = validarCampo(currentAnswer);
         
-        console.log(`📝 [${timestamp}] Valor RAW: "${valorRaw}"`);
-        console.log(`📝 [${timestamp}] Valor LIMPIO: "${valorLimpio}"`);
-        console.log(`📝 [${timestamp}] Es válido: ${valorLimpio.length > 0}`);
-        
-        if (!valorLimpio || valorLimpio.length === 0) {
-            console.warn(`⚠️ [${timestamp}] Validación fallida para pregunta ${currentQuestionNumber}`);
-            alert(`Por favor, responde la pregunta ${currentQuestionNumber} antes de continuar.`);
+        if (!isValid) {
+            console.warn(`⚠️ [${timestamp}] Validación fallida para pregunta ${currentQuestionNumber}. Feedback visual mostrado.`);
+            currentAnswer.focus();
             return false;
         }
         
         console.log(`✅ [${timestamp}] Validación exitosa para pregunta ${currentQuestionNumber}`);
         
-        // Prevenir ejecuciones múltiples
         const nextQuestionNumber = currentQuestionNumber + 1;
         
-        // Usar setTimeout para evitar conflictos de timing
         setTimeout(() => {
             if (nextQuestionNumber <= 5) {
                 mostrarPantalla(`question${nextQuestionNumber}Screen`);
             } else {
                 mostrarPantalla('dataScreen');
             }
-            console.log(`🎯 [${timestamp}] Navegación completada a ${nextQuestionNumber <= 5 ? `question${nextQuestionNumber}` : 'dataScreen'}`);
+            console.log(`🎯 [${timestamp}] Navegación completada`);
         }, 50);
         
         return true;
     }
+
     
     // Sobrescribir la función original para evitar conflictos
     window.nextQuestion = nextQuestionSegura;
@@ -1868,12 +1880,24 @@ textarea {
     // Función para mostrar recolección de datos
     function showDataCollection() {
         const answer5 = document.getElementById('answer5');
-        if (!answer5 || !answer5.value.trim()) {
-            alert('Por favor, completa tu narrativa comercial actual.');
+        if (!answer5) {
+            console.error('Elemento answer5 no encontrado.');
+            showErrorModal('Error interno: No se encuentra el campo de la última pregunta. Por favor, recarga la página.');
             return;
         }
+        
+        // Usar la función de validación integral
+        const isValid = validarCampo(answer5);
+        
+        if (!isValid) {
+            console.warn('🚫 La última pregunta no es válida. Bloqueando avance a datos.');
+            answer5.focus();
+            return;
+        }
+        
         mostrarPantalla('dataScreen');
     }
+
     
     // Función principal para generar diagnóstico
     async function generateDiagnosis() {
@@ -1886,7 +1910,7 @@ textarea {
         for (let i = 1; i <= 5; i++) {
             const answer = document.getElementById(`answer${i}`);
             if (!answer || !answer.value.trim()) {
-                alert(`Por favor, completa la pregunta ${i}.`);
+                showErrorModal(`Por favor, completa la pregunta ${i}.`);
                 allAnswersComplete = false;
                 break;
             }
@@ -1903,7 +1927,7 @@ textarea {
         for (const field of requiredFields) {
             const element = document.getElementById(field);
             if (!element || !element.value.trim()) {
-                alert(`Por favor, completa el campo: ${field}`);
+                showErrorModal(`Por favor, completa el campo: ${field}.`);
                 return;
             }
             personalData[field] = element.value.trim();
@@ -2667,45 +2691,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (originalStartDiagnosis) originalStartDiagnosis();
         // Usar la función original, no redefinir
     };
-    
-    // Interceptar nextQuestion con validación
-    window.nextQuestion = function(numeroPregunta) {
-        // Validar la pregunta actual antes de avanzar
-        const preguntaActual = numeroPregunta - 1;
-        if (preguntaActual >= 1 && preguntaActual <= 5) {
-            if (!validarPreguntaActual(preguntaActual)) {
-                console.log(`🚫 Pregunta ${preguntaActual} inválida - bloqueando avance`);
-                return false;
-            }
-        }
-        
-        // Si es válido, continuar con la función original
-        if (originalNextQuestion) {
-            originalNextQuestion(numeroPregunta);
-        }
-    };
-    
-    // Interceptar showDataCollection
-    window.showDataCollection = function() {
-        // Validar la última pregunta antes de mostrar datos
-        if (!validarPreguntaActual(5)) {
-            console.log('🚫 Pregunta 5 inválida - bloqueando avance a datos');
-            return false;
-        }
-        
-        if (originalShowDataCollection) originalShowDataCollection();
-        mostrarPantalla('dataScreen');
-    };
-    
-// Interceptar generateDiagnosis - DESACTIVADO para usar función original optimizada
-// window.generateDiagnosis = async function(event) {
-//     if (event) {
-//         event.preventDefault();
-//         event.stopPropagation();
-//     }
-//     
-//     await enviarDatos();
-// };
     
     // === CONFIGURACIÓN DE EVENTOS ===
     
