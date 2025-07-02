@@ -787,7 +787,7 @@ textarea {
 }
 
 /* =============================================
-   MEDIA QUERIES UNIFICADOS - CORREGIDOS
+   MEDIA QUERIES UNIFICADOS - CORREGIDOS DEFINITIVAMENTE
    ============================================= */
 
 /* Desktop (1024px+) - Control del contenedor principal */
@@ -848,32 +848,34 @@ textarea {
         width: 100%;
     }
     
-    /* INDICADORES DESKTOP - ALINEACIÓN PERFECTA */
+    /* INDICADORES DESKTOP - ALINEACIÓN PERFECTA CON HEADER */
+    .dimension-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 16px;
+        position: relative; /* CLAVE: Contexto de posicionamiento para el badge */
+        padding-right: 60px; /* Espacio para el badge */
+    }
+    
     .dimension-score-badge {
         position: absolute;
         top: 50%;
-        right: 18px;
-        transform: translateY(-50%); /* Centrado vertical matemáticamente perfecto */
+        right: 0; /* Alineado al borde derecho del header */
+        transform: translateY(-50%); /* Centrado vertical perfecto */
         z-index: 10;
     }
     
     .dimension-metric-card {
-        padding: 20px 60px 20px 20px; /* Espacio para badge */
+        padding: 20px; /* Padding uniforme, sin espacio extra */
+        position: relative;
     }
     
     .dimension-score-indicator {
         min-width: 45px;
-        height: 32px;
+        height: 30px;
         font-size: 13px;
-        border-radius: 16px;
-    }
-    
-    .dimension-header {
-        display: flex;
-        align-items: center; /* Alineación horizontal perfecta */
-        gap: 12px;
-        margin-bottom: 16px;
-        position: relative; /* Para posicionamiento del badge */
+        border-radius: 15px;
     }
     
     .dimension-header h3 {
@@ -884,8 +886,9 @@ textarea {
     }
     
     .dimension-icon {
-        display: flex; /* Mostrar ícono en desktop */
+        display: flex;
         align-items: center;
+        flex-shrink: 0;
     }
     
     .dimension-comment {
@@ -974,19 +977,7 @@ textarea {
         padding-left: 0;
     }
     
-    /* INDICADORES TABLET - COMPORTAMIENTO COMO DESKTOP */
-    .dimension-score-badge {
-        position: absolute;
-        top: 50%;
-        right: 18px;
-        transform: translateY(-50%);
-        z-index: 10;
-    }
-    
-    .dimension-metric-card {
-        padding: 20px 60px 20px 20px; /* Espacio para badge */
-    }
-    
+    /* INDICADORES TABLET - MISMO COMPORTAMIENTO QUE DESKTOP */
     .dimension-header {
         display: flex;
         align-items: center;
@@ -994,13 +985,27 @@ textarea {
         margin-bottom: 16px;
         position: relative;
         text-align: left;
+        padding-right: 60px; /* Espacio para el badge */
+    }
+    
+    .dimension-score-badge {
+        position: absolute;
+        top: 50%;
+        right: 0; /* Alineado al borde derecho del header */
+        transform: translateY(-50%);
+        z-index: 10;
+    }
+    
+    .dimension-metric-card {
+        padding: 20px;
+        position: relative;
     }
     
     .dimension-score-indicator {
         min-width: 45px;
-        height: 32px;
+        height: 30px;
         font-size: 13px;
-        border-radius: 16px;
+        border-radius: 15px;
     }
     
     .dimension-header h3 {
@@ -1011,8 +1016,9 @@ textarea {
     }
     
     .dimension-icon {
-        display: flex; /* Mantener ícono visible en tablet */
+        display: flex;
         align-items: center;
+        flex-shrink: 0;
     }
     
     .dimension-comment {
@@ -1081,23 +1087,25 @@ textarea {
     }
 
     /* INDICADORES MÓVIL - TÍTULO Y BADGE EN LÍNEA HORIZONTAL */
-    .dimension-score-badge {
-        position: static;
-        margin: 0;
-        flex-shrink: 0;
-    }
-    
     .dimension-header {
         display: flex;
         align-items: center;
-        justify-content: space-between; /* Título izquierda, badge derecha */
         gap: 8px;
         margin-bottom: 12px;
         width: 100%;
+        padding-right: 0; /* Sin padding extra */
+        position: relative;
+    }
+    
+    .dimension-score-badge {
+        position: static; /* Vuelve al flujo normal */
+        margin-left: auto; /* CLAVE: Empuja el badge a la derecha */
+        flex-shrink: 0;
     }
     
     .dimension-metric-card {
         padding: 15px;
+        position: relative;
     }
     
     .dimension-score-indicator {
@@ -1117,17 +1125,17 @@ textarea {
         font-size: 8px;
     }
     
-    /* OCULTAR ícono en móvil (reemplazado por badge) */
+    /* OCULTAR ícono en móvil */
     .dimension-icon {
         display: none;
     }
     
     /* Título optimizado para línea horizontal */
     .dimension-header h3 {
-        font-size: 15px; /* Ajustado para que quepa en línea */
+        font-size: 15px;
         line-height: 1.2;
         margin: 0;
-        flex: 1;
+        flex: 1; /* Permite que el título crezca */
         text-align: left;
         font-weight: 600;
     }
@@ -1144,7 +1152,7 @@ textarea {
 /* Móvil Pequeño (480px y menos) */
 @media (max-width: 480px) {
     .dimension-header h3 {
-        font-size: 14px; /* Más compacto para pantallas pequeñas */
+        font-size: 14px;
         line-height: 1.15;
     }
     
@@ -1166,6 +1174,7 @@ textarea {
         font-size: 12px;
     }
 }
+
 
 
     </style>
